@@ -1,0 +1,179 @@
+<body>
+<style type="text/css">
+body {
+	margin: 0;
+	padding: 0;
+	background: #f2f2f2;
+}
+
+.center {
+	position: absolute;
+	top: 256px;
+	bottom: 256px;
+	left: 256px;
+	right: 256px;
+	min-width: 1024px;
+	min-height: 256px;
+	display: flex;
+}
+
+#input,
+#output {
+	padding: 8px;
+	border: none;
+	border-radius: 2px;
+	background: #ffffff;
+	box-shadow: 0 0 0 1px #e5e5e5;
+	flex: 1;
+	resize: none;
+	outline: 0
+}
+
+#input:focus,
+#output:focus {
+	box-shadow: 0 0 0 1px #ffbf00;
+}
+
+#input {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+#output {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+</style>
+
+<div class="center">
+	<textarea id="input" oninput="live_translit();"></textarea>
+	<textarea id="output" oninput="live_translit(true);" spellcheck="false"></textarea>
+</div>
+
+<script>
+Object.prototype.byValue = function(value) {
+    for(var prop in this) {
+        if(this.hasOwnProperty(prop)) {
+             if(this[prop] === value)
+                return prop;
+        }
+    }
+}
+
+function translit(str, val) {
+	/*
+	А БВГД Е ЖЗ И ЙКЛМН О ПРСТ У ФХЦЧШЩЪ Ы Ь ЭЮЯ - Оригинал
+	А Е И О У Ы ЭЮЯ
+	БВГД ЖЗ ЙКЛМН ПРСТ ФХЦЧШЩЪ Ь
+
+	А БВГД Ы ЖЗ Е ЙКЛМН Я ПРСТ И ФХЦЧШЩЪ У Ь ОЭЮ - Перемешанные гласные
+	А Ы Е Я И У ОЭЮ
+	БВГД ЖЗ ЙКЛМН ПРСТ ФХЦЧШЩЪ Ь
+
+	А ЧБЦП Е ЪЙ И ДРЩЖТ О ХГНС У КФЬЗМВЛ Ы Ш ЭЮЯ - Перемешанные согласные
+	А Е И О У Ы ЭЮЯ
+	ЧБЦП ЪЙ ДРЩЖТ ХГНС КФЬЗМВЛ Ш
+
+	АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ - Оригинал
+	АБВГДЫЖЗЕЙКЛМНЯПРСТИФХЦЧШЩЪУЬОЭЮ - Перемешанные гласные
+	АЧБЦПЕЪЙИДРЩЖТОХГНСУКФЬЗМВЛЫШЭЮЯ - Перемешанные согласные
+	ӘБВҐДЫЖЗЄЙКЛМНЯПРСТИФХЦЧШЩЪЎЬОЭЮ - Перемешанные гласные, замененные
+	*/
+	var c = { // Перемешанные гласные, замененные
+		'а':'ә',
+		'б':'б',
+		'в':'в',
+		'г':'ґ',
+		'д':'д',
+		'е':'ы',
+		'ё':'ы',
+		'ж':'ж',
+		'з':'з',
+		'и':'є',
+		'й':'й',
+		'к':'к',
+		'л':'л',
+		'м':'м',
+		'н':'н',
+		'о':'я',
+		'п':'п',
+		'р':'р',
+		'с':'с',
+		'т':'т',
+		'у':'и',
+		'ф':'ф',
+		'х':'х',
+		'ц':'ц',
+		'ч':'ч',
+		'ш':'ш',
+		'щ':'щ',
+		'ъ':'ъ',
+		'ы':'ў',
+		'ь':'ь',
+		'э':'о',
+		'ю':'э',
+		'я':'ю',
+
+		'А':'Ә',
+		'Б':'Б',
+		'В':'В',
+		'Г':'Ґ',
+		'Д':'Д',
+		'Е':'Ы',
+		'Ё':'Ы',
+		'Ж':'Ж',
+		'З':'З',
+		'И':'Є',
+		'Й':'Й',
+		'К':'К',
+		'Л':'Л',
+		'М':'М',
+		'Н':'Н',
+		'О':'Я',
+		'П':'П',
+		'Р':'Р',
+		'С':'С',
+		'Т':'Т',
+		'У':'И',
+		'Ф':'Ф',
+		'Х':'Х',
+		'Ц':'Ц',
+		'Ч':'Ч',
+		'Ш':'Ш',
+		'Щ':'Щ',
+		'Ъ':'Ъ',
+		'Ы':'Ў',
+		'Ь':'Ь',
+		'Э':'О',
+		'Ю':'Э',
+		'Я':'Ю'
+	}
+
+	var newStr = new String();
+	for(var i = 0; i < str.length; i++) {
+		ch = str.charAt(i);
+
+		if(val != true) {
+			newStr += ch in c ? c[ch] : ch;
+		} else {
+			newStr += Object.values(c).indexOf(ch) > -1 ? c.byValue(ch) : ch;
+		}
+	}
+	return newStr;
+}
+
+function live_translit(a) {
+	if(a != true) {
+		var input = document.getElementById('input').value,
+			output = translit(input);
+
+		document.getElementById('output').value = output;
+	} else {
+		var output = document.getElementById('output').value,
+			input = translit(output, true);
+
+		document.getElementById('input').value = input;
+	}
+}
+</script>
+</body>
