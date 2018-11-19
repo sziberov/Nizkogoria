@@ -6,7 +6,7 @@
 ## Язык
 ![Алфавит](https://raw.githubusercontent.com/sziberov/Nizkogoria/master/Alphabet.png)
 
-Русский, с другим алфавитом. Слова произносятся так, как написаны.
+Русский, с другим алфавитом. Слова произносятся аналогично.
 
 Транслиттер - https://sziberov.github.io/Nizkogoria/Translit.html
 ### Официально внесенные разговорные слова
