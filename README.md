@@ -14,7 +14,7 @@
 ## Язык
 ![Алфавит](https://raw.githubusercontent.com/sziberov/Nizkogoria/master/Alphabet.png)
 
-Русский, с другим алфавитом и переставленными буквами.
+Русский, с другим алфавитом и переставленными гласными буквами.
 
 [Транслиттер](https://sziberov.github.io/Nizkogoria/Translit.html)
 
