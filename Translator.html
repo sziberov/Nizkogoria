@@ -1,0 +1,327 @@
+<html>
+<head>
+	<title></title>
+
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+
+			outline: none;
+
+			--color-black: #000000;
+			--color-black-0625: rgba(0,0,0,0.0625);
+			--color-black-25: rgba(0,0,0,0.25);
+			--color-gray: #808080;
+			--color-white: #ffffff;
+			--color-orange: #ffbf00;
+			--color-purple: #800080;
+		}
+
+		body,
+		button,
+		select,
+		input,
+		textarea {
+			color: var(--color-black);
+			
+			font: 12px Arial;
+			line-height: 16px;
+		}
+
+		ul {
+			list-style: none;
+		}
+
+		button:not(:disabled):hover {
+			cursor: pointer;
+		}
+
+		::selection {
+			background: var(--color-orange);
+
+			color: var(--color-white);
+		}
+
+		[content] {
+			display: flex;
+
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+
+			background: var(--color-black-0625);
+		}
+
+		[content-] {
+			display: flex;
+		}
+
+		[content-~="h"] {
+			flex-direction: row;
+		}
+
+		[content-~="h"]:not([content-~="stack"]) > *:not(:first-child) {
+			margin-left: 32px;
+		}
+
+		[content-~="v"] {
+			flex-direction: column;
+		}
+
+		[content-~="v"]:not([content-~="stack"]) > *:not(:first-child) {
+			margin-top: 32px;
+		}
+
+		[content-~="pad"] {
+			padding: 32px;
+		}
+
+		[content-~="space"] {
+			justify-content: space-between;
+		}
+
+		ul[content-tabs] {
+			display: flex;
+		}
+
+		ul[content-tabs] li {
+			position: relative;
+
+			transition: color 250ms ease;
+			cursor: pointer;
+		}
+
+		ul[content-tabs] li:not(:first-child) {
+			margin-left: 16px;
+		}
+
+		ul[content-tabs] li:after {
+			content: '';
+
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: -16px;
+
+			height: 2px;
+
+			background: var(--color-gray);
+
+			transition: background 250ms ease, transform 250ms ease;
+			transform: scaleX(0);
+		}
+
+		ul[content-tabs] li:hover {
+			color: var(--color-gray);
+		}
+
+		ul[content-tabs] li:hover:after {
+			transform: scaleX(0.5);
+		}
+
+		ul[content-tabs] li:not([data-tab-ref]):hover:after {
+			transform: scaleX(0);
+		}
+
+		ul[content-tabs] li[current] {
+			color: var(--color-orange);
+
+			cursor: default;
+		}
+
+		ul[content-tabs] li[current]:after {
+			background: var(--color-orange);
+
+			transform: scaleX(1);
+		}
+
+		textarea {
+			flex: 1;
+
+			min-height: 256px;
+
+			padding: 16px;
+
+			border: none;
+			border-radius: 2px;
+			box-shadow: 0 8px 16px 8px var(--color-black-25);
+		}
+
+		textarea[readonly] {
+			flex: 1;
+
+			background: var(--color-black-0625);
+
+			box-shadow: none;
+		}
+
+		button {
+			padding: 8px;
+
+			min-width: 32px;
+
+			background: var(--color-orange);
+			border: none;
+			border-radius: 2px;
+
+			color: var(--color-white);
+
+			transition: 250ms ease opacity;
+		}
+
+		button:hover {
+			opacity: 0.5;
+		}
+	</style>
+	<script>
+		class Translator {
+			static go() {
+				/*
+				АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ - Оригинал
+				АБВҐДЫЖЗЄЙКЛМНОПРСТИФХЦЧШЩЪЎЬЯЭЮ - Перемешанные гласные, замененные
+
+				АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ - Оригинал
+				АБВҐДЄЄЖЗИЙКЛМНОПРСТЎФХЦЧШЩЪЭЬЯЁЮ - Перемешанные гласные, замененные
+				*/
+
+				var a = document.querySelector('textarea[data-ref="in"]').value,
+					b = document.querySelector('textarea[data-ref="out"]'),
+					c = {
+						'г':	'ґ',
+						'е':	'є',
+						'ё':	'є',
+						'и':	'и',
+						'у':	'ў',
+						'ы':	'э',
+						'э':	'я',
+						'ю':	'ё',
+						'я':	'ю'
+					},
+					d = { // В начале слова
+						'об':	'аб',
+						'бєс':	'бєз',
+						'нєдо':	'нєда',
+						'од':	'ад',
+						'от':	'ат',
+						'под':	'пад',
+						'про':	'пра',
+						'рас':	'раз',
+						'рос':	'рас',
+						'роз':	'раз'
+					},
+					e = { // Везде
+						'асси':	'ассє',
+						'дока':	'дака',
+						'изко':	'єзка',
+						'ишко':	'єшка',
+						'моло':	'мала',
+						'оґро':	'аґро',
+						'одно':	'адно',
+						'омм':	'амм',
+						'она':	'ана',
+						'опр':	'апр',
+						'ора':	'ара',
+						'орош':	'арош',
+						'особ':	'асоб',
+						'раст':	'рост',
+						'тсю':	'ццў',
+						'тьсю':	'ццў',
+						'жи':	'жы',
+						'жь':	'ж',
+						'зд':	'зз',
+						'ли':	'лє',
+						'ци':	'цы',
+						'ши':	'шы',
+						'шь':	'ш',
+						'чє':	'щє',
+						'чк':	'шк',
+						'чн':	'шн',
+						'чт':	'ш'
+					},
+					f = { // В конце слова
+						'дно':	'дна',
+						'жно':	'жна',
+						'зно':	'зна',
+						'льно':	'льна',
+						'рно':	'рна',
+						'сно':	'сна',
+						'сто':	'ста',
+						'тно':	'тна',
+						'нно':	'нна',
+						'шно':	'шна',
+						'щно':	'щна'
+					},
+					g = '';
+
+				for(let i = 0; i < a.length; i++) {
+					let h = a.charAt(i);
+
+					g += h.toLowerCase() in c ? h == h.toUpperCase() ? c[h.toLowerCase()].toUpperCase() : c[h] : h;
+				}
+
+				function m(a, b) {
+					var c = '';
+
+					for(let i = 0; i < a.length; i++) {
+						let d = b.charAt(i),
+							e = a.charAt(i);
+
+						c += e == e.toUpperCase() ? d.toUpperCase() : d;
+					}
+
+					return c;
+				}
+
+				for(let v in d) g = g.replace(new RegExp('(?<=(^|\\s))'+v+'(?=\\S)', 'gi'),				(a) => m(a, d[v]));
+				for(let v in e) g = g.replace(new RegExp(v, 'gi'),										(a) => m(a, e[v]));
+				for(let v in f) g = g.replace(new RegExp('(?<=\\S)'+v+'(?=(\\s|$|\\d|\\p{P}))', 'giu'),	(a) => m(a, f[v]));
+
+				b.value = g;
+			}
+
+			static load() {
+				var a = document.querySelector('textarea[data-ref="in"]'),
+					b = localStorage.getItem('translation');
+
+				a.value = b;
+				Translator.go();
+			}
+
+			static save() {
+				var a = document.querySelector('textarea[data-ref="in"]').value;
+
+				localStorage.setItem('translation', a);
+			}
+
+			static remove() {
+				localStorage.removeItem('translation');
+			}
+		}
+
+	//	document.addEventListener('DOMContentLoaded', () => Translator.load());
+	</script>
+</head>
+<body>
+	<div content content-="v pad">
+		<ul content-tabs>
+			<li data-tab-ref="" current>Перевод</li>
+			<li data-tab-ref="">Сохранения</li>
+		</ul>
+		<div content-="h">
+			<textarea data-ref="in" oninput="Translator.go();"></textarea>
+			<!--<button onclick="Translator.go();"></button>-->
+			<textarea data-ref="out" spellcheck="false" readonly></textarea>
+		</div>
+		<div content-="h space">
+			<button onclick="Translator.load();">Загрузить</button>
+			<div content-="h">
+				<button onclick="Translator.save();">Сохранить</button>
+				<button onclick="Translator.remove();">Удалить</button>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
