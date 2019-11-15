@@ -18,19 +18,32 @@
 			--color-purple: #800080;
 		}
 
+		body {
+			background: var(--color-black-0625);
+		}
+
 		body,
 		button,
 		select,
 		input,
 		textarea {
 			color: var(--color-black);
-			
 			font: 12px Arial;
 			line-height: 16px;
 		}
 
-		ul {
+		ul, ol {
 			list-style: none;
+		}
+
+		b {
+			padding: 0 8px;
+
+			background: var(--color-gray);
+			border-radius: 2px;
+
+			color: var(--color-orange);
+			font-weight: normal;
 		}
 
 		button:not(:disabled):hover {
@@ -41,18 +54,6 @@
 			background: var(--color-orange);
 
 			color: var(--color-white);
-		}
-
-		[content] {
-			display: flex;
-
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-
-			background: var(--color-black-0625);
 		}
 
 		[content-] {
@@ -175,6 +176,37 @@
 		button:hover {
 			opacity: 0.5;
 		}
+
+		ol[content-footnote] {
+			display: flex;
+			flex-direction: column;
+			-align-items: center;
+
+			padding: 16px;
+
+			background: var(--color-black-0625);
+			border-radius: 2px;
+
+			white-space: pre;
+		}
+
+		ol[content-footnote] li {
+			display: flex;
+
+			counter-increment: a;
+		}
+
+		ol li:before {
+			content: counter(a);
+
+			margin-right: 16px;
+
+			color: var(--color-gray);
+		}
+
+		ol[content-footnote] li:not(:first-child) {
+			margin-top: 16px;
+		}
 	</style>
 	<script>
 		class Translator {
@@ -199,6 +231,8 @@
 						'чєрєс':	'чєрєз'
 					},
 					e = { // Везде
+						'бб':	'б',
+
 						'вст':	'ст',
 
 					//	'дз':	'зз',
@@ -208,6 +242,7 @@
 
 					//	'євич':	'ич',
 
+						'жґ':	'жж',
 						'ждк':	'жк',
 						'ждл':	'жл',
 						'ждн':	'жн',
@@ -251,6 +286,7 @@
 						'стч':	'щ',
 						'сч':	'щ',
 						'сш':	'шш',
+						'сщ':	'щщ',
 
 						'тд':	'дд',
 						'тск':	'цк',
@@ -298,7 +334,8 @@
 
 						'(?<=(б|в|ґ|д|ж|з)\\s+)и':			'ы',
 						'єґо(?!р)':							'єво',
-						'(ж|ц|ч|ш|щ)ь(?=[^(є|и|ю|я)]|$)':	'$1'
+						'(ж|ц|ч|ш|щ)ь(?=[^(є|и|ю|я)]|$)':	'$1',
+						'(.)\\1':							'$1\''
 					},
 					f = { // В конце слова
 					/*	'ало':	'ала',
@@ -325,13 +362,13 @@
 						'ыло':	'ыла'	*/
 						'имє':	'имэ',
 						'льно':	'льна',
-						'ниє':	'ньє',
-						'ния':	'нья',
-						'нн':	'н',
+					/*	'ниє':	'ньє',
+						'нию':	'нью',
+						'ния':	'нья',	*/
 						'нько':	'нька',
-						'сс':	'с',
 
-						'(?<!л)оґо':	'ово'
+						'(?<!л)оґо':	'ово',
+						'(.)\'':		'$1'
 					},
 					g = '';
 
@@ -355,9 +392,9 @@
 					return c;
 				}
 
-				for(let v in d) g = g.replace(new RegExp('(?<=(^|\\s|\\d|\\p{P}))'+v+'(?=\\S)', 'giu'),	(a) =>		m(a, d[v]));
+				for(let v in d) g = g.replace(new RegExp('(?<=(^|\\s|\\d|\\p{P}))'+v+'(?=\\S)', 'giu'),	(a, b) =>	m(a, d[v].replace('$1', b)));
 				for(let v in e) g = g.replace(new RegExp(v, 'giu'),										(a, b) =>	m(a, e[v].replace('$1', b)));
-				for(let v in f) g = g.replace(new RegExp('(?<=\\S)'+v+'(?=($|\\s|\\d|\\p{P}))', 'giu'),	(a) =>		m(a, f[v]));
+				for(let v in f) g = g.replace(new RegExp('(?<=\\S)'+v+'(?=($|\\s|\\d|\\p{P}))', 'giu'),	(a, b) =>	m(a, f[v].replace('$1', b)));
 
 				b.value = g;
 			}
@@ -404,6 +441,11 @@
 				<button onclick="Translator.remove();">Удалить</button>
 			</div>
 		</div>
+		<ol content-footnote>
+			<li>Из отличительных (от русского) черт можно привести в пример <b>СС/ШШ > С'/Ш'</b>, <b>ТСЯ/ТЬСЯ > Ц'А</b>, <b>ЧУ/ЩУ > ЧЮ/ЩЮ</b>, <b>ЖЧ/ШЧ > Щ</b>.</li>
+			<li>Апостроф <b>'</b>, помимо типичных целей применения, также часто служит для обозначения дубля предыдущего символа.</li>
+			<li>Аббревиатуры не поддерживаются переводчиком.</li>
+		</ol>
 	</div>
 </body>
 </html>
