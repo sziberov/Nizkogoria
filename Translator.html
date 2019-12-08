@@ -60,50 +60,50 @@
 			color: var(--color-white);
 		}
 
-		[content-] {
+		[_flex] {
 			display: flex;
 		}
 
-		[content-~="h"] {
+		[_flex~="h"] {
 			flex-direction: row;
 		}
 
-		[content-~="h"]:not([content-~="stack"]) > *:not(:first-child) {
+		[_flex~="h"]:not([_flex~="stack"]) > *:not(:first-child) {
 			margin-left: 32px;
 		}
 
-		[content-~="v"] {
+		[_flex~="v"] {
 			flex-direction: column;
 		}
 
-		[content-~="v"]:not([content-~="stack"]) > *:not(:first-child) {
+		[_flex~="v"]:not([_flex~="stack"]) > *:not(:first-child) {
 			margin-top: 32px;
 		}
 
-		[content-~="pad"] {
+		[_flex~="pad"] {
 			padding: 32px;
 		}
 
-		[content-~="space"] {
+		[_flex~="space"] {
 			justify-content: space-between;
 		}
 
-		ul[content-tabs] {
+		ul[_tabs] {
 			display: flex;
 		}
 
-		ul[content-tabs] li {
+		ul[_tabs] li {
 			position: relative;
 
 			transition: color 250ms ease;
 			cursor: pointer;
 		}
 
-		ul[content-tabs] li:not(:first-child) {
+		ul[_tabs] li:not(:first-child) {
 			margin-left: 16px;
 		}
 
-		ul[content-tabs] li:after {
+		ul[_tabs] li:after {
 			content: '';
 
 			position: absolute;
@@ -119,25 +119,25 @@
 			transform: scaleX(0);
 		}
 
-		ul[content-tabs] li:hover {
+		ul[_tabs] li:hover {
 			color: var(--color-gray);
 		}
 
-		ul[content-tabs] li:hover:after {
+		ul[_tabs] li:hover:after {
 			transform: scaleX(0.5);
 		}
 
-		ul[content-tabs] li:not([data-tab-ref]):hover:after {
+		ul[_tabs] li:not([data-tab-ref]):hover:after {
 			transform: scaleX(0);
 		}
 
-		ul[content-tabs] li[current] {
+		ul[_tabs] li[current] {
 			color: var(--color-orange);
 
 			cursor: default;
 		}
 
-		ul[content-tabs] li[current]:after {
+		ul[_tabs] li[current]:after {
 			background: var(--color-orange);
 
 			transform: scaleX(1);
@@ -181,7 +181,7 @@
 			opacity: 0.5;
 		}
 
-		ol[content-footnote] {
+		ol[_footnote] {
 			display: flex;
 			flex-direction: column;
 			-align-items: center;
@@ -194,7 +194,7 @@
 			white-space: pre;
 		}
 
-		ol[content-footnote] li {
+		ol[_footnote] li {
 			display: flex;
 
 			counter-increment: a;
@@ -208,7 +208,7 @@
 			color: var(--color-gray);
 		}
 
-		ol[content-footnote] li:not(:first-child) {
+		ol[_footnote] li:not(:first-child) {
 			margin-top: 16px;
 		}
 	</style>
@@ -324,7 +324,7 @@
 						'щў':	'щю',
 						'щэ':	'щє',
 
-						'(б|и|к|л|м|р|ф)\\1':				'$1',
+						'(б|к|л|м|р|ф)\\1':					'$1',
 						'(?<=(б|в|ґ|д|ж|з)\\s+)и':			'ы',
 						'єґо(?!р)':							'єво',
 						'(ж|ц|ч|ш|щ)ь(?=[^(є|и|ю|я)]|$)':	'$1',
@@ -334,12 +334,13 @@
 					},
 					f = { // В конце слова
 					//	'ая':	'а',
-						'имє':		'имэ',
-						'лся':		'лса',
-					//	'оє':		'о',
-					//	'шся':		'шса',
-					//	'ый':		'ы',
-						'эґо':		'эво',
+						'имє':	'имэ',
+						'лся':	'лса',
+						'лько':	'ко',
+					//	'оє':	'о',
+					//	'шся':	'шса',
+					//	'ый':	'ы',
+						'эґо':	'эво',
 
 						'ива(єш|ю)':		'ю$1',
 						'ыва(єш|ю)':		'у$1',
@@ -406,24 +407,24 @@
 	</script>
 </head>
 <body>
-	<div content content-="v pad">
-		<ul content-tabs>
+	<div _content _flex="v pad">
+		<ul _tabs>
 			<li data-tab-ref="" current>Перевод</li>
 			<li data-tab-ref="">Сохранения</li>
 		</ul>
-		<div content-="h">
+		<div _flex="h">
 			<textarea data-ref="in" oninput="Translator.go();"></textarea>
 			<!--<button onclick="Translator.go();"></button>-->
 			<textarea data-ref="out" spellcheck="false" readonly></textarea>
 		</div>
-		<div content-="h space">
+		<div _flex="h space">
 			<button onclick="Translator.save();">Сохранить</button>
-			<div content-="h">
+			<div _flex="h">
 				<button onclick="Translator.load();">Загрузить</button>
 				<button onclick="Translator.remove();">Удалить</button>
 			</div>
 		</div>
-		<ol content-footnote>
+		<ol _footnote>
 			<li>Из отличительных (от русского) черт можно привести в пример: <b>ТСЯ/ТЬСЯ > Ц'А</b>, <b>ЧУ/ЩУ > ЧЮ/ЩЮ</b>, <b>ЖЧ/ШЧ > Щ</b>.</li>
 			<li>Апостроф <b>'</b>, помимо типичных целей применения, также часто служит для обозначения дубля предыдущего символа.</li>
 			<li>Пишется как слышится, и наоборот.</li>
