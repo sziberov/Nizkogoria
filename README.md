@@ -19,7 +19,7 @@
 ## Язык
 ![Язык](https://raw.githubusercontent.com/sziberov/Nizkogoria/master/Language.png)
 
-Разновидность русского, надстройка над ним.
+Разновидность русского, надстройка над ним. Из простых отличительных черт можно привести в пример: `ТСЯ/ТЬСЯ > Ц'А`, `ЧУ/ЩУ > ЧЮ/ЩЮ`, `ЖЧ/ШЧ > Щ`.
 
 [Односторонний переводчик](https://sziberov.github.io/Nizkogoria/Translator.html)
 
