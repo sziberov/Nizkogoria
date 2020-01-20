@@ -168,6 +168,7 @@
 				0 0 0 16px transparent;
 
 			transition: 250ms ease box-shadow;
+			-scroll-behavior: smooth;
 		}
 
 		textarea:focus {
@@ -269,8 +270,10 @@
 						'бєс':		'бєз',
 						'бєзс':		'бєс',
 						'г':		'ґ',
+						'дєзи':		'дєзы',
 						'золо':		'зло',
 						'кт':		'хт',
+					//	'нє':		'ни',
 						'тщ':		'ч',
 						'чєрєс':	'чєрєз',
 						'что':		'шо',
@@ -319,7 +322,6 @@
 						'зд(?=[клмн])':	'з',
 						'здч':			'щ',
 						'зж':			'жж',
-						'зир(?=[оў])':	'з',
 						'зс(?=[кт])':	'з',
 						'зч':			'щ',
 						'зш':			'шш',
@@ -345,6 +347,7 @@
 						'сяч':				'щ',
 
 						'тд':				'дд',
+						'тзб':				'цб',
 						'тс(?=[клмнт])':	'ц',
 						'тся':				'цца',
 						'тц':				'цц',
@@ -373,6 +376,7 @@
 						'ши':				'шы',
 						'шт(?=[клмнш])':	'ш',
 						'шч':				'щ',
+						'шшт':				'шт',
 						'шю':				'шў',
 						'шя':				'ша',
 
@@ -391,13 +395,16 @@
 						'(?<=\\S{5,})(?:др)?ови(ч|ш)':					'ы$1',
 						'єго(?!дя|м|р)':								'єво',
 						'([жцчшщ])ь(?=[^єиюя]|$)':						'$1',
+						'(?<=\\S{4,})(з|т)ир(?=[оў])':					'$1',
 						'й(?=[єюя])':									'',
 						'([^\\s\\d\\p{P}])\\1(?!\\1)':					'$1\''	// (?<!\\1)
 					},
 					f = { // В конце слова
+					//	'г':	'х',
 						'имє':	'имэ',
 						'лся':	'лса',
 						'лько':	'ко',
+						'стр':	'стэр',
 					//	'шся':	'шса',
 						'эго':	'эво',
 
@@ -433,6 +440,21 @@
 				for(let v in f) g = g.replace(new RegExp('(?<=\\S)'+v+'(?=($|\\s|\\d|\\p{P}))', 'giu'),		(a, b) =>	m(a, f[v].replace('$1', b)));
 
 				b.value = g;
+			}
+
+			static scroll(a) {
+				var b = document.querySelector('textarea[data-ref="in"]'),
+					c = document.querySelector('textarea[data-ref="out"]'),
+					d = $('textarea[data-ref="'+$(a).data('ref')+'"]:hover').length > 0;	// a.matches(':hover');
+
+				if(d) {
+					if(a == b) {
+						c.scrollTop = b.scrollTop;
+					} else
+					if(a == c) {
+						b.scrollTop = c.scrollTop;
+					}
+				}
 			}
 
 			static load() {
@@ -481,9 +503,9 @@
 		<div _tab>
 			<div _flex="v" data-tab="translate" current_>
 				<div _flex="h">
-					<textarea data-ref="in" oninput="Translator.go();"></textarea>
+					<textarea data-ref="in" oninput="Translator.go();" onscroll="Translator.scroll(this);"></textarea>
 					<!--<button onclick="Translator.go();"></button>-->
-					<textarea data-ref="out" spellcheck="false" readonly></textarea>
+					<textarea data-ref="out" onscroll="Translator.scroll(this);" spellcheck="false" readonly></textarea>
 				</div>
 				<div _flex="h space">
 					<button onclick="Translator.save();">Сохранить</button>
