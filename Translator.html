@@ -2,6 +2,8 @@
 <head>
 	<title>Переводчик ~ НГСР</title>
 
+	<link rel="icon" type="image/png" href="Icon.png" />
+
 	<style>
 		* {
 			margin: 0;
@@ -39,16 +41,6 @@
 
 		ul, ol {
 			list-style: none;
-		}
-
-		b {
-			padding: 0 4px;
-
-			background: var(--color-gray);
-			border-radius: 2px;
-
-			color: var(--color-orange);
-			font-weight: normal;
 		}
 
 		button:not(:disabled):hover {
@@ -213,32 +205,40 @@
 			display: flex;
 			flex-direction: column;
 
-			overflow: hidden;
-
-			padding: 16px;
-
 			background: var(--color-black-0625);
 			border-radius: 2px;
 
-			white-space: pre;
+			line-height: 24px;
 		}
 
 		ol[_footnote] li {
-			display: flex;
-
-			counter-increment: a;
+			padding: 12px 16px;
 		}
 
-		ol li:before {
-			content: counter(a);
-
-			margin-right: 16px;
-
-			color: var(--color-gray);
+		ol[_footnote] li:nth-child(2n) {
+			background: var(--color-black-0625);
 		}
 
-		ol[_footnote] li:not(:first-child) {
-			margin-top: 16px;
+		ol[_footnote] b {
+			display: inline-block;
+
+			padding: 0 4px;
+
+			background: var(--color-gray);
+			border-radius: 2px;
+
+			color: var(--color-orange);
+			font-weight: normal;
+			line-height: 16px;
+		}
+
+		ol[_footnote] sup {
+			display: inline-block;
+
+			margin-top: -4px;
+
+			vertical-align: top;
+			font-size: 10px;
 		}
 	</style>
 	<script>
@@ -311,7 +311,7 @@
 
 					//	'дж':				'ǯ',
 					//	'дз':				'ӡ',
-						'дожд(?=[єиьюя])':	'дощщ',
+						'дожд(?=[єиьюя])':	'дощ',
 						'дс(?=[клмнт])':	'ц',
 						'дт':				'тт',
 						'дфк':				'цк',
@@ -416,7 +416,8 @@
 					//	'([єиюя]жж)ў':											'$1ю',
 						'([жцчшщ])ь(?=[^єиюя]|$)':								'$1',
 					//	'(з|с)(?=[днст][єиьюя])':								'$1ь',
-						'(?<=\\S{3,}[взнт])ир(?=[оў](?!с))':					'',
+					//	'(?<=\\S)фицы(?=р)':									'',
+						'(?<=\\S[взнт])ир(?=[оў](?!с))':						'',
 						'((?<=м)|с?т)ьдєсят':									'сят',
 						'([^\\s\\d\\p{P}])\\1(?!\\1)':							'$1\''	// (?<!\\1)
 					},
@@ -540,8 +541,9 @@
 				<ol _footnote>
 					<li>Слышится как пишется, и наоборот.</li>
 					<li>Апостроф <b>'</b>, помимо типичных целей применения, часто служит для обозначения дубля предыдущего символа. Обязан быть использован везде, кроме аббревиатур.</li>
-					<li>Смягчение всегда распространяется на всю последовательность одинаковых символов, созданную с помощью апострофа. Так <b>Н'Ь > НЬНЬ</b>, или <b>С'''Я > СЬСЬСЬСЯ</b>, но <b>ЗЗЮ > ЗЗЮ</b>.</li>
-					<li>Аббревиатуры и латинские символы не учитываются в механизме переводчика.</li>
+					<li>Смягчение всегда распространяется на всю последовательность одинаковых символов, созданную с помощью апострофа. Так <b>Н'Ь > [н'н']</b>, или <b>С'''Я > [с'с'с'с'а]</b>, но <b>ЗЗЮ > [зз'у]</b>.</li>
+					<li>Йотированный гласный символ, стоящий после смягчающего гласного, при чтении произносится так же, как после согласной, почти теряя свою йотацию. <b>ВЫРАЩЮЮ > [выраш'ш'уу<sup>и</sup>]</b>, <b>ЦЭЛЄ' > [цэл'э<sup>и</sup>э<sup>и</sup>]</b>, <b>МЄНЯ'СЬ > [м'э<sup>и</sup>н'а<sup>и</sup>а<sup>и</sup>с']</b>, <b>ТЄЯ > [т'э<sup>и</sup>а<sup>и</sup>]</b>.</li>
+					<li><b>Техническая информация</b> Аббревиатуры и латинские символы не учитываются в механизме переводчика.</li>
 				</ol>
 			</div>
 			<div _flex="v" data-tab="save">
