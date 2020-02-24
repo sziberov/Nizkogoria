@@ -346,7 +346,7 @@
 						'лн(?=єч|ц)':	'н',
 						'льзя':			'зя',
 
-					//	'н(?=[чщ])':	'нь',
+						'н(?=[чщ])':	['нь', 1],
 						'нд(?=[сщ])':	'н',
 						'нт(?=[сщ])':	'н',
 						'нх(?=[кш])':	'н',
@@ -418,9 +418,10 @@
 					//	'([єиюя]жж)а':											'$1я',
 					//	'([єиюя]жж)ў':											'$1ю',
 						'([жцчшщ])ь(?=[^єиюя]|$)':								'$1',
-					//	'(з|с)(?=[днст][єиьюя])':								'$1ь',
+						'(з|с)(?=[днст][єиьюя])':								['$1ь', 2],
 						'(?<=\\S[взнт])ир(?=[оў](?!с))':						'',
 						'((?<=м)|с?т)ьдєсят':									'сят',
+						'((?<=м)|с?т)ьсот':										'сот',
 						'([^\\s\\d\\p{P}])\\1(?!\\1)':							'$1\''	// (?<!\\1)
 					},
 					f = { // В конце слова
@@ -463,7 +464,10 @@
 				}
 
 				function n(a, b) {
-					return !Array.isArray(a) ? a : b ? Translator.setting(a[1]) : Translator.setting(a[1]) ? a[0] : '';
+					var c = !Array.isArray(a),
+						d = $(`[data-setting="${a[1]}"]`).prop('checked');
+
+					return b ? c ? true : d : c ? a : a[0];
 				}
 
 				for(let v in d) g = n(d[v], true) ? g.replace(new RegExp('(?<=(?:^|\\s|\\d|\\p{P}))'+v+'(?=\\S)', 'giu'),	(a, b) => m(a, n(d[v]).replace('$1', b))) : g;
@@ -471,10 +475,6 @@
 				for(let v in f) g = n(f[v], true) ? g.replace(new RegExp('(?<=\\S)'+v+'(?=($|\\s|\\d|\\p{P}))', 'giu'),		(a, b) => m(a, n(f[v]).replace('$1', b))) : g;
 
 				b.value = g;
-			}
-
-			static setting(a) {
-				if(a == 0) return true;
 			}
 
 			static scroll(a) {
@@ -517,14 +517,13 @@
 			}
 		}
 
-	//	$(document).on('click', '[data-tab-ref]:not([current_])', (e) => Tab.switch(e));
+	//	$(document).on('click', '[data-tab-ref]:not([current_])',	(e) => Tab.switch(e));
+	//	$(document).on('click', '[data-setting]',					(e) => Translator.go());
 		document.addEventListener('click', (e) => {
-			if(e.target.matches('[data-tab-ref]:not([current_])')) {
-				e.preventDefault();
-				Tab.switch(e);
-			}
+			if(e.target.matches('[data-tab-ref]:not([current_])'))	Tab.switch(e);
+			if(e.target.matches('[data-setting]'))					Translator.go();
 		}, false);
-	//	document.addEventListener('DOMContentLoaded', () => Translator.load());
+		document.addEventListener('DOMContentLoaded', () => Translator.load());
 	</script>
 </head>
 <body>
@@ -536,6 +535,20 @@
 		</ul>
 		<div _tab>
 			<div _flex="v" data-tab="translate" current_>
+				<div _flex="h">
+					<div _check>
+						<input type="checkbox" data-setting="0">
+						<label>ШО</label>
+					</div>
+					<div _check>
+						<input type="checkbox" data-setting="1">
+						<label>НЬ</label>
+					</div>
+					<div _check>
+						<input type="checkbox" data-setting="2">
+						<label>ЗЬ / СЬ</label>
+					</div>
+				</div>
 				<div _flex="h">
 					<textarea data-ref="in" oninput="Translator.go();" onscroll="Translator.scroll(this);"></textarea>
 					<!--<button onclick="Translator.go();"></button>-->
