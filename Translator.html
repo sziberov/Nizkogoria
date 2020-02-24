@@ -146,6 +146,87 @@
 			display: none;
 		}
 
+		[_label] {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+		}
+
+		[_label]:after {
+			content: attr(_label);
+
+			margin-left: 16px;
+		}
+
+		label[_switch] {
+			width: 64px;
+			height: 32px;
+
+			background: var(--color-black-0625);
+			border-radius: 2px;
+
+			cursor: pointer;
+			user-select: none;
+		}
+
+		label[_switch] input {
+			width: 0;
+			height: 0;
+		}
+
+		label[_switch] div {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			width: 32px;
+			height: 32px;
+
+			background: var(--color-gray);
+			border-radius: 2px;
+			box-shadow: 0 0 0 16px transparent;
+
+			transition: 250ms ease background, 250ms ease box-shadow, 250ms ease opacity, 250ms ease transform;
+		}
+
+		label[_switch]:hover div {
+			opacity: 0.5;
+		}
+
+		label[_switch] input:focus + div {
+			box-shadow: 0 0 0 2px var(--color-black-125);
+		}
+
+		label[_switch] input:checked + div {
+			background: var(--color-orange);
+
+			transform: translate(100%, 0);
+		}
+
+		label[_switch] div:before,
+		label[_switch] div:after {
+			content: '';
+
+			position: absolute;
+
+			width: 16px;
+			height: 2px;
+
+			background: var(--color-white);
+
+			transition: 250ms ease transform;
+			transform: none;
+		}
+
+		label[_switch] div:after {
+			transform: rotate(90deg);
+		}
+
+		label[_switch] input:checked + div:before,
+		label[_switch] input:checked + div:after {
+			transform: rotate(180deg);
+		}
+
 		textarea {
 			flex: 1;
 
@@ -261,8 +342,8 @@
 			//	А Б В   Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я - Оригинал
 			//	А Б В Г Ґ Д Є   Ж З И Й К Л М Н О П Р С Т Ў Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я - Замененные
 
-				var a = document.querySelector('textarea[data-ref="in"]').value,
-					b = document.querySelector('textarea[data-ref="out"]'),
+				var a = document.querySelector('[data-translator-ref="in"]').value,
+					b = document.querySelector('[data-translator-ref="out"]'),
 					c = {
 						'е':	'є',
 						'ё':	'є',
@@ -465,7 +546,7 @@
 
 				function n(a, b) {
 					var c = !Array.isArray(a),
-						d = $(`[data-setting="${a[1]}"]`).prop('checked');
+						d = $(`[data-translator-setting="${a[1]}"]`).prop('checked');
 
 					return b ? c ? true : d : c ? a : a[0];
 				}
@@ -478,9 +559,9 @@
 			}
 
 			static scroll(a) {
-				var b = document.querySelector('textarea[data-ref="in"]'),
-					c = document.querySelector('textarea[data-ref="out"]'),
-					d = $('textarea[data-ref="'+$(a).data('ref')+'"]:hover').length > 0;	// a.matches(':hover');
+				var b = document.querySelector('[data-translator-ref="in"]'),
+					c = document.querySelector('[data-translator-ref="out"]'),
+					d = $('[data-translator-ref="'+$(a).data('ref')+'"]:hover').length > 0;	// a.matches(':hover');
 
 				if(d) {
 					if(a == b) {
@@ -493,7 +574,7 @@
 			}
 
 			static load() {
-				var a = document.querySelector('textarea[data-ref="in"]'),
+				var a = document.querySelector('[data-translator-ref="in"]'),
 					b = localStorage.getItem('translation');
 
 				a.value = b;
@@ -501,7 +582,7 @@
 			}
 
 			static save() {
-				var a = document.querySelector('textarea[data-ref="in"]').value,
+				var a = document.querySelector('[data-translator-ref="in"]').value,
 					b = localStorage.getItem('translation');
 
 				if(b !== '' && !window.confirm('Перезаписать последний сохраненный перевод?')) {
@@ -521,7 +602,7 @@
 	//	$(document).on('click', '[data-setting]',					(e) => Translator.go());
 		document.addEventListener('click', (e) => {
 			if(e.target.matches('[data-tab-ref]:not([current_])'))	Tab.switch(e);
-			if(e.target.matches('[data-setting]'))					Translator.go();
+			if(e.target.matches('[data-translator-setting]'))		Translator.go();
 		}, false);
 		document.addEventListener('DOMContentLoaded', () => Translator.load());
 	</script>
@@ -536,23 +617,29 @@
 		<div _tab>
 			<div _flex="v" data-tab="translate" current_>
 				<div _flex="h">
-					<div _check>
-						<input type="checkbox" data-setting="0">
-						<label>ШО</label>
+					<div _label="Шо">
+						<label _switch>
+							<input type="checkbox" data-translator-setting="0">
+							<div></div>
+						</label>
 					</div>
-					<div _check>
-						<input type="checkbox" data-setting="1">
-						<label>НЬ</label>
+					<div _label="Нь">
+						<label _switch>
+							<input type="checkbox" data-translator-setting="1">
+							<div></div>
+						</label>
 					</div>
-					<div _check>
-						<input type="checkbox" data-setting="2">
-						<label>ЗЬ / СЬ</label>
+					<div _label="Зь / Сь">
+						<label _switch>
+							<input type="checkbox" data-translator-setting="2">
+							<div></div>
+						</label>
 					</div>
 				</div>
 				<div _flex="h">
-					<textarea data-ref="in" oninput="Translator.go();" onscroll="Translator.scroll(this);"></textarea>
+					<textarea data-translator-ref="in" oninput="Translator.go();" onscroll="Translator.scroll(this);"></textarea>
 					<!--<button onclick="Translator.go();"></button>-->
-					<textarea data-ref="out" onscroll="Translator.scroll(this);" spellcheck="false" readonly></textarea>
+					<textarea data-translator-ref="out" onscroll="Translator.scroll(this);" spellcheck="false" readonly></textarea>
 				</div>
 				<div _flex="h space">
 					<button onclick="Translator.save();">Сохранить</button>
