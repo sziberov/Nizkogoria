@@ -561,7 +561,7 @@
 			static scroll(a) {
 				var b = document.querySelector('[data-translator-ref="in"]'),
 					c = document.querySelector('[data-translator-ref="out"]'),
-					d = $('[data-translator-ref="'+$(a).data('ref')+'"]:hover').length > 0;	// a.matches(':hover');
+					d = $('[data-translator-ref="'+$(a).data('translator-ref')+'"]:hover').length > 0;	// a.matches(':hover');
 
 				if(d) {
 					if(a == b) {
