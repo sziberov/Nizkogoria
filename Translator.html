@@ -642,7 +642,7 @@
 							<div>${b[k]}</div>
 							<div>${Datestamp.convert(k)}</div>
 							<button onclick="Translator.load('${k}')">Загрузить</button>
-							<button onclick="Translator.remove('${k}')">Удалить</button>
+							<button onclick="Translator.delete('${k}')">Удалить</button>
 						</li>
 					`);
 				}
@@ -656,7 +656,7 @@
 						<div data-translator-ref="date">${Datestamp.convert(a)}</div>
 						<button onclick="Translator.save('${a}')">Сохранить</button>
 						<button onclick="Translator.load('${a}')">Загрузить</button>
-						<button onclick="Translator.remove('${a}')">Удалить</button>
+						<button onclick="Translator.delete('${a}')">Удалить</button>
 					`;
 				} else {
 					b.innerHTML = `
@@ -714,7 +714,7 @@
 				}
 			}
 
-			static remove(a) {
+			static delete(a) {
 				var b = document.querySelector(this.ref('date')).innerHTML,
 					c = JSON.parse(localStorage.getItem('save'));
 
