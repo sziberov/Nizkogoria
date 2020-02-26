@@ -87,6 +87,10 @@
 			justify-content: space-between;
 		}
 
+		[_flex~="center"] {
+			align-items: center;
+		}
+
 		ul[_tabs] {
 			display: flex;
 		}
@@ -146,14 +150,13 @@
 			display: none;
 		}
 
-		[_label] {
+		[label_] {
 			display: flex;
-			flex-direction: row;
 			align-items: center;
 		}
 
-		[_label]:after {
-			content: attr(_label);
+		[label_]:after {
+			content: attr(label_);
 
 			margin-left: 16px;
 		}
@@ -272,6 +275,7 @@
 			color: var(--color-white);
 
 			transition: 250ms ease box-shadow, 250ms ease opacity;
+			user-select: none;
 		}
 
 		button:hover {
@@ -282,27 +286,66 @@
 			box-shadow: 0 0 0 2px var(--color-black-125);
 		}
 
-		ol[_footnote] {
+		button:not([onclick]) {
+			background: var(--color-black-0625);
+
+			color: var(--color-gray);
+
+			pointer-events: none;
+		}
+
+		ul[_list] {
 			display: flex;
 			flex-direction: column;
 
 			overflow: hidden;
 
-			background: var(--color-black-0625);
+			background: var(--color-white);
 			border-radius: 2px;
+			box-shadow:
+				0 8px 16px 8px var(--color-black-25),
+				0 0 0 16px transparent;
+		}
+
+		ul[_list="footnote"] {
+			background: var(--color-black-0625);
+			box-shadow: none;
+		}
+
+		ul[_list] li {
+			padding: 16px;
+		}
+
+		ul[_list] li:nth-child(2n) {
+			background: var(--color-black-0625);
+		}
+
+		ul[_list="footnote"] li {
+			padding: 12px 16px;
 
 			line-height: 24px;
 		}
 
-		ol[_footnote] li {
-			padding: 12px 16px;
+		ul[_list="save"] li {
+			display: flex;
+			align-items: center;
 		}
 
-		ol[_footnote] li:nth-child(2n) {
-			background: var(--color-black-0625);
+		ul[_list="save"] li > *:first-child {
+			flex: 1 1;
+
+			height: 16px;
+			overflow: hidden;
+
+			text-overflow: ellipsis;
+			white-space: nowrap;
 		}
 
-		ol[_footnote] b {
+		ul[_list="save"] li > *:not(:first-child) {
+			margin-left: 16px;
+		}
+
+		ul[_list] b {
 			display: inline-block;
 
 			padding: 0 4px;
@@ -315,7 +358,7 @@
 			line-height: 16px;
 		}
 
-		ol[_footnote] sup {
+		ul[_list] sup {
 			display: inline-block;
 
 			margin-top: -4px;
@@ -331,19 +374,31 @@
 	<script>
 		class Tab {
 			static switch(a) {
-				var b = $(a.srcElement).data('tab-ref');
+				var b = typeof a == 'string' ? a : $(a.srcElement).data('tab-ref');
 
 				$(`[data-tab-ref="${b}"], [data-tab="${b}"]`).attr('current_', '').siblings().removeAttr('current_');
 			}
 		}
 
+		class Datestamp {
+			static current = () => Date.now();
+
+			static convert(a) {
+				var b = new Date(a*1);
+				
+				return b.toLocaleTimeString()+`, `+b.toLocaleDateString();
+			}
+		}
+
 		class Translator {
+			static ref = (a) => `[data-translator-ref="${a}"]`;
+
 			static go() {
 			//	А Б В   Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я - Оригинал
 			//	А Б В Г Ґ Д Е   Ж З И Й К Л М Н О П Р С Т Ў Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я - Замененные
 
-				var a = document.querySelector('[data-translator-ref="in"]').value,
-					b = document.querySelector('[data-translator-ref="out"]'),
+				var a = document.querySelector(this.ref('in')).value,
+					b = document.querySelector(this.ref('out')),
 					c = {
 						'ё':	'е',
 						'у':	'ў'
@@ -562,9 +617,9 @@
 			}
 
 			static scroll(a) {
-				var b = document.querySelector('[data-translator-ref="in"]'),
-					c = document.querySelector('[data-translator-ref="out"]'),
-					d = $('[data-translator-ref="'+$(a).data('translator-ref')+'"]:hover').length > 0;	// a.matches(':hover');
+				var b = document.querySelector(this.ref('in')),
+					c = document.querySelector(this.ref('out')),
+					d = $(this.ref($(a).data('translator-ref'))+':hover').length > 0;	// a.matches(':hover');
 
 				if(d) {
 					if(a == b) {
@@ -576,27 +631,100 @@
 				}
 			}
 
-			static load() {
-				var a = document.querySelector('[data-translator-ref="in"]'),
-					b = localStorage.getItem('translation');
+			static updateList() {
+				var a = $(this.ref('list')),
+					b = JSON.parse(localStorage.getItem('save'));
 
-				a.value = b;
-				Translator.go();
-			}
-
-			static save() {
-				var a = document.querySelector('[data-translator-ref="in"]').value,
-					b = localStorage.getItem('translation');
-
-				if(b !== '' && !window.confirm('Перезаписать последний сохраненный перевод?')) {
-					return;
+				a.html('');
+				for(let k in b) {
+					a.append(`
+						<li>
+							<div>${b[k]}</div>
+							<div>${Datestamp.convert(k)}</div>
+							<button onclick="Translator.load('${k}')">Загрузить</button>
+							<button onclick="Translator.remove('${k}')">Удалить</button>
+						</li>
+					`);
 				}
-				localStorage.setItem('translation', a);
 			}
 
-			static remove() {
-				if(window.prompt('Удалить последний сохраненный перевод? ("Y" для подтверждения).') == 'Y') {
+			static updateButtons(a) {
+				var b = document.querySelector(this.ref('current'));
+
+				if(a) {
+					b.innerHTML = `
+						<div data-translator-ref="date">${Datestamp.convert(a)}</div>
+						<button onclick="Translator.save('${a}')">Сохранить</button>
+						<button onclick="Translator.load('${a}')">Загрузить</button>
+						<button onclick="Translator.remove('${a}')">Удалить</button>
+					`;
+				} else {
+					b.innerHTML = `
+						<div data-translator-ref="date"></div>
+						<button>Сохранить</button>
+						<button>Загрузить</button>
+						<button>Удалить</button>
+					`;
+				}
+			}
+
+			static update(a) {
+				this.updateList();
+				this.updateButtons(a);
+			}
+
+			static load(a) {
+				var b = document.querySelector(this.ref('in')),
+					c = document.querySelector(this.ref('date')).innerHTML,
+					d = JSON.parse(localStorage.getItem('save')),
+					e = localStorage.getItem('translation');
+
+				if(a) {
+					if(d[a].trim() !== '' && c == Datestamp.convert(a) && !window.confirm(`Восстановить сохранение "${Datestamp.convert(a)}"?`)) return;
+					b.value = d[a];
+					Translator.go();
+					Translator.update(a);
+					Tab.switch('translate');
+				} else
+				if(!d && e) {
+					b.value = e;
 					localStorage.removeItem('translation');
+					Translator.save();
+					Translator.update();
+				}
+			}
+
+			static save(a) {
+				var b = document.querySelector(this.ref('in')).value,
+					c = JSON.parse(localStorage.getItem('save')),
+					d = Datestamp.current();
+
+				if(!a) {
+					c = {
+						[d]: b,
+						...c
+					}
+					localStorage.setItem('save', JSON.stringify(c));
+					Translator.update(d);
+				} else {
+					if(c[a].trim() !== '' && !window.confirm(`Перезаписать сохранение "${Datestamp.convert(a)}"?`)) return;
+					c[a] = b;
+					localStorage.setItem('save', JSON.stringify(c));
+					Translator.updateList();
+				}
+			}
+
+			static remove(a) {
+				var b = document.querySelector(this.ref('date')).innerHTML,
+					c = JSON.parse(localStorage.getItem('save'));
+
+				if(c[a].trim() !== '' && window.prompt(`Удалить сохранение "${Datestamp.convert(a)}"? ("Y" для подтверждения).`) !== 'Y') return;
+				c[a] = undefined;
+				localStorage.setItem('save', JSON.stringify(c));
+				if(b == Datestamp.convert(a)) {
+					Translator.update();
+				} else {
+					Translator.updateList();
 				}
 			}
 		}
@@ -607,7 +735,10 @@
 			if(e.target.matches('[data-tab-ref]:not([current_])'))	Tab.switch(e);
 			if(e.target.matches('[data-translator-setting]'))		Translator.go();
 		}, false);
-	//	document.addEventListener('DOMContentLoaded', () => Translator.load());
+		document.addEventListener('DOMContentLoaded', () => {
+			Translator.update();
+			Translator.load();
+		});
 	</script>
 </head>
 <body>
@@ -620,25 +751,25 @@
 		<div _tab>
 			<div _flex="v" data-tab="translate" current_>
 				<div _flex="h">
-					<div _label="Шо">
+					<div label_="Шо">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="0" checked>
 							<div></div>
 						</label>
 					</div>
-					<div _label="Нь">
+					<div label_="Нь">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="1">
 							<div></div>
 						</label>
 					</div>
-					<div _label="Ю / Ў">
+					<div label_="Ю / Ў">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="2" checked>
 							<div></div>
 						</label>
 					</div>
-					<div _label="Зь / Сь">
+					<div label_="Зь / Сь">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="3">
 							<div></div>
@@ -652,23 +783,24 @@
 				</div>
 				<div _flex="h space">
 					<button onclick="Translator.save();">Сохранить</button>
-					<div _flex="h">
-						<button onclick="Translator.load();">Загрузить</button>
-						<button onclick="Translator.remove();">Удалить</button>
-					</div>
+					<div _flex="h center" data-translator-ref="current"></div>
 				</div>
-				<ol _footnote>
+				<ul _list="footnote">
 					<li>Слышится как пишется, и наоборот. Относится ко всему, кроме безударной <b>О</b> - безударная <b>О > [а]</b>, и заимствованных слов.</li>
 					<li>Апостроф <b>'</b>, помимо типичных целей применения, часто служит для обозначения дубля предыдущего символа. Обязан быть использован везде, кроме аббревиатур.</li>
 					<li>Смягчение всегда распространяется на всю последовательность одинаковых символов, созданную с помощью апострофа. Так <b>Н'Ь > [н'н']</b>, или <b>С'''Я > [с'с'с'с'а]</b>, но <b>ЗЗЮ > [зз'у]</b>.</li>
 					<li>Йотированный гласный <b>Е / Ю / Я</b>, стоящий после гласного, но не перед <b>Д</b>, при чтении разрешается произносить так же, как после согласной. <b>ТАКОЕ > [такоэ<sup>и</sup>]</b>, <b>ВНИМАНИЕ > [вн'иман'иэ<sup>и</sup>]</b>, <b>ЦЭЛЕ' > [цэл'э<sup>и</sup>э<sup>и</sup>]</b>, <b>ТЕРЯ' > [тер'а<sup>и</sup>а<sup>и</sup>]</b>, <b>КЛЮЮТ' > [кл'у<sup>и</sup>у<sup>и</sup>т]</b>, <b>ТЕ'РЬ > [тэ<sup>и</sup>э<sup>и</sup>р']</b>, <b>ТЕЯ > [т'э<sup>и</sup>а<sup>и</sup>]</b>, <b>ЗМЕ''Д > [зм'э<sup>и</sup>э<sup>и</sup>й'</sup>э<sup>и</sup>д]</b>.</li>
 					<li><b>Техническая информация</b> Аббревиатуры и латинские символы не учитываются в механизме переводчика.</li>
-				</ol>
+				</ul>
 			</div>
 			<div _flex="v" data-tab="save">
-				<ol _footnote>
-					<li>Заглушка.</li>
-				</ol>
+				<ul _list="save" data-translator-ref="list"></ul>
+				<!--
+				<div _flex="h">
+					<button onclick="Translator.download();">Загрузить ▼</button>
+					<button onclick="Translator.upload();">Загрузить ▲</button>
+				</div>
+				-->
 			</div>
 		</div>
 	</div>
