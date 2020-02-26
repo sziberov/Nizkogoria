@@ -646,6 +646,9 @@
 						</li>
 					`);
 				}
+				if($.isEmptyObject(b)) {
+					a.append('<li>Пусто.</li>');
+				}
 			}
 
 			static updateButtons(a) {
