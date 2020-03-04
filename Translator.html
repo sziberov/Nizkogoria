@@ -26,6 +26,8 @@
 		}
 
 		body {
+			min-width: 768px;
+
 			background: var(--color-black-0625);
 		}
 
@@ -395,7 +397,7 @@
 
 			static go() {
 			//	А Б В   Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я - Оригинал
-			//	А Б В Г Ґ Д Е Ё Ж З И Й К Л М Н О П Р С Т Ў Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я - Замененные
+			//	А Б В Г Ґ Д Е Ё Ж З И Й К Л М Н О П Р С Т Ў Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я - Заменённые, добавленные
 
 				var a = document.querySelector(this.ref('in')).value,
 					b = document.querySelector(this.ref('out')),
@@ -412,6 +414,7 @@
 						'елем':		'элем',
 					//	'ещ':		'ищ',
 						'золо':		'зло',
+						'ие':		'е',
 						'кт':		'хт',
 					//	'не':		'ни',
 						'отим':		'отым',
@@ -685,6 +688,14 @@
 				this.updateButtons(a);
 			}
 
+			static clear() {
+				var a = document.querySelector(this.ref('in'));
+
+				if(a.value.trim() !== '' && !window.confirm(`Очистить поле ввода?`)) return;
+				a.value = '';
+				this.go();
+			}
+
 			static load(a) {
 				var b = document.querySelector(this.ref('in')),
 					c = document.querySelector(this.ref('date')).innerHTML,
@@ -692,17 +703,17 @@
 					e = localStorage.getItem('translation');
 
 				if(a) {
-					if(d[a].trim() !== '' && c == Datestamp.convert(a) && !window.confirm(`Восстановить сохранение "${Datestamp.convert(a)}"?`)) return;
+					if(b.value.trim() !== '' && !window.confirm(`${c == Datestamp.convert(a) ? 'Восстановить' : 'Загрузить'} сохранение "${Datestamp.convert(a)}"?`)) return;
 					b.value = d[a];
-					Translator.go();
-					Translator.update(a);
+					this.go();
+					this.update(a);
 					Tab.switch('translate');
 				} else
 				if(!d && e) {
 					b.value = e;
 					localStorage.removeItem('translation');
-					Translator.save();
-					Translator.update();
+					this.save();
+					this.update();
 				}
 			}
 
@@ -717,12 +728,12 @@
 						...c
 					}
 					localStorage.setItem('save', JSON.stringify(c));
-					Translator.update(d);
+					this.update(d);
 				} else {
 					if(c[a].trim() !== '' && !window.confirm(`Перезаписать сохранение "${Datestamp.convert(a)}"?`)) return;
 					c[a] = b;
 					localStorage.setItem('save', JSON.stringify(c));
-					Translator.updateList();
+					this.updateList();
 				}
 			}
 
@@ -734,9 +745,9 @@
 				c[a] = undefined;
 				localStorage.setItem('save', JSON.stringify(c));
 				if(b == Datestamp.convert(a)) {
-					Translator.update();
+					this.update();
 				} else {
-					Translator.updateList();
+					this.updateList();
 				}
 			}
 		}
@@ -794,7 +805,10 @@
 					<textarea data-translator-ref="out" onscroll="Translator.scroll(this);" spellcheck="false" readonly></textarea>
 				</div>
 				<div _flex="h space">
-					<button onclick="Translator.save();">Сохранить</button>
+					<div _flex="h">
+						<button onclick="Translator.save();">Сохранить</button>
+						<button onclick="Translator.clear();">Очистить</button>
+					</div>
 					<div _flex="h center" data-translator-ref="current"></div>
 				</div>
 				<ul _list="footnote">
