@@ -155,15 +155,24 @@
 		[label_] {
 			display: flex;
 			align-items: center;
+
+			min-width: 0;
 		}
 
 		[label_]:after {
 			content: attr(label_);
 
+			overflow: hidden;
+
 			margin-left: 16px;
+
+			text-overflow: ellipsis;
+			white-space: nowrap;
 		}
 
 		label[_switch] {
+			flex-shrink: 0;
+
 			width: 64px;
 			height: 32px;
 
@@ -192,6 +201,7 @@
 			box-shadow: 0 0 0 16px transparent;
 
 			transition: 250ms ease background, 250ms ease box-shadow, 250ms ease opacity, 250ms ease transform;
+			transform: translateX(0);
 		}
 
 		label[_switch]:hover div {
@@ -205,7 +215,7 @@
 		label[_switch] input:checked + div {
 			background: var(--color-orange);
 
-			transform: translate(100%, 0);
+			transform: translateX(100%);
 		}
 
 		label[_switch] div:before,
@@ -517,9 +527,8 @@
 
 						'ўчр':	'ўчер',
 
-					//	'ф':		'хв',
-						'фицир':	'фик',
-						'фст':		'ст',
+						'ф(?=[аеёиоўыэюя]|ь[еёиоюя])':	['хв', 2],
+						'фст':							'ст',
 
 						'хг':	'г',
 
@@ -552,7 +561,7 @@
 						'щў':	'щю',
 						'щэ':	'ще',
 
-						'ьи':	'ьйи',
+					//	'ьи':	'ьйи',
 						'ьо':	'ьё',
 
 						'ять?с':	'яц',
@@ -561,8 +570,8 @@
 						'в(?=ь?[\\s\\p{P}]+[кпстфхцчшщ])':						'ф',
 					//	'в(о?)(?=[^\\S]|$)':									'ў$1',
 						'(?<=[бвгджз][ \\t]+)и':								'ы',
-						'(?<=\\S{4,}[^бвгдкх])ива([ейюя]\\S*)':					['ю$1', 2],
-						'(?<=\\S{4,})(?<!б|[дзк]р|[пс]л)[иы]ва([ейюя]\\S*)':	['ў$1', 2],
+						'(?<=\\S{4,}[^бвгдкх])ива([еёйюя]\\S*)':				['ю$1', 3],
+						'(?<=\\S{4,})(?<!б|[дзк]р|[пс]л)[иы]ва([еёйюя]\\S*)':	['ў$1', 3],
 						'[дт]ь?(?=(д|т)[еёиьюя])':								'$1',
 						'(?<=\\S{5,})еви(ч|ш)':									'и$1',
 						'(?<=\\S{5,})(?:др)?ови(ч|ш)':							'ы$1',
@@ -570,8 +579,9 @@
 					//	'([еёиюя]жж)а':											'$1я',
 					//	'([еёиюя]жж)ў':											'$1ю',
 						'([жцчшщ])ь(?=[^еёиюя]|$)':								'$1',
-						'(з|с)(?=[днст][еёиьюя])':								['$1ь', 3],
-						'(?<=\\S[взнт])ир(?=[оў](?!с))':						'',
+						'(з|с)(?=[днст][еёиьюя])':								['$1ь', 4],
+						'(?<=\\S[взнтф])ир(?=[оў](?!с))':						'',
+						'(ф|хв)ицыр':											'$1ик',
 						'((?<=м)|с?т)ьдесят':									'сят',
 						'((?<=м)|с?т)ьсот':										'сот',
 						'([^\\s\\d\\p{P}])\\1(?!\\1)':							'$1\''	// (?<!\\1)
@@ -774,7 +784,7 @@
 		</ul>
 		<div _tab>
 			<div _flex="v" data-tab="translate" current_>
-				<div _flex="h">
+				<div _flex="h scroll">
 					<div label_="Што > Шо">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="0" checked>
@@ -787,15 +797,21 @@
 							<div></div>
 						</label>
 					</div>
+					<div label_="Ф > Хв">
+						<label _switch>
+							<input type="checkbox" data-translator-setting="2">
+							<div></div>
+						</label>
+					</div>
 					<div label_="Ива / Ыва > Ю / Ў">
 						<label _switch>
-							<input type="checkbox" data-translator-setting="2" checked>
+							<input type="checkbox" data-translator-setting="3" checked>
 							<div></div>
 						</label>
 					</div>
 					<div label_="З / С > Зь / Сь">
 						<label _switch>
-							<input type="checkbox" data-translator-setting="3">
+							<input type="checkbox" data-translator-setting="4">
 							<div></div>
 						</label>
 					</div>
