@@ -75,6 +75,8 @@
 
 		[_flex~="h"]:not([_flex~="stack"]) > *:not(:first-child) {
 			margin-left: 32px;
+
+			transition: 250ms ease margin-left;
 		}
 
 		[_flex~="v"] {
@@ -83,6 +85,8 @@
 
 		[_flex~="v"]:not([_flex~="stack"]) > *:not(:first-child) {
 			margin-top: 32px;
+
+			transition: 250ms ease margin-top;
 		}
 
 		[_flex~="space"] {
@@ -100,7 +104,7 @@
 		ul[_tabs] li {
 			position: relative;
 
-			transition: color 250ms ease;
+			transition: 250ms ease color;
 			cursor: pointer;
 		}
 
@@ -120,7 +124,8 @@
 
 			background: var(--color-gray);
 
-			transition: background 250ms ease, transform 250ms ease;
+			transition: 250ms ease;
+			transition-property: background, opacity, transform;
 			transform: scaleX(0);
 		}
 
@@ -168,6 +173,8 @@
 
 			text-overflow: ellipsis;
 			white-space: nowrap;
+
+			transition: 250ms ease margin-left;
 		}
 
 		label[_switch] {
@@ -179,6 +186,8 @@
 			background: var(--color-black-0625);
 			border-radius: 2px;
 
+			transition: 250ms ease;
+			transition-property: width, height;
 			cursor: pointer;
 			user-select: none;
 		}
@@ -200,8 +209,8 @@
 			border-radius: 2px;
 			box-shadow: 0 0 0 16px transparent;
 
-			transition: 250ms ease background, 250ms ease box-shadow, 250ms ease opacity, 250ms ease transform;
-			transform: translateX(0);
+			transition: 250ms ease;
+			transition-property: width, height, background, box-shadow, opacity, transform;
 		}
 
 		label[_switch]:hover div {
@@ -229,7 +238,8 @@
 
 			background: var(--color-white);
 
-			transition: 250ms ease transform;
+			transition: 250ms ease;
+			transition-property: width, height, transform;
 			transform: none;
 		}
 
@@ -256,7 +266,6 @@
 				0 0 0 16px transparent;
 
 			transition: 250ms ease box-shadow;
-			-scroll-behavior: smooth;
 		}
 
 		textarea:focus {
@@ -286,7 +295,8 @@
 
 			color: var(--color-white);
 
-			transition: 250ms ease box-shadow, 250ms ease opacity;
+			transition: 250ms ease;
+			transition-property: box-shadow, opacity;
 			user-select: none;
 		}
 
@@ -314,9 +324,9 @@
 
 			background: var(--color-white);
 			border-radius: 2px;
-			box-shadow:
-				0 8px 16px 8px var(--color-black-25),
-				0 0 0 16px transparent;
+			box-shadow: 0 8px 16px 8px var(--color-black-25);
+
+			transition: 250ms ease box-shadow;
 		}
 
 		ul[_list="footnote"] {
@@ -378,6 +388,55 @@
 			vertical-align: top;
 			font-size: 10px;
 		}
+
+		@media screen and (max-width: 1024px) {
+			[_flex~="h"]:not([_flex~="stack"]) > *:not(:first-child) {
+				margin-left: 16px;
+			}
+
+			[_flex~="v"]:not([_flex~="stack"]) > *:not(:first-child) {
+				margin-top: 16px;
+			}
+
+			ul[_tabs] li:after {
+				opacity: 0;
+			}
+
+			label[_switch],
+			label[_switch] div {
+				width: 16px;
+				height: 16px;
+			}
+
+			label[_switch] input:checked + div {
+				transform: translateX(0);
+			}
+
+			label[_switch] div:before,
+			label[_switch] div:after {
+				width: 8px;
+			}
+
+			textarea {
+				box-shadow:
+					0 4px 8px 4px var(--color-black-25),
+					0 0 0 16px transparent;
+			}
+
+			textarea:not([readonly]):focus {
+				box-shadow:
+					0 4px 8px 4px var(--color-black-25),
+					0 0 0 2px var(--color-black-125);
+			}
+
+			button {
+				transition-property: margin-top, margin-left, box-shadow, opacity!important;
+			}
+
+			ul[_list]:not([_list="footnote"]) {
+				box-shadow: 0 4px 8px 4px var(--color-black-25);
+			}
+		}
 	</style>
 	<script>
 		//jQuery v3.4.1 | (c) JS Foundation and other contributors | jquery.org/license
@@ -416,33 +475,23 @@
 					},
 					d = { // В начале слова
 						'бес':		'без',
-					//	'безс':		'бес',
 						'взим':		'взым',
-						'вск':		'ск',
-						'всп':		'сп',
 						'дези':		'дезы',
 						'елем':		'элем',
-					//	'ещ':		'ищ',
 					//	'золо':		'зла',
 						'ие':		'е',
 						'капю':		'капи',
 						'кт':		'хт',
 						'мадем':	'мадм',
-					//	'не':		'ни',
 						'отим':		'отым',
 						'отмщ':		'отомщ',
 						'респў':	'репў',
-					//	'сожале':	'сожэле',
 						'тщ':		'ч',
 						'что':		['шо', 0],
 						'эйн':		'ин',
 						'эсте':		'эстэ',
 
 						'г(?!..?г)':		'ґ',
-					//	'пеле(?!нк)':		'пели',
-					//	'пре(?!сс)':		'при',
-					//	'(п|ч)ере':			'$1ери',
-					//	'(с|т)еб':			'$1иб',
 						'че?ре[зс](?!л)':	'через'
 					},
 					e = { // Везде
@@ -483,7 +532,6 @@
 						'жю':			'жў',
 						'жя':			'жа',
 
-					//	'завр':			'заўр',
 						'зд(?=[клмн])':	'з',
 						'здч':			'щ',
 						'зж':			'жж',
@@ -529,7 +577,7 @@
 						'ўчр':	'ўчер',
 
 						'ф(?=[аеёиоўыэюя]|ь[еёиоюя])':	['хв', 2],
-						'фст':							'ст',
+						'фств':							'ств',
 
 						'хг':	'г',
 
@@ -788,16 +836,18 @@
 				<div _flex="h">
 					<div label_="Што > Шо">
 						<label _switch>
-							<input type="checkbox" data-translator-setting="0" checked>
+							<input type="checkbox" data-translator-setting="0">
 							<div></div>
 						</label>
 					</div>
+					<!--
 					<div label_="Н > Нь">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="1">
 							<div></div>
 						</label>
 					</div>
+					-->
 					<div label_="Ф > Хв">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="2">
@@ -806,16 +856,18 @@
 					</div>
 					<div label_="Ива / Ыва > Ю / Ў">
 						<label _switch>
-							<input type="checkbox" data-translator-setting="3" checked>
+							<input type="checkbox" data-translator-setting="3">
 							<div></div>
 						</label>
 					</div>
+					<!--
 					<div label_="З / С > Зь / Сь">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="4">
 							<div></div>
 						</label>
 					</div>
+					-->
 				</div>
 				<div _flex="h">
 					<textarea data-translator-ref="in" oninput="Translator.go();" onscroll="Translator.scroll(this);"></textarea>
