@@ -536,6 +536,7 @@
 						'зш':			'шш',
 						'зщ':			'щ',
 
+						'из-под':		'с-под',
 						'иил':			'ил',
 						'интер(?!ес)':	'интэр',
 
@@ -668,7 +669,7 @@
 							e = a.charAt(i);
 							e = e != '' ? e : a.slice(-1);
 
-						c += e == e.toUpperCase() ? d.toUpperCase() : d;
+						c += e == e.toUpperCase() && !e.match(/\p{P}/u) ? d.toUpperCase() : d;
 					}
 
 					return c;
