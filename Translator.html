@@ -290,7 +290,7 @@
 				0 0 0 16px transparent;
 
 			transition: 250ms ease;
-			transition-property: box-shadow, font-size, line-height;
+			transition-property: margin-top, margin-left, padding, box-shadow, font-size, line-height!important;
 		}
 
 		textarea:focus {
@@ -300,6 +300,8 @@
 		}
 
 		textarea[zoom_] {
+			padding: 8px 16px;
+
 			font-size: 16px;
 			line-height: 32px;
 		}
@@ -309,8 +311,6 @@
 
 			background: var(--color-black-0625);
 			box-shadow: none;
-
-			font-size: 12px;
 		}
 
 		button {
@@ -692,6 +692,7 @@
 
 						'(?!=а)кто':				'хто',
 					//	'(?<=и)нет':				'нэт',
+						'ни([еёиюя][вм]?)':			['нь$1', 5],
 						'(?<!дор|л|(?<!ў)мн)ого':	'ово',
 					//	'(л|ш)ся':					'$1са',
 						'(?<=ш)то':					['о', 0],
@@ -700,6 +701,12 @@
 
 					},
 					g = '';
+
+				if(a.length <= 128) {
+					$(this.ref('in')+', '+this.ref('out')).attr('zoom_', '');
+				} else {
+					$(this.ref('in')+', '+this.ref('out')).removeAttr('zoom_');
+				}
 
 				for(let i = 0; i < a.length; i++) {
 					let h = a.charAt(i);
@@ -815,6 +822,7 @@
 					this.go();
 					this.update(a);
 					Tab.switch('translate');
+					window.scrollTo(0, 0);
 				} else
 				if(!d && e) {
 					b.value = e;
@@ -915,11 +923,17 @@
 						</label>
 					</div>
 					-->
+					<div label_="Ние > Нье">
+						<label _switch>
+							<input type="checkbox" data-translator-setting="5">
+							<div></div>
+						</label>
+					</div>
 				</div>
 				<div _flex="h">
-					<textarea data-translator-ref="in" oninput="Translator.go();" onscroll="Translator.scroll(this);"></textarea>
+					<textarea data-translator-ref="in" oninput="Translator.go();" onscroll="Translator.scroll(this);" zoom_></textarea>
 					<!--<button onclick="Translator.go();"></button>-->
-					<textarea data-translator-ref="out" onscroll="Translator.scroll(this);" spellcheck="false" readonly></textarea>
+					<textarea data-translator-ref="out" onscroll="Translator.scroll(this);" spellcheck="false" readonly zoom_></textarea>
 				</div>
 				<div _flex="h space">
 					<div _flex="h">
