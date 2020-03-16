@@ -3,6 +3,7 @@
 	<title>Переводчик ~ НГСР</title>
 
 	<link rel="icon" type="image/png" href="Icon.png" />
+	<meta name="HandheldFriendly" content="true" />
 
 	<style>
 		* {
@@ -104,7 +105,8 @@
 		ul[_tabs] li {
 			position: relative;
 
-			transition: 250ms ease color;
+			transition: 250ms ease;
+			transition-property: margin-left, color;
 			cursor: pointer;
 		}
 
@@ -112,25 +114,53 @@
 			margin-left: 16px;
 		}
 
+		ul[_tabs] li:hover {
+			color: var(--color-gray);
+		}
+
+		ul[_tabs] li[current_] {
+			color: var(--color-orange);
+
+			cursor: default;
+		}
+
+		ul[_tabs] li:before,
 		ul[_tabs] li:after {
 			content: '';
 
 			position: absolute;
+
+			background: var(--color-gray);
+
+			transition: 250ms ease;
+			transition-property: background, opacity, transform;
+		}
+
+		ul[_tabs] li:before {
+			top: 0;
+			left: -16px;
+			bottom: 0;
+
+			width: 2px;
+
+			opacity: 0;
+			transform: scaleY(0);
+		}
+
+		ul[_tabs] li[current_]:before {
+			background: var(--color-orange);
+
+			transform: scaleY(1);
+		}
+
+		ul[_tabs] li:after {
 			left: 0;
 			right: 0;
 			bottom: -16px;
 
 			height: 2px;
 
-			background: var(--color-gray);
-
-			transition: 250ms ease;
-			transition-property: background, opacity, transform;
 			transform: scaleX(0);
-		}
-
-		ul[_tabs] li:hover {
-			color: var(--color-gray);
 		}
 
 		ul[_tabs] li:hover:after {
@@ -139,12 +169,6 @@
 
 		ul[_tabs] li:not([data-tab-ref]):hover:after {
 			transform: scaleX(0);
-		}
-
-		ul[_tabs] li[current_] {
-			color: var(--color-orange);
-
-			cursor: default;
 		}
 
 		ul[_tabs] li[current_]:after {
@@ -265,13 +289,19 @@
 				0 8px 16px 8px var(--color-black-25),
 				0 0 0 16px transparent;
 
-			transition: 250ms ease box-shadow;
+			transition: 250ms ease;
+			transition-property: box-shadow, font-size, line-height;
 		}
 
 		textarea:focus {
 			box-shadow:
 				0 8px 16px 8px var(--color-black-25),
 				0 0 0 2px var(--color-black-125);
+		}
+
+		textarea[zoom_] {
+			font-size: 16px;
+			line-height: 32px;
 		}
 
 		textarea[readonly] {
@@ -296,7 +326,7 @@
 			color: var(--color-white);
 
 			transition: 250ms ease;
-			transition-property: margin-top, margin-left, box-shadow, opacity;
+			transition-property: margin-top, margin-left, box-shadow, opacity!important;
 			user-select: none;
 		}
 
@@ -396,6 +426,18 @@
 
 			[_flex~="v"]:not([_flex~="stack"]) > *:not(:first-child) {
 				margin-top: 16px;
+			}
+
+			ul[_tabs] li[current_] {
+				margin-left: 16px;
+			}
+
+			ul[_tabs] li:not(:first-child)[current_] {
+				margin-left: 32px;
+			}
+
+			ul[_tabs] li:before {
+				opacity: 1;
 			}
 
 			ul[_tabs] li:after {
@@ -538,6 +580,7 @@
 
 						'из-под':		'с-под',
 						'иил':			'ил',
+						'индекс':		'индэкс',
 						'интер(?!ес)':	'интэр',
 
 						'й(?=[еёюя])':	'',
@@ -604,14 +647,17 @@
 						'шю':				'шў',
 						'шя':				'ша',
 
-						'ща':	'щя',
-						'що':	'щё',
-						'щри':	'щери',
-						'щў':	'щю',
-						'щэ':	'ще',
+						'ща':		'щя',
+						'що':		'щё',
+						'щри':		'щери',
+						'штейн':	'штэйн',
+						'щў':		'щю',
+						'щэ':		'ще',
 
 					//	'ьи':	'ьйи',
 						'ьо':	'ьё',
+
+						'экспрес':	'экспрэс',
 
 						'ять?с':	'яц',
 
@@ -624,7 +670,7 @@
 						'[дт]ь?(?=(д|т)[еёиьюя])':								'$1',
 						'(?<=\\S{5,})еви(ч|ш)':									'и$1',
 						'(?<=\\S{5,})(?:др)?ови(ч|ш)':							'ы$1',
-						'его(?!дя|м|р)':										'ево',
+						'(?<!пер)его(?!дя|м|р)':								'ево',
 					//	'([еёиюя]жж)а':											'$1я',
 					//	'([еёиюя]жж)ў':											'$1ю',
 						'([жцчшщ])ь(?=[^еёиюя]|$)':								'$1',
@@ -642,7 +688,6 @@
 						'лько':				'ко',
 						'стр':				'стэр',
 					//	'ожд([еёиьюя].?)':	'ож\'$1',
-						'штейн':			'штэйн',
 						'эго':				'эво',
 
 						'(?!=а)кто':				'хто',
