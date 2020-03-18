@@ -654,17 +654,17 @@
 						'шё':				'шо',
 						'ши':				'шы',
 						'шт(?=[клмнш])':	'ш',
+						'ште(?=йн|пс)':		'штэ',
 						'шч':				'щ',
 						'шшт':				'шт',
 						'шю':				'шў',
 						'шя':				'ша',
 
-						'ща':		'щя',
-						'що':		'щё',
-						'щри':		'щери',
-						'штейн':	'штэйн',
-						'щў':		'щю',
-						'щэ':		'ще',
+						'ща':	'щя',
+						'що':	'щё',
+						'щри':	'щери',
+						'щў':	'щю',
+						'щэ':	'ще',
 
 					//	'ьи':	'ьйи',
 						'ьо':	'ьё',
@@ -758,6 +758,16 @@
 				for(let v in f) g = n(f[v], true) ? g.replace(new RegExp('(?<=\\S)'+v+'(?=($|\\s|\\d|\\p{P}))', 'giu'),		(a, b) => m(a, n(f[v]).replace('$1', b))) : g;
 
 				b.value = g;
+			}
+
+			static setting(a) {
+				var b = localStorage.getItem('setting');
+
+				if(a) {
+					this.go();
+				} else {
+
+				}
 			}
 
 			static scroll(a) {
@@ -889,7 +899,7 @@
 	//	$(document).on('click', '[data-setting]',					(e) => Translator.go());
 		document.addEventListener('click', (e) => {
 			if(e.target.matches('[data-tab-ref]:not([current_])'))	Tab.switch(e);
-			if(e.target.matches('[data-translator-setting]'))		Translator.go();
+			if(e.target.matches('[data-translator-setting]'))		Translator.setting(e);
 		}, false);
 		document.addEventListener('DOMContentLoaded', () => {
 			Translator.update();
