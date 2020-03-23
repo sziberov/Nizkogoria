@@ -201,6 +201,16 @@
 			transition: 250ms ease margin-left;
 		}
 
+		label {
+			cursor: pointer;
+			user-select: none;
+		}
+
+		label input {
+			width: 0;
+			height: 0;
+		}
+
 		label[_switch] {
 			flex-shrink: 0;
 
@@ -212,13 +222,6 @@
 
 			transition: 250ms ease;
 			transition-property: width, height;
-			cursor: pointer;
-			user-select: none;
-		}
-
-		label[_switch] input {
-			width: 0;
-			height: 0;
 		}
 
 		label[_switch] div {
@@ -274,6 +277,29 @@
 		label[_switch] input:checked + div:before,
 		label[_switch] input:checked + div:after {
 			transform: rotate(180deg);
+		}
+
+		label[_file] div {
+			padding: 8px;
+
+			min-width: 32px;
+
+			background: var(--color-orange);
+			border-radius: 2px;
+			box-shadow: 0 0 0 16px transparent;
+
+			color: var(--color-white);
+
+			transition: 250ms ease;
+			transition-property: box-shadow, opacity;
+		}
+
+		label[_file]:hover div {
+			opacity: 0.5;
+		}
+
+		label[_file] input:focus + div {
+			box-shadow: 0 0 0 2px var(--color-black-125);
 		}
 
 		textarea {
@@ -499,6 +525,30 @@
 			}
 		}
 
+		class File {
+			static write(a, b, c) {
+				var d = new Blob([a], { type: b }),
+					e = $('<a>').appendTo('body').attr({
+						'href': URL.createObjectURL(d),
+						'download': c
+					});
+
+				e[0].click();
+				e.remove();
+			}
+
+			static read(a, b, c) {
+				var d = a.files[c || 0];
+
+				if(d) {
+					d.text().then(a => {
+						d.text = a;
+						b(d);
+					});
+				}
+			}
+		}
+
 		class Translator {
 			static ref = (a) => `[data-translator-ref="${a}"]`;
 
@@ -516,6 +566,7 @@
 						'взим':		'взым',
 						'дези':		'дезы',
 						'елем':		'элем',
+						'жвачк':	'жэвачк',
 					//	'золо':		'зла',
 						'ие':		'е',
 						'иис':		'ис',
@@ -599,8 +650,8 @@
 						'йо':			'ё',
 						'йў':			'ю',
 
-						'лн(?=еч|ц|ы)':	'н',
-						'льзя':			'зя',
+						'лн(?=еч|ц|ы)':		'н',
+						'ль((?=зя|ко))':	'$1',
 
 						'н(?=[чщ])':	['нь', 1],
 						'нд(?=[сщ])':	'н',
@@ -706,7 +757,6 @@
 					//	'в':				'ф',
 					//	'г':				'х',
 						'име':				'имэ',
-						'лько':				'ко',
 						'стр':				'стэр',
 					//	'ожд([еёиьюя].?)':	'ож\'$1',
 						'эго':				'эво',
@@ -837,7 +887,7 @@
 			static clear() {
 				var a = document.querySelector(this.ref('in'));
 
-				if(a.value.trim() !== '' && !window.confirm(`Очистить поле ввода?`)) return;
+				if(a.value.trim() !== '' && !confirm(`Очистить поле ввода?`)) return;
 				a.value = '';
 				this.go();
 			}
@@ -849,12 +899,12 @@
 					e = localStorage.getItem('translation');
 
 				if(a) {
-					if(b.value.trim() !== '' && !window.confirm(`${c == Datestamp.convert(a) ? 'Восстановить' : 'Загрузить'} сохранение "${Datestamp.convert(a)}"?`)) return;
+					if(b.value.trim() !== '' && !confirm(`${c == Datestamp.convert(a) ? 'Восстановить' : 'Загрузить'} сохранение "${Datestamp.convert(a)}"?`)) return;
 					b.value = d[a];
 					this.go();
 					this.update(a);
 					Tab.switch('translate');
-					window.scrollTo(0, 0);
+					scrollTo(0, 0);
 				} else
 				if(!d && e) {
 					b.value = e;
@@ -877,7 +927,7 @@
 					localStorage.setItem('save', JSON.stringify(c));
 					this.update(d);
 				} else {
-					if(c[a].trim() !== '' && !window.confirm(`Перезаписать сохранение "${Datestamp.convert(a)}"?`)) return;
+					if(c[a].trim() !== '' && !confirm(`Перезаписать сохранение "${Datestamp.convert(a)}"?`)) return;
 					c[a] = b;
 					localStorage.setItem('save', JSON.stringify(c));
 					this.updateList();
@@ -888,13 +938,26 @@
 				var b = document.querySelector(this.ref('date')).innerHTML,
 					c = JSON.parse(localStorage.getItem('save'));
 
-				if(c[a].trim() !== '' && window.prompt(`Удалить сохранение "${Datestamp.convert(a)}"? ("Y" для подтверждения).`) !== 'Y') return;
+				if(c[a].trim() !== '' && prompt(`Удалить сохранение "${Datestamp.convert(a)}"? ("Y" для подтверждения).`) !== 'Y') return;
 				c[a] = undefined;
 				localStorage.setItem('save', JSON.stringify(c));
 				if(b == Datestamp.convert(a)) {
 					this.update();
 				} else {
 					this.updateList();
+				}
+			}
+
+			static file(a, b) {
+				if(a == 'download') {
+					File.write(localStorage.getItem('save'), 'application/json', `Сохранения (${Datestamp.convert(Datestamp.current())}).json`);
+				} else
+				if(a == 'upload') {
+					File.read(b, (a) => {
+						if(a.type !== 'application/json' || prompt(`Перезаписать все сохранения?`) !== 'Y') return;
+						localStorage.setItem('save', a.text);
+						this.update();
+					});
 				}
 			}
 		}
@@ -991,12 +1054,14 @@
 			</div>
 			<div _flex="v" data-tab="save">
 				<ul _list="save" data-translator-ref="list"></ul>
-				<!--
 				<div _flex="h">
-					<button onclick="Translator.download();">Загрузить ▼</button>
-					<button onclick="Translator.upload();">Загрузить ▲</button>
+					<button onclick="Translator.file('download');">▼ Сохранить</button>
+					<!--<button onclick="Translator.file('upload');">▲ Загрузить</button>-->
+					<label _file>
+						<input type="file" onchange="Translator.file('upload', this)">
+						<div>▲ Загрузить</div>
+					</label>
 				</div>
-				-->
 			</div>
 		</div>
 	</div>
