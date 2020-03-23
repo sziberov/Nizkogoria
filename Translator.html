@@ -672,6 +672,7 @@
 						'сяч':				'щ',
 
 						'тд':				'дд',
+						'теи(?=[знс])':		'тэи',
 						'тзб':				'цб',
 						'тс(?=[клмнт])':	'ц',
 						'тся':				'цца',
@@ -742,8 +743,9 @@
 						'([жцчшщ])ь(?=[^еёиюя]|$)':								'$1',
 						'(з|с)(?=[днст][еёиьюя])':								['$1ь', 4],
 						'(?<=[бвгджз][ \\t]+)и':								'ы',
-						'(?<=\\S{4,}[^бвгдкх])ива([еёйюя]\\S*)':				['ю$1', 5],
-						'(?<=\\S{4,})(?<!б|[дзк]р|[пс]л)[иы]ва([еёйюя]\\S*)':	['ў$1', 5],
+						'(?<=[бвгджзкпстфхцчшщ][ \\t]+)(е(?=ё)|и)':				['ы', 5],
+						'(?<=\\S{4,}[^бвгдкх])ива([еёйюя]\\S*)':				['ю$1', 6],
+						'(?<=\\S{4,})(?<!б|[дзк]р|[пс]л)[иы]ва([еёйюя]\\S*)':	['ў$1', 6],
 						'(?<=\\S[взнтф])ир(?=[оў](?!с))':						'',
 						'(?<!пе)рейд':											'рэйд',
 						'(ф|хв)анер':											'$1анэр',
@@ -764,8 +766,8 @@
 
 						'(?!=а)кто':							'хто',
 					//	'(?<=и)нет':							'нэт',
-						'ни([еёюя][вм]?)':						['нь$1', 6],
-						'ни(\'[вм]?)':							['ньи', 6],
+						'ни([еёюя][вм]?)':						['нь$1', 7],
+						'ни(\'[вм]?)':							['ньи', 7],
 						'(?<!дор|л|(?<!ў)мн|(?<!бы|о)стр)ого':	'ово',
 					//	'(л|ш)ся':								'$1са',
 						'(?<=ш)то':								['о', 0],
@@ -985,49 +987,55 @@
 		<div _tab>
 			<div _flex="v" data-tab="translate" current_>
 				<div _flex="h">
-					<div label_="Што > Шо">
+					<div label_="Шо">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="0">
 							<div></div>
 						</label>
 					</div>
 					<!--
-					<div label_="Н > Нь">
+					<div label_="Нь">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="1">
 							<div></div>
 						</label>
 					</div>
 					-->
-					<div label_="Ф > Хв">
+					<div label_="Хв">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="2">
 							<div></div>
 						</label>
 					</div>
-					<div label_="Чъш > Дш">
+					<div label_="Дш">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="3">
 							<div></div>
 						</label>
 					</div>
 					<!--
-					<div label_="З / С > Зь / Сь">
+					<div label_="Зь / Сь">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="4">
 							<div></div>
 						</label>
 					</div>
 					-->
-					<div label_="Ива / Ыва > Ю / Ў">
+					<div label_="Ы">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="5">
 							<div></div>
 						</label>
 					</div>
-					<div label_="Ние > Нье">
+					<div label_="Ю / Ў">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="6">
+							<div></div>
+						</label>
+					</div>
+					<div label_="Нье">
+						<label _switch>
+							<input type="checkbox" data-translator-setting="7">
 							<div></div>
 						</label>
 					</div>
