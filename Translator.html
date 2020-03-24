@@ -18,6 +18,7 @@
 			--color-black-25: rgba(0,0,0,0.25);
 			--color-gray: #808080;
 			--color-white: #ffffff;
+			--color-white-75: rgba(255,255,255,0.75);
 			--color-orange: #ffbf00;
 			--color-purple: #800080;
 		}
@@ -199,6 +200,42 @@
 			white-space: nowrap;
 
 			transition: 250ms ease margin-left;
+		}
+
+		[tip_] {
+			position: relative;
+		}
+
+		[tip_]:before {
+			content: attr(tip_);
+
+			display: table;
+
+			position: absolute;
+			top: 100%;
+			left: 50%;
+
+			margin-top: 16px;
+			padding: 8px;
+
+			min-width: 16px;
+
+			background: var(--color-white-75);
+			backdrop-filter: blur(2px);
+			border-radius: 2px;
+			box-shadow: 0 2px 4px var(--color-black-25);
+
+			text-align: center;
+			white-space: nowrap;
+
+			opacity: 0;
+			transition: 250ms ease opacity;
+			transform: translateX(-50%);
+			pointer-events: none;
+		}
+
+		[tip_]:hover:before {
+			opacity: 1;
 		}
 
 		label {
@@ -987,53 +1024,53 @@
 		<div _tab>
 			<div _flex="v" data-tab="translate" current_>
 				<div _flex="h">
-					<div label_="Шо" title="Што">
+					<div label_="Шо" tip_="Што">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="0">
 							<div></div>
 						</label>
 					</div>
 					<!--
-					<div label_="Н > Нь">
+					<div label_="Нь" tip_="Н">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="1">
 							<div></div>
 						</label>
 					</div>
 					-->
-					<div label_="Хв" title="Ф">
+					<div label_="Хв" tip_="Ф">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="2">
 							<div></div>
 						</label>
 					</div>
-					<div label_="Дш" title="Чъш">
+					<div label_="Дш" tip_="Чъш">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="3">
 							<div></div>
 						</label>
 					</div>
 					<!--
-					<div label_="Зь / Сь" title="З / С">
+					<div label_="Зь / Сь" tip_="З / С">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="4">
 							<div></div>
 						</label>
 					</div>
 					-->
-					<div label_="Ы / Ыё" title="И / Её">
+					<div label_="Ы / Ыё" tip_="И / Её">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="5">
 							<div></div>
 						</label>
 					</div>
-					<div label_="Ю / Ў" title="Ива / Ыва">
+					<div label_="Ю / Ў" tip_="Ива / Ыва">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="6">
 							<div></div>
 						</label>
 					</div>
-					<div label_="Нье" title="Ние">
+					<div label_="Нье" tip_="Ние">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="7">
 							<div></div>
