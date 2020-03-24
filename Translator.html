@@ -21,6 +21,7 @@
 			--color-white-75: rgba(255,255,255,0.75);
 			--color-orange: #ffbf00;
 			--color-purple: #800080;
+			--color-green: #008000;
 		}
 
 		html {
@@ -28,6 +29,9 @@
 		}
 
 		body {
+			display: flex;
+			flex-direction: column;
+
 			min-width: 768px;
 
 			background: var(--color-black-0625);
@@ -99,11 +103,11 @@
 			align-items: center;
 		}
 
-		ul[_tabs] {
+		ul[_tab-switch] {
 			display: flex;
 		}
 
-		ul[_tabs] li {
+		ul[_tab-switch] li {
 			position: relative;
 
 			transition: 250ms ease;
@@ -111,22 +115,22 @@
 			cursor: pointer;
 		}
 
-		ul[_tabs] li:not(:first-child) {
+		ul[_tab-switch] li:not(:first-child) {
 			margin-left: 16px;
 		}
 
-		ul[_tabs] li:hover {
+		ul[_tab-switch] li:hover {
 			color: var(--color-gray);
 		}
 
-		ul[_tabs] li[current_] {
+		ul[_tab-switch] li[current_] {
 			color: var(--color-orange);
 
 			cursor: default;
 		}
 
-		ul[_tabs] li:before,
-		ul[_tabs] li:after {
+		ul[_tab-switch] li:before,
+		ul[_tab-switch] li:after {
 			content: '';
 
 			position: absolute;
@@ -137,7 +141,7 @@
 			transition-property: background, opacity, transform;
 		}
 
-		ul[_tabs] li:before {
+		ul[_tab-switch] li:before {
 			top: 0;
 			left: -16px;
 			bottom: 0;
@@ -148,13 +152,13 @@
 			transform: scaleY(0);
 		}
 
-		ul[_tabs] li[current_]:before {
+		ul[_tab-switch] li[current_]:before {
 			background: var(--color-orange);
 
 			transform: scaleY(1);
 		}
 
-		ul[_tabs] li:after {
+		ul[_tab-switch] li:after {
 			left: 0;
 			right: 0;
 			bottom: -16px;
@@ -164,15 +168,15 @@
 			transform: scaleX(0);
 		}
 
-		ul[_tabs] li:hover:after {
+		ul[_tab-switch] li:hover:after {
 			transform: scaleX(0.5);
 		}
 
-		ul[_tabs] li:not([data-tab-ref]):hover:after {
+		ul[_tab-switch] li:not([data-tab-ref]):hover:after {
 			transform: scaleX(0);
 		}
 
-		ul[_tabs] li[current_]:after {
+		ul[_tab-switch] li[current_]:after {
 			background: var(--color-orange);
 
 			transform: scaleX(1);
@@ -236,7 +240,7 @@
 
 		[tip_]:hover:before {
 			opacity: 1;
-			transition: 250ms ease opacity 1s;
+			transition-delay: 1s;
 		}
 
 		label {
@@ -492,19 +496,19 @@
 				margin-top: 16px;
 			}
 
-			ul[_tabs] li[current_] {
+			ul[_tab-switch] li[current_] {
 				margin-left: 16px;
 			}
 
-			ul[_tabs] li:not(:first-child)[current_] {
+			ul[_tab-switch] li:not(:first-child)[current_] {
 				margin-left: 32px;
 			}
 
-			ul[_tabs] li:before {
+			ul[_tab-switch] li:before {
 				opacity: 1;
 			}
 
-			ul[_tabs] li:after {
+			ul[_tab-switch] li:after {
 				opacity: 0;
 			}
 
@@ -538,6 +542,14 @@
 			ul[_list]:not([_list="footnote"]) {
 				box-shadow: 0 4px 8px 4px var(--color-black-25);
 			}
+		}
+
+		[_footer] {
+			height: 2px;
+
+			margin-top: auto;
+
+			background: var(--color-green);
 		}
 	</style>
 	<script>
@@ -1018,12 +1030,12 @@
 <body>
 	<div _header></div>
 	<div _content _flex="v">
-		<ul _tabs>
+		<ul _tab-switch>
 			<li data-tab-ref="translate" current_>Перевод</li>
 			<li data-tab-ref="save">Сохранения</li>
 		</ul>
 		<div _tab>
-			<div _flex="v" data-tab="translate" current_>
+			<div data-tab="translate" _flex="v" current_>
 				<div _flex="h">
 					<div label_="Шо" tip_="Што">
 						<label _switch>
@@ -1099,7 +1111,7 @@
 					<li><b>ВАЖНО</b> Для корректного перевода ввод гласного <b>Ё</b> обязателен; Аббревиатуры и латинские символы не учитываются, требуется самостоятельная правка после обработки.</li>
 				</ul>
 			</div>
-			<div _flex="v" data-tab="save">
+			<div data-tab="save" _flex="v">
 				<ul _list="save" data-translator-ref="list"></ul>
 				<div _flex="h">
 					<button onclick="Translator.file('download');">▼ Сохранить</button>
@@ -1112,5 +1124,6 @@
 			</div>
 		</div>
 	</div>
+	<div _footer></div>
 </body>
 </html>
