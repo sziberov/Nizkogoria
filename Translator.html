@@ -233,14 +233,16 @@
 			white-space: nowrap;
 
 			opacity: 0;
-			transition: 250ms ease opacity;
-			transform: translateX(-50%);
+			transition: 250ms ease;
+			transition-property: opacity, transform;
+			transform: translate(-50%, -16px);
 			pointer-events: none;
 		}
 
 		[tip_]:hover:before {
 			opacity: 1;
 			transition-delay: 1s;
+			transform: translateX(-50%);
 		}
 
 		label {
@@ -1001,17 +1003,16 @@
 				}
 			}
 
-			static file(a, b) {
-				if(a == 'download') {
-					File.write(localStorage.getItem('save'), 'application/json', `Сохранения (${Datestamp.convert(Datestamp.current())}).json`);
-				} else
-				if(a == 'upload') {
-					File.read(b, (a) => {
-						if(a.type !== 'application/json' || prompt(`Перезаписать все сохранения?`) !== 'Y') return;
-						localStorage.setItem('save', a.text);
-						this.update();
-					});
-				}
+			static fileDownload() {
+				File.write(localStorage.getItem('save'), 'application/json', `Сохранения (${Datestamp.convert(Datestamp.current())}).json`);
+			}
+
+			static fileUpload(a) {
+				File.read(a, (a) => {
+					if(a.type !== 'application/json' || prompt(`Перезаписать все сохранения?`) !== 'Y') return;
+					localStorage.setItem('save', a.text);
+					this.update();
+				});
 			}
 		}
 
@@ -1114,10 +1115,9 @@
 			<div data-tab="save" _flex="v">
 				<ul _list="save" data-translator-ref="list"></ul>
 				<div _flex="h">
-					<button onclick="Translator.file('download');">▼ Сохранить</button>
-					<!--<button onclick="Translator.file('upload');">▲ Загрузить</button>-->
+					<button onclick="Translator.fileDownload();">▼ Сохранить</button>
 					<label _file>
-						<input type="file" onchange="Translator.file('upload', this)">
+						<input type="file" onchange="Translator.fileUpload(this)">
 						<div>▲ Загрузить</div>
 					</label>
 				</div>
