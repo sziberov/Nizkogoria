@@ -893,11 +893,9 @@
 			static setting(a) {
 				var b = localStorage.getItem('setting');
 
-				if(a) {
-					this.go();
-				} else {
+			//	if(a) {} else {}
 
-				}
+				this.go();
 			}
 
 			static scroll(a) {
@@ -1044,6 +1042,14 @@
 			if(e.target.matches('[data-tab-ref]:not([current_])'))	Tab.switch(e);
 			if(e.target.matches('[data-translator-setting]'))		Translator.setting(e);
 		}, false);
+		document.addEventListener('keyup', (e) => {
+			var ref = Translator.ref('setting')+' input[type="checkbox"]';
+
+			if(e.code == 'KeyQ') {
+				$(ref).prop('checked', !$(ref).first()[0].checked);
+				Translator.setting();
+			}
+		});
 		document.addEventListener('DOMContentLoaded', () => {
 			Translator.update();
 			Translator.load();
@@ -1059,7 +1065,7 @@
 		</ul>
 		<div _tab>
 			<div data-tab="translate" _flex="v" current_>
-				<div _flex="h">
+				<div _flex="h" data-translator-ref="setting">
 					<div label_="Яш" tip_="Еш">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="0">
