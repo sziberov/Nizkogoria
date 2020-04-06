@@ -1042,11 +1042,12 @@
 			if(e.target.matches('[data-tab-ref]:not([current_])'))	Tab.switch(e);
 			if(e.target.matches('[data-translator-setting]'))		Translator.setting(e);
 		}, false);
-		document.addEventListener('keyup', (e) => {
-			var ref = Translator.ref('setting')+' input[type="checkbox"]';
+		document.addEventListener('keypress', (e) => {
+			var a = Translator.ref('in'),
+				b = Translator.ref('setting')+' input[type="checkbox"]';
 
-			if(e.code == 'KeyQ') {
-				$(ref).prop('checked', !$(ref).first()[0].checked);
+			if(!$(a).is(':focus') && e.code == 'KeyQ') {
+				$(b).prop('checked', !$(b).first()[0].checked);
 				Translator.setting();
 			}
 		});
