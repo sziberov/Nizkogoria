@@ -55,6 +55,12 @@
 			cursor: pointer;
 		}
 
+		::placeholder {
+			color: var(--color-gray);
+
+			opacity: 1;
+		}
+
 		::selection {
 			background: var(--color-orange);
 
@@ -1123,9 +1129,9 @@
 					</div>
 				</div>
 				<div _flex="h">
-					<textarea data-translator-ref="in" oninput="Translator.go();" onscroll="Translator.scroll(this);" zoom_></textarea>
+					<textarea data-translator-ref="in" oninput="Translator.go();" onscroll="Translator.scroll(this);" placeholder="Текст на русском" zoom_></textarea>
 					<!--<button onclick="Translator.go();"></button>-->
-					<textarea data-translator-ref="out" onscroll="Translator.scroll(this);" spellcheck="false" readonly zoom_></textarea>
+					<textarea data-translator-ref="out" onscroll="Translator.scroll(this);" spellcheck="false" readonly placeholder="Текст на низкогорском" zoom_></textarea>
 				</div>
 				<div _flex="h space">
 					<div _flex="h">
@@ -1147,7 +1153,7 @@
 					</li>
 					<li>Согласный <b>Ч</b> является мягким во всех случаях, кроме тех, когда сразу после него стоит <b>Ъ</b> знак - <b>ЛЎЧЪШЭ > [лучшэ]</b>.</li>
 					<li>Йотированный гласный <b>Е / Ё / Ю / Я</b>, стоящий после гласного, но не перед <b>Д</b>, при чтении разрешается произносить так же, как после согласной - <b>ТАКОЕ > [такоэ<sup>и</sup>]</b>, <b>ВНИМАНИЕ > [вн'иман'иэ<sup>и</sup>]</b>, <b>ЦЭЛЕ' > [цэл'э<sup>и</sup>э<sup>и</sup>]</b>, <b>ТЕРЯ' > [тер'а<sup>и</sup>а<sup>и</sup>]</b>, <b>КЛЮЮТ' > [кл'у<sup>и</sup>у<sup>и</sup>т]</b>, <b>ТЕ'РЬ > [тэ<sup>и</sup>э<sup>и</sup>р']</b>, <b>ТЕЯ > [т'э<sup>и</sup>а<sup>и</sup>]</b>, <b>ЗМЕ''Д > [зм'э<sup>и</sup>э<sup>и</sup>й'</sup>э<sup>и</sup>д]</b>.</li>
-					<li><b>ВАЖНО</b> Для корректного перевода ввод гласного <b>Ё</b> обязателен; Аббревиатуры и латинские символы не учитываются, требуется самостоятельная правка после обработки.</li>
+					<li><b>ВАЖНО</b> Для корректного перевода ввод гласного <b>Ё</b> обязателен; Аббревиатуры и латинские символы не учитываются, требуется самостоятельная правка после обработки; Chromium на Android не поддерживается.</li>
 				</ul>
 			</div>
 			<div data-tab="save" _flex="v">
