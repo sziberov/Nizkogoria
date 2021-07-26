@@ -12,16 +12,16 @@
 
 			outline: none;
 
-			--color-black: #000000;
-			--color-black-0625: rgba(0,0,0,0.0625);
-			--color-black-125: rgba(0,0,0,0.125);
-			--color-black-25: rgba(0,0,0,0.25);
-			--color-gray: #808080;
-			--color-white: #ffffff;
-			--color-white-75: rgba(255,255,255,0.75);
-			--color-orange: #ffbf00;
-			--color-purple: #800080;
-			--color-green: #008000;
+			--color-black: rgb(0 0 0);
+			--color-black-0625: rgba(0 0 0 / 0.0625);
+			--color-black-125: rgba(0 0 0 / 0.125);
+			--color-black-25: rgba(0 0 0 / 0.25);
+			--color-gray: rgb(50% 50% 50%);
+			--color-white: rgb(100% 100% 100%);
+			--color-white-75: rgba(100% 100% 100% / 0.75);
+			--color-orange: rgb(100% 75% 0%);
+			--color-purple: rgb(50% 0% 50%);
+			--color-green: rgb(0% 50% 0%);
 		}
 
 		html {
@@ -33,6 +33,7 @@
 			flex-direction: column;
 
 			min-width: 768px;
+			min-height: 100%;
 
 			background: var(--color-black-0625);
 		}
@@ -81,24 +82,22 @@
 			display: flex;
 		}
 
-		[_flex~="h"] {
-			flex-direction: row;
+		[_flex]:not([_flex~="stack"]) {
+			gap: 32px;
+
+			transition: 250ms ease gap;
 		}
 
-		[_flex~="h"]:not([_flex~="stack"]) > *:not(:first-child) {
-			margin-left: 32px;
-
-			transition: 250ms ease margin-left;
+		[_flex~="h"] {
+			flex-direction: row;
 		}
 
 		[_flex~="v"] {
 			flex-direction: column;
 		}
 
-		[_flex~="v"]:not([_flex~="stack"]) > *:not(:first-child) {
-			margin-top: 32px;
-
-			transition: 250ms ease margin-top;
+		[_flex~="wrap"] {
+			flex-wrap: wrap;
 		}
 
 		[_flex~="space"] {
@@ -109,8 +108,14 @@
 			align-items: center;
 		}
 
+		[_flex] > [__space] {
+			flex: 1;
+		}
+
 		ul[_tab-switch] {
 			display: flex;
+
+			gap: 16px;
 		}
 
 		ul[_tab-switch] li {
@@ -119,10 +124,6 @@
 			transition: 250ms ease;
 			transition-property: margin-left, color;
 			cursor: pointer;
-		}
-
-		ul[_tab-switch] li:not(:first-child) {
-			margin-left: 16px;
 		}
 
 		ul[_tab-switch] li:hover {
@@ -422,6 +423,22 @@
 			pointer-events: none;
 		}
 
+		[_flex~="h"][_flex~="stack"] > button:first-child {
+			border-radius: 2px 0 0 2px;
+		}
+
+		[_flex~="h"][_flex~="stack"] > button:not(:last-child) {
+			margin-right: 2px;
+		}
+
+		[_flex~="h"][_flex~="stack"] > button:last-child {
+			border-radius: 0 2px 2px 0;
+		}
+
+		[_flex~="h"][_flex~="stack"] > button:only-child {
+			border-radius: 2px;
+		}
+
 		ul[_list] {
 			display: flex;
 			flex-direction: column;
@@ -457,6 +474,8 @@
 		ul[_list="save"] li {
 			display: flex;
 			align-items: center;
+
+			gap: 16px;
 		}
 
 		ul[_list="save"] li > *:first-child {
@@ -467,10 +486,6 @@
 
 			text-overflow: ellipsis;
 			white-space: nowrap;
-		}
-
-		ul[_list="save"] li > *:not(:first-child) {
-			margin-left: 16px;
 		}
 
 		ul[_list] b {
@@ -506,20 +521,12 @@
 		}
 
 		@media screen and (max-width: 1024px) {
-			[_flex~="h"]:not([_flex~="stack"]) > *:not(:first-child) {
-				margin-left: 16px;
-			}
-
-			[_flex~="v"]:not([_flex~="stack"]) > *:not(:first-child) {
-				margin-top: 16px;
+			[_flex]:not([_flex~="stack"]) {
+				gap: 16px;
 			}
 
 			ul[_tab-switch] li[current_] {
 				margin-left: 16px;
-			}
-
-			ul[_tab-switch] li:not(:first-child)[current_] {
-				margin-left: 32px;
 			}
 
 			ul[_tab-switch] li:before {
@@ -573,28 +580,41 @@
 	<script>
 		class Tab {
 			static switch(a) {
-				var b = typeof a == 'string' ? a : $(a.srcElement).data('tab-ref');
+				let title = typeof a === 'string' ? a : $(a.srcElement).data('tab-ref');
 
-				$(`[data-tab-ref="${b}"], [data-tab="${b}"]`).attr('current_', '').siblings().removeAttr('current_');
+				$(`[data-tab-ref="${ title }"], [data-tab="${ title }"]`).attr('current_', '').siblings().removeAttr('current_');
 			}
 		}
 
-		class Datestamp {
+		class Characters {
+			static grave = '̀';
+			static acute = '́';
+
+			static replaceAt(string, index, replacement) {
+				return string.substring(0, index)+replacement+string.substring(index+replacement.length);
+			}
+
+			static insertAt(string, index, insertement) {
+				return string.slice(0, index)+insertement+string.slice(index);
+			}
+		}
+
+		class Timestamp {
 			static current = () => Date.now();
 
-			static convert(a) {
-				var b = new Date(a*1);
+			static toDateString(value) {
+				let date = new Date(value*1);
 
-				return b.toLocaleTimeString()+`, `+b.toLocaleDateString();
+				return date.toLocaleTimeString()+`, `+date.toLocaleDateString();
 			}
 		}
 
 		class File {
-			static write(a, b, c) {
-				var d = new Blob([a], { type: b }),
+			static write(content, type, title) {
+				let d = new Blob([content], { type: type }),
 					e = $('<a>').appendTo('body').attr({
 						'href': URL.createObjectURL(d),
-						'download': c
+						'download': title
 					});
 
 				e[0].click();
@@ -602,7 +622,7 @@
 			}
 
 			static read(a, b, c) {
-				var d = a.files[c || 0];
+				let d = a.files[c ?? 0]
 
 				if(d) {
 					d.text().then(a => {
@@ -614,13 +634,15 @@
 		}
 
 		class Translator {
-			static ref = (a) => `[data-translator-ref="${a}"]`;
+			static settings = {}
+
+			static ref = (title) => `[data-translator-ref="${ title }"]`;
 
 			static go() {
 			//	А Б В   Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У   Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я - Оригинал
 			//	А Б В Г Ґ Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ў Ф Х Ц Ч Ш   Ъ Ы Ь Э Ю Я - Добавленные, заменённые, убранные
 
-				var a = document.querySelector(this.ref('in')).value,
+				let a = document.querySelector(this.ref('in')).value,
 					b = document.querySelector(this.ref('out')),
 					c = { // В начале слова
 						'ассо':		'асо',
@@ -738,8 +760,12 @@
 						'йу':			'ю',
 						'й(?=[ъь])':	'й',
 
+						'картел':			'картэл',
 						'кластер':			'кластэр',
+						'команданте':		'командантэ',
 						'конте(?=йн|нт)':	'контэ',
+						'копилефт':			'копилэфт',
+						'копирайте':		'копирайтэ',
 
 						'лн(?=еч|ц|ыш)':	'н',
 						'ль(?=зя|ко(?!в))':	'',
@@ -760,7 +786,6 @@
 						'пандеми':			'пандэми',
 						'панел(?=и|ь)':		'панэл',
 						'парикм':			'парихм',
-						'пле(?=е|й)':		'плэ',
 						'потен(?=[зтц])':	'потэн',
 						'пржэва':			'прожэва',
 						'прогресс':			'прогрэсс',
@@ -792,6 +817,7 @@
 						'терра(?=р|ф)':		'тэрра',
 						'терро':			'тэрро',
 						'тзб':				'цб',
+						'т(о|у)ннел':		'т$1нэл',
 						'торрент':			'торрэнт',
 					//	'требуш':			'трибуш',
 						'тремпел':			'трэмпел',
@@ -880,6 +906,7 @@
 						'(?<=\\S{4,}[^бвгдкх])ива([еёйюя]\\S*)':							['ю$1', 7],
 						'(?<=\\S{4,})(?<!б|[дзк]р|[пс]л)[иы]ва([еёйюя]\\S*)':				['у$1', 7],
 						'(?<=\\S([взлнптф]|(?<!п)р))ир(?=[оу](?!с))':						'',
+						'(?<!ка)пле(?=е|й)':												'плэ',
 						'(?<!пе)рейд':														'рэйд',
 						'(ф|хв)анер':														'$1анэр',
 						'(ф|хв)ицыр':														'$1ик',
@@ -887,101 +914,227 @@
 						'щ(?=[еёищюя])':													'ш',
 						'щь?':																'шь',
 						'((?<=м)|с?т)ьдесят':												'сят',
-						'((?<=м)|с?т)ьсот':													'сот',
-						'([^\\s\\d\\p{P}])\\1(?!\\1)':										'$1\''	// (?<!\\1)
+						'((?<=м)|с?т)ьсот':													'сот'
 					},
 					e = { // В конце слова
 					//	'в':	'ф',
 					//	'г':	'х',
-						'е\'':	['ей', 8],
+						'ее':	['ей', 8],
 						'име':	'имэ',
 						'стр':	'стор',
 					//	'сь':	'ся',
 						'эго':	'эво',
 
 						'[дт]с((?:ам|ов)?[аиуы]?)':					'ц$1',
-						'ц\'а':										['тса', 9],
+						'цца':										['тса', 9],
 						'ц((?:ам|ов)?[аиуы]?)':						['тс$1', 9],
 						'(?<!а)кто':								'хто',
 					//	'(?<=и)нет':								'нэт',
 						'ни([еёюя][вм]?)':							['нь$1', 10],
-						'ни(\'[вм]?)':								['ньи', 10],
+						'ни(и[вм]?)':								['ньи', 10],
 						'(л|ў)ся':									['$1са', 9],
 						'(?<!дор|л|(?<![уў])мн|(?<!бы|о)стр)ого':	'ово',
+						'ые':										['ыэ', 11],
 					//	'(?<!л)ь(ся|те)':							'$1',
-						'\'ь':										'ь',
 						'([^еёиюя])\'':								'$1'
 					}
 
-				if(a.length <= 128) {
-					$(this.ref('in')+', '+this.ref('out')).attr('zoom_', '');
-				} else {
-					$(this.ref('in')+', '+this.ref('out')).removeAttr('zoom_');
-				}
+				$(this.ref('in')+', '+this.ref('out'))[a.length <= 128 ? 'attr' : 'removeAttr']('zoom_', '');
 
-				function m(a, b) {
-					var c = '';
+				let text = [],
+					replaceWithCase = (a, b) => {
+						let c = '';
 
-					for(let i = 0; i < Math.max(a.length, b.length); i++) {
-						let d = b.charAt(i),
-							e = a.charAt(i);
-							e = e != '' ? e : a.slice(-1);
+						for(let i = 0; i < Math.max(a.length, b.length); i++) {
+							let d = b.charAt(i),
+								e = a.charAt(i);
+								e = e != '' ? e : a.slice(-1);
 
-						c += e == e.toUpperCase() && !e.match(/[\p{P}\s]/u) ? d.toUpperCase() : d;
+							c += e === e.toUpperCase() && !e.match(/[\p{P}\s]/u) ? d.toUpperCase() : d;
+						}
+
+						return c;
+					},
+					shouldReplace = (a, b) => {
+						let c = !Array.isArray(a),
+							d = this.settings[a[1]]
+
+						return b ? c ? true : d : c ? a : a[0]
 					}
 
-					return c;
+				// Разбор текста
+
+				let currentType,
+					currentString = '';
+
+				for(let i = 0; i <= a.length; i++) {
+					let character = a[i],
+						type = new RegExp('[абвгдеёжзийклмнопрстуфхцчшщъыьэюя-]|['+Characters.grave+'|'+Characters.acute+']', 'i').test(character) ? 'word' : 'symbol';
+
+					if((type !== currentType || i === a.length) && currentString !== '') {
+						text.push({
+							type: currentType,
+							string: currentString
+						});
+
+						currentString = '';
+					}
+					if(i !== a.length) {
+						currentType = type;
+						currentString += character;
+					}
 				}
 
-				function n(a, b) {
-					var c = !Array.isArray(a),
-						d = $(`[data-translator-setting="${a[1]}"]`).prop('checked');
+				// Обработка слов
 
-					return b ? c ? true : d : c ? a : a[0];
+				for(let v of text) {
+					if(v.type !== 'word') {
+						continue;
+					}
+
+					// Разбор гласных
+
+					let currentVowelIndex = -1;
+
+					v.vowelsCount = 0;
+
+					for(let i = 0; i < v.string.length; i++) {
+						if(!/[аеёиоуыэюя]/i.test(v.string[i])) {
+							continue;
+						}
+
+						currentVowelIndex++;
+						v.vowelsCount++;
+						if(v.string[i+1] === Characters.grave) {
+							v.graveIndex = currentVowelIndex;
+						}
+						if(v.string[i+1] === Characters.acute) {
+							v.acuteIndex = currentVowelIndex;
+						}
+					}
+
+					v.string = v.string.replaceAll(Characters.grave, '').replaceAll(Characters.acute, '');
+
+					// Применение общих правил замены
+
+					for(let k in c) v.string = shouldReplace(c[k], true) ? v.string.replace(new RegExp('(?<=^)'+k+'(?=\\S)',	'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(c[k]).replace('$1', cg ?? ''))) : v.string;
+					for(let k in d) v.string = shouldReplace(d[k], true) ? v.string.replace(new RegExp(k,						'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(d[k]).replace('$1', cg ?? ''))) : v.string;
+					for(let k in e) v.string = shouldReplace(e[k], true) ? v.string.replace(new RegExp('(?<=\\S)'+k+'(?=$)',	'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(e[k]).replace('$1', cg ?? ''))) : v.string;
+
+					// Замена безударного "О" на "А"
+
+					if(/*this.settings[-1] &&*/ v.vowelsCount > 1) {
+						currentVowelIndex = -1;
+
+						for(let i = 0; i < v.string.length; i++) {
+							if(!/[аеёиоуыэюя]/i.test(v.string[i])) {
+								continue;
+							}
+
+							currentVowelIndex++;
+							if(currentVowelIndex !== v.graveIndex && currentVowelIndex !== v.acuteIndex && /о/i.test(v.string[i])) {
+								v.string = Characters.replaceAt(v.string, i, replaceWithCase(v.string[i], 'а'));
+							}
+							/*
+							if([v.graveIndex, v.acuteIndex].includes(currentVowelIndex)) {
+								v.string = Characters.insertAt(v.string, i+1, v.graveIndex !== currentVowelIndex ? Characters.acute : Characters.grave);
+							}
+							*/
+						}
+					}
+
+					// Замена дублирующихся букв на апострофы
+
+					let currentCharacter;
+
+					for(let i = v.string.length-1; i > -1; i--) {
+						if(currentCharacter !== v.string[i]) {
+							currentCharacter = v.string[i]
+						}
+						if(currentCharacter === '-') {
+							continue;
+						}
+						if(currentCharacter === v.string[i-1]) {
+							v.string = Characters.replaceAt(v.string, i, `'`);
+						}
+					}
 				}
 
-				for(let v in c) a = n(c[v], true) ? a.replace(new RegExp('(?<=^|[\\s\\d\\p{P}])'+v+'(?=\\S)',	'giu'), (a, b) => m(a, n(c[v]).replace('$1', b || ''))) : a;
-				for(let v in d) a = n(d[v], true) ? a.replace(new RegExp(v,										'giu'), (a, b) => m(a, n(d[v]).replace('$1', b || ''))) : a; // '(?<=(?:^|[\\s\\d\\p{P}])\\S*?)'+v+'(?=\\S*?(?:^|[\\s\\d\\p{P}]))'
-				for(let v in e) a = n(e[v], true) ? a.replace(new RegExp('(?<=\\S)'+v+'(?=$|[\\s\\d\\p{P}])',	'giu'), (a, b) => m(a, n(e[v]).replace('$1', b || ''))) : a;
+				// Сбор текста
 
-				b.value = a;
+				b.value = '';
+
+				for(let v of text) {
+					b.value += v.string;
+				}
 			}
 
-			static setting(a) {
-				var b = localStorage.getItem('setting');
+			static loadSettings() {
+				let settings = document.querySelectorAll('[data-translator-setting]');	// localStorage.getItem('settings');
 
-			//	if(a) {} else {}
+				this.settings = {}
+
+				for(let k in settings) {
+					this.settings[k /*settings[k].dataset?.translatorSetting*/] = settings[k].checked;
+				}
 
 				this.go();
 			}
 
-			static scroll(a) {
-				var b = document.querySelector(this.ref('in')),
-					c = document.querySelector(this.ref('out')),
-					d = $(this.ref($(a).data('translator-ref'))+':hover').length > 0;	// a.matches(':hover');
+			static loadAccents() {
+				let a = JSON.parse(localStorage.getItem('accent'));
+			}
 
-				if(d) {
-					if(a == b) {
-						c.scrollTop = b.scrollTop;
-					} else
-					if(a == c) {
-						b.scrollTop = c.scrollTop;
+			static saveAccents() {
+				let a = document.querySelector(this.ref('in'));
+
+			//	localStorage.setItem('accent', JSON.stringify({}));
+			}
+
+			static scroll(scrolled) {
+				let a = document.querySelector(this.ref('in')),
+					b = document.querySelector(this.ref('out')),
+					c = $(this.ref($(scrolled).data('translator-ref'))+':hover').length > 0;	// scrolled.matches(':hover');
+
+				if(c) {
+					if(scrolled === a) {
+						b.scrollTop = a.scrollTop;
+					}
+					if(scrolled === b) {
+						a.scrollTop = b.scrollTop;
 					}
 				}
 			}
 
+			static insertAccent(grave) {
+				let a = document.querySelector(this.ref('in')),
+					b = a.value,
+					c = a.selectionEnd-a.selectionStart === 1 ? a.selectionEnd : a.selectionStart;
+
+				if(/[аеёиоуыэюя]/i.test(b[c-1]) && ![Characters.grave, Characters.acute].includes(b[c])) {
+					a.value = Characters.insertAt(b, c, !grave ? Characters.acute : Characters.grave);
+				}
+
+				a.focus({ preventScroll: true });
+				a.setSelectionRange(c, c);
+
+				this.go();
+			}
+
 			static updateList() {
-				var a = $(this.ref('list')),
+				let a = $(this.ref('list')),
 					b = JSON.parse(localStorage.getItem('save'));
 
 				a.html('');
 				for(let k in b) {
 					a.append(`
 						<li>
-							<div>${b[k]}</div>
-							<div>${Datestamp.convert(k)}</div>
-							<button onclick="Translator.load('${k}')">Загрузить</button>
-							<button onclick="Translator.delete('${k}')">Удалить</button>
+							<div>${ b[k] }</div>
+							<div>${ Timestamp.toDateString(k) }</div>
+							<div _flex="h stack">
+								<button onclick="Translator.load('${ k }')">Загрузить</button>
+								<button onclick="Translator.delete('${ k }')">Удалить</button>
+							</div>
 						</li>
 					`);
 				}
@@ -991,14 +1144,14 @@
 			}
 
 			static updateButtons(a) {
-				var b = document.querySelector(this.ref('current'));
+				let b = document.querySelector(this.ref('current'));
 
 				if(a) {
 					b.innerHTML = `
-						<div data-translator-ref="date">${Datestamp.convert(a)}</div>
-						<button onclick="Translator.save('${a}')">Сохранить</button>
-						<button onclick="Translator.load('${a}')">Загрузить</button>
-						<button onclick="Translator.delete('${a}')">Удалить</button>
+						<div data-translator-ref="date">${ Timestamp.toDateString(a) }</div>
+						<button onclick="Translator.save('${ a }')">Сохранить</button>
+						<button onclick="Translator.load('${ a }')">Загрузить</button>
+						<button onclick="Translator.delete('${ a }')">Удалить</button>
 					`;
 				} else {
 					b.innerHTML = `
@@ -1016,22 +1169,28 @@
 			}
 
 			static clear() {
-				var a = document.querySelector(this.ref('in'));
+				let a = document.querySelector(this.ref('in'));
 
-				if(a.value.trim() !== '' && !confirm(`Очистить поле ввода?`)) return;
+				if(a.value.trim() !== '' && !confirm(`Очистить поле ввода?`)) {
+					return;
+				}
+
 				a.value = '';
 				this.go();
 			}
 
 			static load(a) {
-				var b = document.querySelector(this.ref('in')),
+				let b = document.querySelector(this.ref('in')),
 					c = document.querySelector(this.ref('date')).innerHTML,
 					d = JSON.parse(localStorage.getItem('save')),
 					e = localStorage.getItem('translation');
 
 				if(a) {
-					if(b.value.trim() !== '' && !confirm(`${c == Datestamp.convert(a) ? 'Восстановить' : 'Загрузить'} сохранение "${Datestamp.convert(a)}"?`)) return;
-					b.value = d[a];
+					if(b.value.trim() !== '' && !confirm(`${ c === Timestamp.toDateString(a) ? 'Восстановить' : 'Загрузить' } сохранение "${ Timestamp.toDateString(a) }"?`)) {
+						return;
+					}
+
+					b.value = d[a]
 				//	b.scrollTop = 0;
 					this.go();
 					this.update(a);
@@ -1047,9 +1206,9 @@
 			}
 
 			static save(a) {
-				var b = document.querySelector(this.ref('in')).value,
+				let b = document.querySelector(this.ref('in')).value,
 					c = JSON.parse(localStorage.getItem('save')),
-					d = Datestamp.current();
+					d = Timestamp.current();
 
 				if(!a) {
 					c = {
@@ -1059,7 +1218,10 @@
 					localStorage.setItem('save', JSON.stringify(c));
 					this.update(d);
 				} else {
-					if(c[a].trim() !== '' && !confirm(`Перезаписать сохранение "${Datestamp.convert(a)}"?`)) return;
+					if(c[a].trim() !== '' && !confirm(`Перезаписать сохранение "${ Timestamp.toDateString(a) }"?`)) {
+						return;
+					}
+
 					c[a] = b;
 					localStorage.setItem('save', JSON.stringify(c));
 					this.updateList();
@@ -1067,49 +1229,77 @@
 			}
 
 			static delete(a) {
-				var b = document.querySelector(this.ref('date')).innerHTML,
+				let b = document.querySelector(this.ref('date')).innerHTML,
 					c = JSON.parse(localStorage.getItem('save'));
 
-				if(c[a].trim() !== '' && prompt(`Удалить сохранение "${Datestamp.convert(a)}"? ("Y" для подтверждения).`) !== 'Y') return;
+				if(c[a].trim() !== '' && prompt(`Удалить сохранение "${ Timestamp.toDateString(a) }"? ("Y" для подтверждения).`) !== 'Y') {
+					return;
+				}
+
 				c[a] = undefined;
 				localStorage.setItem('save', JSON.stringify(c));
-				if(b == Datestamp.convert(a)) {
+				if(b === Timestamp.toDateString(a)) {
 					this.update();
 				} else {
 					this.updateList();
 				}
 			}
 
-			static fileDownload() {
-				File.write(localStorage.getItem('save'), 'application/json', `Сохранения (${Datestamp.convert(Datestamp.current())}).json`);
+			static savesDownload() {
+				File.write(localStorage.getItem('save'), 'application/json', `Сохранения (${ Timestamp.toDateString(Timestamp.current()) }).json`);
 			}
 
-			static fileUpload(a) {
+			static savesUpload(a) {
 				File.read(a, (a) => {
-					if(a.type !== 'application/json' || prompt(`Перезаписать все сохранения?`) !== 'Y') return;
+					if(a.type !== 'application/json' || prompt(`Перезаписать все сохранения?`) !== 'Y') {
+						return;
+					}
+
 					localStorage.setItem('save', a.text);
 					this.update();
 				});
 			}
 		}
 
-	//	$(document).on('click', '[data-tab-ref]:not([current_])',	(e) => Tab.switch(e));
-	//	$(document).on('click', '[data-setting]',					(e) => Translator.go());
 		document.addEventListener('click', (e) => {
 			if(e.target.matches('[data-tab-ref]:not([current_])'))	Tab.switch(e);
-			if(e.target.matches('[data-translator-setting]'))		Translator.setting(e);
+			if(e.target.matches('[data-translator-setting]'))		Translator.loadSettings(e);
 		}, false);
-		document.addEventListener('keypress', (e) => {
-			var a = Translator.ref('in'),
+
+		let keys = {}
+
+		document.addEventListener('keydown', (e) => {
+			keys[e.code] = true;
+		});
+		document.addEventListener('keyup', (e) => {
+			let a = Translator.ref('in'),
 				b = Translator.ref('setting')+' input[type="checkbox"]';
 
-			if(!$(a).is(':focus') && e.code == 'KeyQ') {
+			if(!$(a).is(':focus') && keys['KeyQ']) {
 				$(b).prop('checked', !$(b).first()[0].checked);
-				Translator.setting();
+				Translator.loadSettings();
 			}
+			if(keys['AltLeft']) {
+				if(keys['KeyS']) {
+					Translator.save();
+				}
+				if(keys['KeyQ']) {
+					Translator.insertAccent(true);
+				}
+				if(keys['KeyW']) {
+					Translator.insertAccent();
+				}
+				if(keys['KeyA']) {
+					Translator.clear();
+				}
+			}
+
+			keys = {}
 		});
+
 		document.addEventListener('DOMContentLoaded', () => {
 			Translator.update();
+			Translator.loadSettings();
 			Translator.load();
 		});
 	</script>
@@ -1123,7 +1313,15 @@
 		</ul>
 		<div _tab>
 			<div data-tab="translate" _flex="v" current_>
-				<div _flex="h" data-translator-ref="setting">
+				<div _flex="wrap" data-translator-ref="setting">
+					<!--
+					<div label_="А" tip_="О">
+						<label _switch>
+							<input type="checkbox" data-translator-setting="-1">
+							<div></div>
+						</label>
+					</div>
+					-->
 					<div label_="Яш" tip_="Еш">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="0">
@@ -1206,41 +1404,50 @@
 							<div></div>
 						</label>
 					</div>
+					<div label_="Ыэ" tip_="Ые">
+						<label _switch>
+							<input type="checkbox" data-translator-setting="11">
+							<div></div>
+						</label>
+					</div>
 				</div>
 				<div _flex="h">
 					<textarea data-translator-ref="in" oninput="Translator.go();" onscroll="Translator.scroll(this);" placeholder="Текст на русском" zoom_></textarea>
 					<!--<button onclick="Translator.go();"></button>-->
 					<textarea data-translator-ref="out" onscroll="Translator.scroll(this);" spellcheck="false" readonly placeholder="Текст на низкогорском" zoom_></textarea>
 				</div>
-				<div _flex="h space">
-					<div _flex="h">
-						<button onclick="Translator.save();">Сохранить</button>
-						<button onclick="Translator.clear();">Очистить</button>
+				<div _flex="h">
+					<button onclick="Translator.save();" title="Alt+S">Сохранить</button>
+					<div _flex="h stack">
+						<button onclick="Translator.insertAccent(true);" title="Alt+Q">ˋ</button>
+						<button onclick="Translator.insertAccent();" title="Alt+W">ˊ</button>
 					</div>
+					<button onclick="Translator.clear();" title="Alt+A">Очистить</button>
+					<div __space></div>
 					<div _flex="h center" data-translator-ref="current"></div>
 				</div>
 				<ul _list="footnote">
 					<li>
-						Орфография по большей части фонетична (слышится как пишется, и наоборот). Относится ко всему, кроме смягчённой <b>Ж / Ш</b>, безударной <b>О</b>, <b>Ч</b> перед твёрдой <b>Ж / Ш</b> и заимствованных слов.
+						Орфография по большей части фонетична (слышится как пишется, и наоборот). Относится ко всему, кроме смягчённой <b>Ж / Ш</b>, <b>Ч</b> перед твёрдой <b>Ж / Ш</b> и заимствованных слов.
 						<br><br>
-						Смягчённый согласный <b>Ж / Ш > [ж'ж'] / [ш'ш']</b>. Безударный гласный <b>О > [ʌ]</b>. Согласный <b>Ч</b> перед твёрдой <b>Ж / Ш</b> - <b>[ч]</b>. В заимствованных словах <b>Е > [э]</b>.
+						Смягчённый согласный <b>Ж / Ш > [ж'ж'] / [ш'ш']</b>. Согласный <b>Ч</b> перед твёрдой <b>Ж / Ш</b> - <b>[ч]</b>. В заимствованных словах <b>Е > [э]</b>.
 					</li>
 					<li>
-						Апостроф <b>'</b> служит для отделения падежных окончаний от чисел, и для обозначения дубля предыдущей буквы (также себя) - <b>16'ЫЙ > [шэснаццатый]</b>, <b>ЛУН'ЫЙ > [лунный]</b>. Обязан быть использован везде, кроме аббревиатур.
+						Апостроф <b>'</b> служит для отделения падежных окончаний от чисел, и для обозначения дубля предыдущей буквы (с учётом регистра) или себя - <b>16'ЫЙ > [шэснаццатый]</b>, <b>ЛУН'ЫЙ > [лунный]</b>. Обязан быть использован везде, кроме аббревиатур.
 						<br><br>
 						Смягчение всегда распространяется на всю последовательность (одинаковых) согласных, созданную с помощью апострофа. Так <b>Н'Ь > [н'н']</b>, или <b>С'''Я > [с'с'с'с'а]</b>, но <b>ЗЗЮ > [зз'у]</b>.
 					</li>
 					<li>Согласный <b>Г / Ґ</b> обозначает звук <b>[ɣ] / [g]</b>, а гласный/полугласный <b>У / Ў > [v] / [w]</b>.</li>
 					<li>Йотированный гласный <b>Е / Ё / Ю / Я</b>, стоящий после гласного, но не перед <b>Д</b>, при чтении разрешается произносить так же, как после согласной (с полным отсутствием йотации) - <b>ТАКОЕ > [такоэ<sup>и</sup>]</b>, <b>ВНИМАНИЕ > [вн'иман'иэ<sup>и</sup>]</b>, <b>ЦЭЛЕ' > [цэл'э<sup>и</sup>э<sup>и</sup>]</b>, <b>ТЕРЯ' > [тер'а<sup>и</sup>а<sup>и</sup>]</b>, <b>КЛЮЮТ' > [кл'у<sup>и</sup>у<sup>и</sup>т]</b>, <b>ТЕ'РЬ > [тэ<sup>и</sup>э<sup>и</sup>р']</b>, <b>ТЕЯ > [т'э<sup>и</sup>а<sup>и</sup>]</b>, <b>ЗМЕ''Д > [зм'э<sup>и</sup>э<sup>и</sup>й'</sup>э<sup>и</sup>д]</b>.</li>
-					<li><b>ВАЖНО</b> Для корректного перевода ввод гласного <b>Ё</b> обязателен; Аббревиатуры и латинские символы не учитываются, требуется самостоятельная правка после обработки; Работоспособность в мобильных браузерах не гарантируется.</li>
+					<li><b>ВАЖНО</b> Для корректного перевода ввод гласного <b>Ё</b> и расстановка ударений над <b>О / Ё > О</b> обязательны; Аббревиатуры не учитываются, требуется самостоятельная правка после обработки; Работоспособность в мобильных браузерах не гарантируется.</li>
 				</ul>
 			</div>
 			<div data-tab="save" _flex="v">
 				<ul _list="save" data-translator-ref="list"></ul>
 				<div _flex="h">
-					<button onclick="Translator.fileDownload();">▼ Сохранить</button>
+					<button onclick="Translator.savesDownload();">▼ Сохранить</button>
 					<label _file>
-						<input type="file" onchange="Translator.fileUpload(this)">
+						<input type="file" onchange="Translator.savesUpload(this);">
 						<div>▲ Загрузить</div>
 					</label>
 				</div>
