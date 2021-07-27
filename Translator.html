@@ -136,6 +136,12 @@
 			cursor: default;
 		}
 
+		ul[_tab-switch] li:not([data-tab-ref]):not([current_]) {
+			color: var(--color-gray);
+
+			pointer-events: none;
+		}
+
 		ul[_tab-switch] li:before,
 		ul[_tab-switch] li:after {
 			content: '';
@@ -177,10 +183,6 @@
 
 		ul[_tab-switch] li:hover:after {
 			transform: scaleX(0.5);
-		}
-
-		ul[_tab-switch] li:not([data-tab-ref]):hover:after {
-			transform: scaleX(0);
 		}
 
 		ul[_tab-switch] li[current_]:after {
@@ -423,6 +425,10 @@
 			pointer-events: none;
 		}
 
+		[_flex~="h"][_flex~="stack"] > button {
+			border-radius: 0;
+		}
+
 		[_flex~="h"][_flex~="stack"] > button:first-child {
 			border-radius: 2px 0 0 2px;
 		}
@@ -580,7 +586,7 @@
 	<script>
 		class Tab {
 			static switch(a) {
-				let title = typeof a === 'string' ? a : $(a.srcElement).data('tab-ref');
+				let title = typeof a === 'string' ? a : a.srcElement.dataset.tabRef;
 
 				$(`[data-tab-ref="${ title }"], [data-tab="${ title }"]`).attr('current_', '').siblings().removeAttr('current_');
 			}
@@ -621,29 +627,117 @@
 				e.remove();
 			}
 
-			static read(a, b, c) {
-				let d = a.files[c ?? 0]
+			static read(element, function_, a) {
+				let b = element.files[a ?? 0]
 
-				if(d) {
-					d.text().then(a => {
-						d.text = a;
-						b(d);
+				if(b) {
+					b.text().then(a => {
+						b.text = a;
+						function_(b);
 					});
 				}
 			}
 		}
 
 		class Translator {
+			// А Б В   Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У   Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я - Оригинал
+			// А Б В Г Ґ Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ў Ф Х Ц Ч Ш   Ъ Ы Ь Э Ю Я - Добавленные, заменённые, убранные
+
 			static settings = {}
 
 			static ref = (title) => `[data-translator-ref="${ title }"]`;
 
-			static go() {
-			//	А Б В   Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У   Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я - Оригинал
-			//	А Б В Г Ґ Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ў Ф Х Ц Ч Ш   Ъ Ы Ь Э Ю Я - Добавленные, заменённые, убранные
+			static in = () => document.querySelector(this.ref('in'));
+			static out = () => document.querySelector(this.ref('out'));
 
-				let a = document.querySelector(this.ref('in')).value,
-					b = document.querySelector(this.ref('out')),
+			static parse(raw) {
+				let parsed = [],
+					tokenStart = 0,
+					tokenType,
+					tokenString = '';
+
+				for(let i = 0; i <= raw.length; i++) {
+					let character = raw[i],
+						characterType = new RegExp('[абвгдеёжзийклмнопрстуфхцчшщъыьэюя-]|['+Characters.grave+'|'+Characters.acute+']', 'i').test(character) ? 'word' : 'symbol';
+
+					if((characterType !== tokenType || i === raw.length) && tokenString !== '') {
+						parsed.push({
+							start: tokenStart,
+							end: i-1,
+							type: tokenType,
+							string: tokenString
+						});
+
+						tokenStart = i;
+						tokenString = '';
+					}
+					if(i !== raw.length) {
+						tokenType = characterType;
+						tokenString += character;
+					}
+				}
+				for(let v of parsed) {
+					if(v.type !== 'word') {
+						continue;
+					}
+
+					// Разбор гласных
+
+					let vowelIndex = -1;
+
+					v.vowelsCount = 0;
+
+					for(let i = 0; i < v.string.length; i++) {
+						if(!/[аеёиоуыэюя]/i.test(v.string[i])) {
+							continue;
+						}
+
+						vowelIndex++;
+						v.vowelsCount++;
+						if(v.string[i+1] === Characters.grave) {
+							v.graveIndex = vowelIndex;
+						}
+						if(v.string[i+1] === Characters.acute) {
+							v.acuteIndex = vowelIndex;
+						}
+					}
+
+					v.string = v.string.replaceAll(Characters.grave, '').replaceAll(Characters.acute, '');
+				}
+
+				return parsed;
+			}
+
+			static unparse(parsed, considerAccents) {
+				let raw = '';
+
+				for(let v of parsed) {
+					if(considerAccents) {
+						// Сбор гласных
+
+						let vowelIndex = -1;
+
+						for(let i = 0; i < v.string.length; i++) {
+							if(!/[аеёиоуыэюя]/i.test(v.string[i])) {
+								continue;
+							}
+
+							vowelIndex++;
+							if([v.graveIndex, v.acuteIndex].includes(vowelIndex)) {
+								v.string = Characters.insertAt(v.string, i+1, v.graveIndex !== vowelIndex ? Characters.acute : Characters.grave);
+							}
+						}
+					}
+
+					raw += v.string;
+				}
+
+				return raw;
+			}
+
+			static go() {
+				let a = this.in().value,
+					b = this.out(),
 					c = { // В начале слова
 						'ассо':		'асо',
 						'взим':		'взым',
@@ -701,9 +795,10 @@
 						'астер(?=ис|о)':	'астэр',
 						'афг':				'авг',
 
-						'бизнеc':	'бизнэс',
-						'бленде':	'блэндэ',
-						'бюллет':	'биллют',
+						'белорусси':	'белоруси',
+						'бизнеc':		'бизнэс',
+						'бленде':		'блэндэ',
+						'бюллет':		'биллют',
 
 						'вибрисс':	'вибрис',
 
@@ -766,6 +861,7 @@
 						'конте(?=йн|нт)':	'контэ',
 						'копилефт':			'копилэфт',
 						'копирайте':		'копирайтэ',
+						'кортеж':			'кортэж',
 
 						'лн(?=еч|ц|ыш)':	'н',
 						'ль(?=зя|ко(?!в))':	'',
@@ -925,23 +1021,23 @@
 					//	'сь':	'ся',
 						'эго':	'эво',
 
-						'[дт]с((?:ам|ов)?[аиуы]?)':					'ц$1',
-						'цца':										['тса', 9],
-						'ц((?:ам|ов)?[аиуы]?)':						['тс$1', 9],
-						'(?<!а)кто':								'хто',
-					//	'(?<=и)нет':								'нэт',
-						'ни([еёюя][вм]?)':							['нь$1', 10],
-						'ни(и[вм]?)':								['ньи', 10],
-						'(л|ў)ся':									['$1са', 9],
-						'(?<!дор|л|(?<![уў])мн|(?<!бы|о)стр)ого':	'ово',
-						'ые':										['ыэ', 11],
-					//	'(?<!л)ь(ся|те)':							'$1',
-						'([^еёиюя])\'':								'$1'
+						'[дт]с((?:ам|ов)?[аиуы]?)':						'ц$1',
+						'цца':											['тса', 9],
+						'ц((?:ам|ов)?[аиуы]?)':							['тс$1', 9],
+						'(?<!а)кто':									'хто',
+					//	'(?<=и)нет':									'нэт',
+						'ни([еёюя][вм]?)':								['нь$1', 10],
+						'ни(и[вм]?)':									['ньи', 10],
+						'(л|ў)ся':										['$1са', 9],
+						'(?<!дор|л|(?<![уў])мн|(?<!бы|о)стр)ого(-.*)?':	'ово$1',
+						'ые':											['ыэ', 11],
+					//	'(?<!л)ь(ся|те)':								'$1',
+						'([^еёиюя])\\1':								'$1'
 					}
 
 				$(this.ref('in')+', '+this.ref('out'))[a.length <= 128 ? 'attr' : 'removeAttr']('zoom_', '');
 
-				let text = [],
+				let parsed = this.parse(a),
 					replaceWithCase = (a, b) => {
 						let c = '';
 
@@ -962,152 +1058,138 @@
 						return b ? c ? true : d : c ? a : a[0]
 					}
 
-				// Разбор текста
-
-				let currentType,
-					currentString = '';
-
-				for(let i = 0; i <= a.length; i++) {
-					let character = a[i],
-						type = new RegExp('[абвгдеёжзийклмнопрстуфхцчшщъыьэюя-]|['+Characters.grave+'|'+Characters.acute+']', 'i').test(character) ? 'word' : 'symbol';
-
-					if((type !== currentType || i === a.length) && currentString !== '') {
-						text.push({
-							type: currentType,
-							string: currentString
-						});
-
-						currentString = '';
-					}
-					if(i !== a.length) {
-						currentType = type;
-						currentString += character;
-					}
-				}
-
-				// Обработка слов
-
-				for(let v of text) {
+				for(let v of parsed) {
 					if(v.type !== 'word') {
 						continue;
 					}
 
-					// Разбор гласных
-
-					let currentVowelIndex = -1;
-
-					v.vowelsCount = 0;
-
-					for(let i = 0; i < v.string.length; i++) {
-						if(!/[аеёиоуыэюя]/i.test(v.string[i])) {
-							continue;
-						}
-
-						currentVowelIndex++;
-						v.vowelsCount++;
-						if(v.string[i+1] === Characters.grave) {
-							v.graveIndex = currentVowelIndex;
-						}
-						if(v.string[i+1] === Characters.acute) {
-							v.acuteIndex = currentVowelIndex;
-						}
-					}
-
-					v.string = v.string.replaceAll(Characters.grave, '').replaceAll(Characters.acute, '');
-
 					// Применение общих правил замены
 
-					for(let k in c) v.string = shouldReplace(c[k], true) ? v.string.replace(new RegExp('(?<=^)'+k+'(?=\\S)',	'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(c[k]).replace('$1', cg ?? ''))) : v.string;
-					for(let k in d) v.string = shouldReplace(d[k], true) ? v.string.replace(new RegExp(k,						'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(d[k]).replace('$1', cg ?? ''))) : v.string;
-					for(let k in e) v.string = shouldReplace(e[k], true) ? v.string.replace(new RegExp('(?<=\\S)'+k+'(?=$)',	'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(e[k]).replace('$1', cg ?? ''))) : v.string;
+					for(let k in c) v.string = shouldReplace(c[k], true) ? v.string.replace(new RegExp('^'+k+'(?=\\S)',		'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(c[k]).replace('$1', cg ?? ''))) : v.string;
+					for(let k in d) v.string = shouldReplace(d[k], true) ? v.string.replace(new RegExp(k,					'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(d[k]).replace('$1', cg ?? ''))) : v.string;
+					for(let k in e) v.string = shouldReplace(e[k], true) ? v.string.replace(new RegExp('(?<=\\S)'+k+'$',	'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(e[k]).replace('$1', cg ?? ''))) : v.string;
 
 					// Замена безударного "О" на "А"
 
-					if(/*this.settings[-1] &&*/ v.vowelsCount > 1) {
-						currentVowelIndex = -1;
+					if(this.settings[-1] && v.vowelsCount > 0) {
+						let vowelIndex = -1;
 
 						for(let i = 0; i < v.string.length; i++) {
 							if(!/[аеёиоуыэюя]/i.test(v.string[i])) {
 								continue;
 							}
 
-							currentVowelIndex++;
-							if(currentVowelIndex !== v.graveIndex && currentVowelIndex !== v.acuteIndex && /о/i.test(v.string[i])) {
+							vowelIndex++;
+							if(vowelIndex !== v.graveIndex && vowelIndex !== v.acuteIndex && /о/i.test(v.string[i])) {
 								v.string = Characters.replaceAt(v.string, i, replaceWithCase(v.string[i], 'а'));
 							}
-							/*
-							if([v.graveIndex, v.acuteIndex].includes(currentVowelIndex)) {
-								v.string = Characters.insertAt(v.string, i+1, v.graveIndex !== currentVowelIndex ? Characters.acute : Characters.grave);
-							}
-							*/
 						}
 					}
 
 					// Замена дублирующихся букв на апострофы
 
-					let currentCharacter;
-
 					for(let i = v.string.length-1; i > -1; i--) {
-						if(currentCharacter !== v.string[i]) {
-							currentCharacter = v.string[i]
-						}
-						if(currentCharacter === '-') {
+						if(v.string[i] === '-') {
 							continue;
 						}
-						if(currentCharacter === v.string[i-1]) {
+						if(v.string[i] === v.string[i-1]) {
 							v.string = Characters.replaceAt(v.string, i, `'`);
 						}
 					}
 				}
 
-				// Сбор текста
-
-				b.value = '';
-
-				for(let v of text) {
-					b.value += v.string;
-				}
+				b.value = this.unparse(parsed);
 			}
 
-			static loadSettings() {
-				let settings = document.querySelectorAll('[data-translator-setting]');	// localStorage.getItem('settings');
+			static loadSettings(event) {
+				let settings;
 
-				this.settings = {}
+				if(!event) {
+					settings = document.querySelectorAll('[data-translator-setting]');	// localStorage.getItem('settings');
 
-				for(let k in settings) {
-					this.settings[k /*settings[k].dataset?.translatorSetting*/] = settings[k].checked;
+					this.settings = {}
+				} else {
+					settings = [event.srcElement]
+				}
+
+				for(let v of settings) {
+					let k = v.dataset.translatorSetting;
+
+					if(k) {
+						this.settings[k] = v.checked;
+					}
 				}
 
 				this.go();
 			}
 
 			static loadAccents() {
-				let a = JSON.parse(localStorage.getItem('accent'));
+				let a = this.in(),
+					b = JSON.parse(localStorage.getItem('accent')) ?? {},
+					parsed = this.parse(a.value);
+
+				for(let v of parsed) {
+					if(v.type !== 'word' || !b[v.string.toLowerCase()] || v.graveIndex != undefined || v.acuteIndex != undefined) {
+						continue;
+					}
+
+					if(b[v.string.toLowerCase()].graveIndex != undefined) {
+						v.graveIndex = b[v.string.toLowerCase()].graveIndex;
+					}
+					if(b[v.string.toLowerCase()].acuteIndex != undefined) {
+						v.acuteIndex = b[v.string.toLowerCase()].acuteIndex;
+					}
+				}
+
+				a.value = this.unparse(parsed, true);
+				a.oninput();
 			}
 
 			static saveAccents() {
-				let a = document.querySelector(this.ref('in'));
+				let a = this.in().value,
+					b = JSON.parse(localStorage.getItem('accent')) ?? {}
 
-			//	localStorage.setItem('accent', JSON.stringify({}));
+				for(let v of this.parse(a)) {
+					if(v.type !== 'word') {
+						continue;
+					}
+					if(v.graveIndex == undefined && v.acuteIndex == undefined) {
+						delete b[v.string.toLowerCase()]
+						continue;
+					}
+
+					let token = {}
+
+					if(v.graveIndex != undefined) {
+						token.graveIndex = v.graveIndex;
+					}
+					if(v.acuteIndex != undefined) {
+						token.acuteIndex = v.acuteIndex;
+					}
+
+					b[v.string.toLowerCase()] = token;
+				}
+
+				localStorage.setItem('accent', JSON.stringify(b));
 			}
 
-			static scroll(scrolled) {
-				let a = document.querySelector(this.ref('in')),
-					b = document.querySelector(this.ref('out')),
-					c = $(this.ref($(scrolled).data('translator-ref'))+':hover').length > 0;	// scrolled.matches(':hover');
+			static scrolled(element) {
+				let a = this.in(),
+					b = this.out(),
+					c = $(this.ref(element.dataset.translatorRef)+':hover').length > 0;	// element.matches(':hover');
 
 				if(c) {
-					if(scrolled === a) {
+					if(element === a) {
 						b.scrollTop = a.scrollTop;
 					}
-					if(scrolled === b) {
+					if(element === b) {
 						a.scrollTop = b.scrollTop;
 					}
 				}
 			}
 
 			static insertAccent(grave) {
-				let a = document.querySelector(this.ref('in')),
+				let a = this.in(),
 					b = a.value,
 					c = a.selectionEnd-a.selectionStart === 1 ? a.selectionEnd : a.selectionStart;
 
@@ -1117,13 +1199,12 @@
 
 				a.focus({ preventScroll: true });
 				a.setSelectionRange(c, c);
-
-				this.go();
+				a.oninput();
 			}
 
 			static updateList() {
 				let a = $(this.ref('list')),
-					b = JSON.parse(localStorage.getItem('save'));
+					b = JSON.parse(localStorage.getItem('save')) ?? {}
 
 				a.html('');
 				for(let k in b) {
@@ -1131,10 +1212,8 @@
 						<li>
 							<div>${ b[k] }</div>
 							<div>${ Timestamp.toDateString(k) }</div>
-							<div _flex="h stack">
-								<button onclick="Translator.load('${ k }')">Загрузить</button>
-								<button onclick="Translator.delete('${ k }')">Удалить</button>
-							</div>
+							<button onclick="Translator.load('${ k }')">Загрузить</button>
+							<button onclick="Translator.delete('${ k }')">Удалить</button>
 						</li>
 					`);
 				}
@@ -1143,18 +1222,18 @@
 				}
 			}
 
-			static updateButtons(a) {
-				let b = document.querySelector(this.ref('current'));
+			static updateButtons(timestamp) {
+				let a = document.querySelector(this.ref('current'));
 
-				if(a) {
-					b.innerHTML = `
-						<div data-translator-ref="date">${ Timestamp.toDateString(a) }</div>
-						<button onclick="Translator.save('${ a }')">Сохранить</button>
-						<button onclick="Translator.load('${ a }')">Загрузить</button>
-						<button onclick="Translator.delete('${ a }')">Удалить</button>
+				if(timestamp) {
+					a.innerHTML = `
+						<div data-translator-ref="date">${ Timestamp.toDateString(timestamp) }</div>
+						<button onclick="Translator.save('${ timestamp }')">Сохранить</button>
+						<button onclick="Translator.load('${ timestamp }')">Загрузить</button>
+						<button onclick="Translator.delete('${ timestamp }')">Удалить</button>
 					`;
 				} else {
-					b.innerHTML = `
+					a.innerHTML = `
 						<div data-translator-ref="date"></div>
 						<button>Сохранить</button>
 						<button>Загрузить</button>
@@ -1163,99 +1242,101 @@
 				}
 			}
 
-			static update(a) {
+			static update(timestamp) {
 				this.updateList();
-				this.updateButtons(a);
+				this.updateButtons(timestamp);
 			}
 
 			static clear() {
-				let a = document.querySelector(this.ref('in'));
+				let a = this.in();
 
 				if(a.value.trim() !== '' && !confirm(`Очистить поле ввода?`)) {
 					return;
 				}
 
 				a.value = '';
-				this.go();
+				a.oninput();
 			}
 
-			static load(a) {
-				let b = document.querySelector(this.ref('in')),
-					c = document.querySelector(this.ref('date')).innerHTML,
-					d = JSON.parse(localStorage.getItem('save')),
-					e = localStorage.getItem('translation');
+			static load(timestamp) {
+				let a = this.in(),
+					b = document.querySelector(this.ref('date')).innerHTML,
+					c = JSON.parse(localStorage.getItem('save')) ?? {}
 
-				if(a) {
-					if(b.value.trim() !== '' && !confirm(`${ c === Timestamp.toDateString(a) ? 'Восстановить' : 'Загрузить' } сохранение "${ Timestamp.toDateString(a) }"?`)) {
+				if(timestamp) {
+					if(a.value.trim() !== '' && !confirm(`${ b === Timestamp.toDateString(timestamp) ? 'Восстановить' : 'Загрузить' } сохранение "${ Timestamp.toDateString(timestamp) }"?`)) {
 						return;
 					}
 
-					b.value = d[a]
-				//	b.scrollTop = 0;
-					this.go();
-					this.update(a);
+					a.value = c[timestamp]
+				//	a.scrollTop = 0;
+					a.oninput();
+					this.update(timestamp);
 					Tab.switch('translate');
 					scrollTo(0, 0);
-				} else
-				if(!d && e) {
-					b.value = e;
-					localStorage.removeItem('translation');
-					this.save();
-					this.update();
 				}
 			}
 
-			static save(a) {
-				let b = document.querySelector(this.ref('in')).value,
-					c = JSON.parse(localStorage.getItem('save')),
-					d = Timestamp.current();
+			static save(timestamp) {
+				let a = this.in().value,
+					b = JSON.parse(localStorage.getItem('save')) ?? {},
+					c = Timestamp.current();
 
-				if(!a) {
-					c = {
-						[d]: b,
-						...c
+				if(!timestamp) {
+					b = {
+						[c]: a,
+						...b
 					}
-					localStorage.setItem('save', JSON.stringify(c));
-					this.update(d);
+					localStorage.setItem('save', JSON.stringify(b));
+					this.update(c);
 				} else {
-					if(c[a].trim() !== '' && !confirm(`Перезаписать сохранение "${ Timestamp.toDateString(a) }"?`)) {
+					if(b[timestamp].trim() !== '' && !confirm(`Перезаписать сохранение "${ Timestamp.toDateString(timestamp) }"?`)) {
 						return;
 					}
 
-					c[a] = b;
-					localStorage.setItem('save', JSON.stringify(c));
+					b[timestamp] = a;
+					localStorage.setItem('save', JSON.stringify(b));
 					this.updateList();
 				}
+				this.saveAccents();
 			}
 
-			static delete(a) {
-				let b = document.querySelector(this.ref('date')).innerHTML,
-					c = JSON.parse(localStorage.getItem('save'));
+			static delete(timestamp) {
+				let a = document.querySelector(this.ref('date')).innerHTML,
+					b = JSON.parse(localStorage.getItem('save')) ?? {}
 
-				if(c[a].trim() !== '' && prompt(`Удалить сохранение "${ Timestamp.toDateString(a) }"? ("Y" для подтверждения).`) !== 'Y') {
+				if(b[timestamp].trim() !== '' && prompt(`Удалить сохранение "${ Timestamp.toDateString(timestamp) }"? ("Y" для подтверждения).`) !== 'Y') {
 					return;
 				}
 
-				c[a] = undefined;
-				localStorage.setItem('save', JSON.stringify(c));
-				if(b === Timestamp.toDateString(a)) {
+				b[timestamp] = undefined;
+				localStorage.setItem('save', JSON.stringify(b));
+				if(a === Timestamp.toDateString(timestamp)) {
 					this.update();
 				} else {
 					this.updateList();
 				}
 			}
 
-			static savesDownload() {
-				File.write(localStorage.getItem('save'), 'application/json', `Сохранения (${ Timestamp.toDateString(Timestamp.current()) }).json`);
+			static download(type) {
+				if(!['save', 'accent'].includes(type)) {
+					return;
+				}
+
+				File.write(localStorage.getItem(type) ?? '', 'application/json', `${ type === 'save' ? 'Сохранения' : 'Ударения' } (${ Timestamp.toDateString(Timestamp.current()) }).json`);
 			}
 
-			static savesUpload(a) {
-				File.read(a, (a) => {
-					if(a.type !== 'application/json' || prompt(`Перезаписать все сохранения?`) !== 'Y') {
+			static upload(element, type) {
+				if(!['save', 'accent'].includes(type)) {
+					return;
+				}
+
+				File.read(element, (file) => {
+					if(file.type !== 'application/json' || prompt(`Перезаписать все ${ type === 'save' ? 'сохранения' : 'ударения' }?`) !== 'Y') {
 						return;
 					}
 
-					localStorage.setItem('save', a.text);
+					localStorage.setItem(type, file.text);
 					this.update();
 				});
 			}
@@ -1287,6 +1368,9 @@
 					Translator.insertAccent(true);
 				}
 				if(keys['KeyW']) {
+					Translator.loadAccents();
+				}
+				if(keys['KeyE']) {
 					Translator.insertAccent();
 				}
 				if(keys['KeyA']) {
@@ -1310,18 +1394,17 @@
 		<ul _tab-switch>
 			<li data-tab-ref="translate" current_>Перевод</li>
 			<li data-tab-ref="save">Сохранения</li>
+			<!--<li data-tab-ref="accent">Ударения</li>-->
 		</ul>
 		<div _tab>
 			<div data-tab="translate" _flex="v" current_>
 				<div _flex="wrap" data-translator-ref="setting">
-					<!--
 					<div label_="А" tip_="О">
 						<label _switch>
-							<input type="checkbox" data-translator-setting="-1">
+							<input type="checkbox" data-translator-setting="-1" checked>
 							<div></div>
 						</label>
 					</div>
-					-->
 					<div label_="Яш" tip_="Еш">
 						<label _switch>
 							<input type="checkbox" data-translator-setting="0">
@@ -1412,15 +1495,15 @@
 					</div>
 				</div>
 				<div _flex="h">
-					<textarea data-translator-ref="in" oninput="Translator.go();" onscroll="Translator.scroll(this);" placeholder="Текст на русском" zoom_></textarea>
-					<!--<button onclick="Translator.go();"></button>-->
-					<textarea data-translator-ref="out" onscroll="Translator.scroll(this);" spellcheck="false" readonly placeholder="Текст на низкогорском" zoom_></textarea>
+					<textarea data-translator-ref="in" oninput="Translator.go();" onscroll="Translator.scrolled(this);" placeholder="Текст на русском" zoom_></textarea>
+					<textarea data-translator-ref="out" onscroll="Translator.scrolled(this);" spellcheck="false" readonly placeholder="Текст на низкогорском" zoom_></textarea>
 				</div>
 				<div _flex="h">
 					<button onclick="Translator.save();" title="Alt+S">Сохранить</button>
 					<div _flex="h stack">
 						<button onclick="Translator.insertAccent(true);" title="Alt+Q">ˋ</button>
-						<button onclick="Translator.insertAccent();" title="Alt+W">ˊ</button>
+						<button onclick="Translator.loadAccents();" title="Alt+W">Авто</button>
+						<button onclick="Translator.insertAccent();" title="Alt+E">ˊ</button>
 					</div>
 					<button onclick="Translator.clear();" title="Alt+A">Очистить</button>
 					<div __space></div>
@@ -1438,20 +1521,31 @@
 						Смягчение всегда распространяется на всю последовательность (одинаковых) согласных, созданную с помощью апострофа. Так <b>Н'Ь > [н'н']</b>, или <b>С'''Я > [с'с'с'с'а]</b>, но <b>ЗЗЮ > [зз'у]</b>.
 					</li>
 					<li>Согласный <b>Г / Ґ</b> обозначает звук <b>[ɣ] / [g]</b>, а гласный/полугласный <b>У / Ў > [v] / [w]</b>.</li>
-					<li>Йотированный гласный <b>Е / Ё / Ю / Я</b>, стоящий после гласного, но не перед <b>Д</b>, при чтении разрешается произносить так же, как после согласной (с полным отсутствием йотации) - <b>ТАКОЕ > [такоэ<sup>и</sup>]</b>, <b>ВНИМАНИЕ > [вн'иман'иэ<sup>и</sup>]</b>, <b>ЦЭЛЕ' > [цэл'э<sup>и</sup>э<sup>и</sup>]</b>, <b>ТЕРЯ' > [тер'а<sup>и</sup>а<sup>и</sup>]</b>, <b>КЛЮЮТ' > [кл'у<sup>и</sup>у<sup>и</sup>т]</b>, <b>ТЕ'РЬ > [тэ<sup>и</sup>э<sup>и</sup>р']</b>, <b>ТЕЯ > [т'э<sup>и</sup>а<sup>и</sup>]</b>, <b>ЗМЕ''Д > [зм'э<sup>и</sup>э<sup>и</sup>й'</sup>э<sup>и</sup>д]</b>.</li>
-					<li><b>ВАЖНО</b> Для корректного перевода ввод гласного <b>Ё</b> и расстановка ударений над <b>О / Ё > О</b> обязательны; Аббревиатуры не учитываются, требуется самостоятельная правка после обработки; Работоспособность в мобильных браузерах не гарантируется.</li>
+					<li>Йотированный гласный <b>Е / Ё / Ю / Я</b>, стоящий после гласного, но не перед <b>Д</b>, при чтении разрешается произносить так же, как после согласной (с полным отсутствием йотации) - <b>ТАКОЕ > [такоэ<sup>и</sup>]</b>, <b>ВНИМАНИЕ > [вн'иман'иэ<sup>и</sup>]</b>, <b>ЦЭЛЕ' > [цэл'э<sup>и</sup>э<sup>и</sup>]</b>, <b>ТЕРЯ' > [тер'а<sup>и</sup>а<sup>и</sup>]</b>, <b>КЛЮ'Т > [кл'у<sup>и</sup>у<sup>и</sup>т]</b>, <b>ТЕ'РЬ > [тэ<sup>и</sup>э<sup>и</sup>р']</b>, <b>ТЕЯ > [т'э<sup>и</sup>а<sup>и</sup>]</b>, <b>ЗМЕ''Д > [зм'э<sup>и</sup>э<sup>и</sup>й'</sup>э<sup>и</sup>д]</b>.</li>
+					<li><b>ВАЖНО</b> Для корректного перевода использование гласного <b>Ё</b> и (при аканьи) расстановка словарных ударений над <b>О</b> (или <b>Ё / И</b>, переходящей в неё) обязательны; Аббревиатуры не учитываются, требуется самостоятельная правка после обработки; Работоспособность в старых браузерах не гарантируется.</li>
 				</ul>
 			</div>
 			<div data-tab="save" _flex="v">
 				<ul _list="save" data-translator-ref="list"></ul>
 				<div _flex="h">
-					<button onclick="Translator.savesDownload();">▼ Сохранить</button>
+					<button onclick="Translator.download('save');">▼ Сохранить</button>
 					<label _file>
-						<input type="file" onchange="Translator.savesUpload(this);">
+						<input type="file" onchange="Translator.upload(this, 'save');">
 						<div>▲ Загрузить</div>
 					</label>
 				</div>
 			</div>
+			<!--
+			<div data-tab="accent" _flex="v">
+				<div _flex="h">
+					<button onclick="Translator.download('accent');">▼ Сохранить</button>
+					<label _file>
+						<input type="file" onchange="Translator.upload(this, 'accent');">
+						<div>▲ Загрузить</div>
+					</label>
+				</div>
+			</div>
+			-->
 		</div>
 	</div>
 	<div _footer></div>
