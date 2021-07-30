@@ -1645,24 +1645,29 @@ document.addEventListener('keydown', (e) => {
 				}, 125);
 			}
 
-			({
-				KeyS: () => Translator.save(),
-				KeyQ: () => Translator.insertAccent(true),
-				KeyW: () => Translator.loadAccents(),
-				KeyE: () => Translator.insertAccent(),
-				KeyR: () => Translator.displayAccents(),
-				KeyA: () => Translator.clear(),
-				KeyX: () => document.querySelector(Translator.ref('uploadSaves'))?.click(),
-				KeyC: () => document.querySelector(Translator.ref('downloadSaves'))?.click(),
-				KeyV: () => document.querySelector(Translator.ref('uploadAccents'))?.click(),
-				KeyB: () => document.querySelector(Translator.ref('downloadAccents'))?.click(),
-				KeyZ: () => {
-					let checks = Translator.ref('setting')+' input[type="checkbox"]';
+			if(location.hash.substring(1) === 'translator') {
+				({
+					KeyS: () => Translator.save(),
+					KeyQ: () => Translator.insertAccent(true),
+					KeyW: () => Translator.loadAccents(),
+					KeyE: () => Translator.insertAccent(),
+					KeyR: () => Translator.displayAccents(),
+					KeyA: () => Translator.clear(),
+					KeyX: () => document.querySelector(Translator.ref('uploadSaves'))?.click(),
+					KeyC: () => document.querySelector(Translator.ref('downloadSaves'))?.click(),
+					KeyV: () => document.querySelector(Translator.ref('uploadAccents'))?.click(),
+					KeyB: () => document.querySelector(Translator.ref('downloadAccents'))?.click(),
+					KeyZ: () => {
+						let checks = Translator.ref('setting')+' input[type="checkbox"]';
 
-					$(checks).prop('checked', !$(checks).first()[0].checked);
-					Translator.loadSettings();
-				}
-			})[e.code]?.();
+						$(checks).prop('checked', !$(checks).first()[0].checked);
+						Translator.loadSettings();
+					}
+				})[e.code]?.();
+			}
+			if(e.code === 'KeyN') {
+				$('[_navigation]').attr('fixed_', (a, b) => b === '' ? null : '');
+			}
 		}
 	}
 });

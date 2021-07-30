@@ -68,7 +68,7 @@ h1, h2, h3 {
 }
 
 h1, h2 {
-	margin: -6px 0;
+	margin: -8px 0;
 }
 
 h1 {
@@ -131,8 +131,9 @@ ul[_navigation] {
 	transition: 250ms ease width;
 }
 
-ul[_navigation]:hover/*,
-ul[_navigation]:has(li[current_]:first-child)*/ {
+ul[_navigation]:hover,
+ul[_navigation][fixed_]/*,
+ul[_navigation]:not([fixed_]):not(:has(li[current_]:first-child))*/ {
 	width: 64px;
 }
 
@@ -195,7 +196,8 @@ ul[_navigation] li:before {
 	transform: scaleY(0);
 }
 
-ul[_navigation]:hover li[current_]:before {
+ul[_navigation]:hover li[current_]:before,
+ul[_navigation][fixed_] li[current_]:before {
 	transform: scaleY(1);
 }
 
@@ -266,7 +268,9 @@ ul[_navigation] li img {
 ul[_tab-switch] {
 	display: flex;
 
-	gap: 16px;
+	gap: 32px;
+
+	transition: 250ms ease gap;
 }
 
 ul[_tab-switch] li {
@@ -732,6 +736,10 @@ ul[_list] li:nth-child(2n) {
 	}
 
 	[_flex]:not([_flex~="stack"]) {
+		gap: 16px;
+	}
+
+	ul[_tab-switch] {
 		gap: 16px;
 	}
 
