@@ -13,173 +13,207 @@
 	<script src="./app/main.js"></script>
 </head>
 <body>
-	<ul _navigation>
-		<li data-tab-ref="main"><img src="./app/image/logo.svg"></li>
-		<li data-tab-ref="translator"><img src="./app/image/translator.svg"></li>
-		<li data-tab-ref="dictionary"><img src="./app/image/dictionary.svg"></li>
-	</ul>
-	<div _content _flex="v">
-		<div _flex="v" data-tab="main" data-tab-global-title="Главная">
-			Главная
-		</div>
-		<div _flex="v" data-tab="translator" data-tab-global-title="Переводчик">
-			<ul _tab-switch>
-				<li data-tab-ref="translate">Перевод</li>
-				<li data-tab-ref="saves">Сохранения</li>
-				<li data-tab-ref="accents">Ударения</li>
-			</ul>
-			<div _tab>
-				<div data-tab="translate" _flex="v">
-					<div _flex="wrap" data-translator-ref="setting">
-						<div label_="А" tip_="О">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="-1" checked>
-								<div></div>
-							</label>
-						</div>
-						<div label_="Яш" tip_="Еш">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="0">
-								<div></div>
-							</label>
-						</div>
-						<div label_="Хв" tip_="Ф">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="1">
-								<div></div>
-							</label>
-						</div>
-						<div label_="Дж / Дш" tip_="Чж / Чш">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="2">
-								<div></div>
-							</label>
-						</div>
-						<div label_="Шо" tip_="Што">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="3">
-								<div></div>
-							</label>
-						</div>
-						<div label_="Ў" tip_="В / Л / Ф">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="4" checked>
-								<div></div>
-							</label>
-						</div>
-						<!--
-						<div label_="Зь / Сь" tip_="З / С">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="">
-								<div></div>
-							</label>
-						</div>
-						-->
-						<div label_="И / Ы" tip_="Еви / Ови">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="5">
-								<div></div>
-							</label>
-						</div>
-						<div label_="Ы" tip_="И / Е">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="6">
-								<div></div>
-							</label>
-						</div>
-						<div label_="Ю / У" tip_="Ива / Ыва">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="7">
-								<div></div>
-							</label>
-						</div>
-						<div label_="Ей" tip_="Е'">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="8">
-								<div></div>
-							</label>
-						</div>
-						<div label_="Са" tip_="Ца / Ся">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="9">
-								<div></div>
-							</label>
-						</div>
-						<div label_="Нь" tip_="Ни">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="10">
-								<div></div>
-							</label>
-						</div>
-						<div label_="Ыэ" tip_="Ые">
-							<label _switch>
-								<input type="checkbox" data-translator-setting="11">
-								<div></div>
-							</label>
-						</div>
+	<div _wrapper>
+		<ul _navigation>
+			<li data-tab-ref="main"><img src="./app/image/logo.svg"></li>
+			<li data-tab-ref="translator"><img src="./app/image/translator.svg"></li>
+			<li data-tab-ref="dictionary"><img src="./app/image/dictionary.svg"></li>
+		</ul>
+		<div _content _flex="v">
+			<div _flex="v" data-tab="main" data-tab-global-title="Главная">
+				<h1>НизкоГорская Социалистическая Республика <sup>НГСР / Низкогория</sup></h1>
+				<img _image src="./app/image/map.svg">
+				<div _table="natural">
+					<div __header>
+						<div>Характеристика</div>
+						<div>Значение</div>
 					</div>
-					<div _flex="h">
-						<textarea data-translator-ref="in" oninput="Translator.go();" onscroll="Translator.scrolled(this);" placeholder="Текст на русском" zoom_></textarea>
-						<textarea data-translator-ref="out" onscroll="Translator.scrolled(this);" spellcheck="false" readonly placeholder="Текст на низкогорском" zoom_></textarea>
+					<div>
+						<div>Валюта</div>
+						<div>Низкогорские рубль и копейка</div>
 					</div>
-					<div _flex="h center">
-						<button onclick="Translator.save();" title="Alt+S">Сохранить</button>
-						<div _flex="h stack">
-							<button onclick="Translator.insertAccent(true);" title="Alt+Q">ˋ</button>
-							<button onclick="Translator.loadAccents();" title="Alt+W">Авто</button>
-							<button onclick="Translator.insertAccent();" title="Alt+E">ˊ</button>
-						</div>
-						<button onclick="Translator.clear();" title="Alt+A">Очистить</button>
-						<div __space></div>
-						<div data-translator-ref="date"></div>
-						<button data-translator-ref="closeCurrent">Закрыть</button>
-						<button data-translator-ref="saveCurrent">Сохранить</button>
-						<button data-translator-ref="restoreCurrent">Восстановить</button>
-						<button data-translator-ref="deleteCurrent">Удалить</button>
+					<div>
+						<div>Политический строй</div>
+						<div>Социализм</div>
 					</div>
-					<ul _list>
-						<li>
-							Орфография по большей части фонетична (слышится как пишется, и наоборот). Относится ко всему, кроме смягчённой <b>Ж / Ш</b>, <b>Ч</b> перед твёрдой <b>Ж / Ш</b> и заимствованных слов.
-							<br><br>
-							Смягчённый согласный <b>Ж / Ш > [ж'ж'] / [ш'ш']</b>. Согласный <b>Ч</b> перед твёрдой <b>Ж / Ш</b> - <b>[ч]</b>. В заимствованных словах <b>Е > [э]</b>.
-						</li>
-						<li>
-							Апостроф <b>'</b> служит для отделения падежных окончаний от чисел, и для обозначения дубля предыдущей буквы (с учётом регистра) или себя - <b>16'ЫЙ > [шэснаццатый]</b>, <b>ЛУН'ЫЙ > [лунный]</b>. Обязан быть использован везде, кроме аббревиатур.
-							<br><br>
-							Смягчение всегда распространяется на всю последовательность (одинаковых) согласных, созданную с помощью апострофа. Так <b>Н'Ь > [н'н']</b>, или <b>С'''Я > [с'с'с'с'а]</b>, но <b>ЗЗЮ > [зз'у]</b>.
-						</li>
-						<li>Согласный <b>Г / Ґ</b> обозначает звук <b>[ɣ] / [g]</b>, а гласный/полугласный <b>У / Ў > [v] / [w]</b>.</li>
-						<li>Йотированный гласный <b>Е / Ё / Ю / Я</b>, стоящий после гласного, но не перед <b>Д</b>, при чтении разрешается произносить так же, как после согласной (с полным отсутствием йотации) - <b>ТАКОЕ > [такоэ<sup>и</sup>]</b>, <b>ВНИМАНИЕ > [вн'иман'иэ<sup>и</sup>]</b>, <b>ЦЭЛЕ' > [цэл'э<sup>и</sup>э<sup>и</sup>]</b>, <b>ТЕРЯ' > [тер'а<sup>и</sup>а<sup>и</sup>]</b>, <b>КЛЮ'Т > [кл'у<sup>и</sup>у<sup>и</sup>т]</b>, <b>ТЕ'РЬ > [тэ<sup>и</sup>э<sup>и</sup>р']</b>, <b>ТЕЯ > [т'э<sup>и</sup>а<sup>и</sup>]</b>, <b>ЗМЕ''Д > [зм'э<sup>и</sup>э<sup>и</sup>й'</sup>э<sup>и</sup>д]</b>.</li>
-						<li><b>ВАЖНО</b> Для корректного перевода использование гласного <b>Ё</b> и (при аканьи) расстановка словарных ударений над <b>О</b> (или <b>Ё / И</b>, переходящей в неё) обязательны; Аббревиатуры не учитываются, требуется самостоятельная правка после обработки; При большой объёме текста будут наблюдаться подтормаживания; Работоспособность в старых браузерах не гарантируется.</li>
-					</ul>
-				</div>
-				<div data-tab="saves" _flex="v">
-					<div _table data-translator-ref="savesTable"></div>
-					<div _flex="h">
-						<button title="Alt+C" data-translator-ref="downloadSaves">▼ Сохранить</button>
-						<label _file title="Alt+X">
-							<input type="file" onchange="Translator.upload(this, 'saves');" data-translator-ref="uploadSaves">
-							<div>▲ Загрузить</div>
-						</label>
+					<div>
+						<div>Религия</div>
+						<div>Агностицизм</div>
+					</div>
+					<div>
+						<div>Столица</div>
+						<div>Ельград</div>
 					</div>
 				</div>
-				<div data-tab="accents" _flex="v">
-					<div _table data-translator-ref="accentsTable"></div>
-					<div _flex="h">
-						<button title="Alt+B" data-translator-ref="downloadAccents">▼ Сохранить</button>
-						<label _file title="Alt+V">
-							<input type="file" onchange="Translator.upload(this, 'accents');" data-translator-ref="uploadAccents">
-							<div>▲ Загрузить</div>
-						</label>
-						<div __space></div>
-						<button title="Alt+R" data-translator-ref="displayAccents">Отобразить в поле для редактирования</button>
+				<h2>Символика</h2>
+				<h3>Флаг</h3>
+				<img _image src="./app/image/flag.svg">
+				<div _text>Представляет собой полотнище, состоящее из двух вертикально расположенных цветных полос: верхней фиолетового цвета, составляющей три четверти высоты, и нижней зелёного цвета, составляющей одну четверть высоты флага, с изображением на верхнем левом углу фиолетовой полосы золотых серпа и молота. Отношение высоты к ширине 1:2.</div>
+				<h2>Язык</h2>
+				<img _image src="./app/image/language.svg">
+				<div _text>Разновидность русского, надстройка над ним. Из простых отличительных черт можно привести в пример: письменное аканье, <b>Ў</b> на месте <b>В / Л / Ф</b> перед и после гласной, <b>ТСЯ / ТЬСЯ > Ц'А</b>, <b>ЧУ / ЩУ > ЧЮ / ШЮ</b> и <b>ЖЧ / ШЧ > ШЬ</b>.</div>
+			</div>
+			<div _flex="v" data-tab="translator" data-tab-global-title="Переводчик">
+				<h2>Переводчик</h2>
+				<ul _tab-switch>
+					<li data-tab-ref="translate">Перевод</li>
+					<li data-tab-ref="saves">Сохранения</li>
+					<li data-tab-ref="accents">Ударения</li>
+				</ul>
+				<div _tab>
+					<div data-tab="translate" _flex="v">
+						<div _flex="wrap" data-translator-ref="setting">
+							<div label_="А" tip_="О">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="-1" checked>
+									<div></div>
+								</label>
+							</div>
+							<div label_="Яш" tip_="Еш">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="0">
+									<div></div>
+								</label>
+							</div>
+							<div label_="Хв" tip_="Ф">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="1">
+									<div></div>
+								</label>
+							</div>
+							<div label_="Дж / Дш" tip_="Чж / Чш">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="2">
+									<div></div>
+								</label>
+							</div>
+							<div label_="Шо" tip_="Што">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="3">
+									<div></div>
+								</label>
+							</div>
+							<div label_="Ў" tip_="В / Л / Ф">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="4" checked>
+									<div></div>
+								</label>
+							</div>
+							<!--
+							<div label_="Зь / Сь" tip_="З / С">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="">
+									<div></div>
+								</label>
+							</div>
+							-->
+							<div label_="И / Ы" tip_="Еви / Ови">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="5">
+									<div></div>
+								</label>
+							</div>
+							<div label_="Ы" tip_="И / Е">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="6">
+									<div></div>
+								</label>
+							</div>
+							<div label_="Ю / У" tip_="Ива / Ыва">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="7">
+									<div></div>
+								</label>
+							</div>
+							<div label_="Ей" tip_="Е'">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="8">
+									<div></div>
+								</label>
+							</div>
+							<div label_="Са" tip_="Ца / Ся">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="9">
+									<div></div>
+								</label>
+							</div>
+							<div label_="Нь" tip_="Ни">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="10">
+									<div></div>
+								</label>
+							</div>
+							<div label_="Ыэ" tip_="Ые">
+								<label _switch>
+									<input type="checkbox" data-translator-setting="11">
+									<div></div>
+								</label>
+							</div>
+						</div>
+						<div _flex="h">
+							<textarea data-translator-ref="in" oninput="Translator.go();" onscroll="Translator.scrolled(this);" placeholder="Текст на русском" zoom_></textarea>
+							<textarea data-translator-ref="out" onscroll="Translator.scrolled(this);" spellcheck="false" readonly placeholder="Текст на низкогорском" zoom_></textarea>
+						</div>
+						<div _flex="h center">
+							<button onclick="Translator.save();" title="Alt+S">Сохранить</button>
+							<div _flex="h stack">
+								<button onclick="Translator.insertAccent(true);" title="Alt+Q">ˋ</button>
+								<button onclick="Translator.loadAccents();" title="Alt+W">Авто</button>
+								<button onclick="Translator.insertAccent();" title="Alt+E">ˊ</button>
+							</div>
+							<button title="Alt+A" data-translator-ref="clear">Очистить</button>
+							<div __space></div>
+							<div data-translator-ref="date"></div>
+							<button data-translator-ref="closeCurrent">Закрыть</button>
+							<button data-translator-ref="saveCurrent">Сохранить</button>
+							<button data-translator-ref="restoreCurrent">Восстановить</button>
+							<button data-translator-ref="deleteCurrent">Удалить</button>
+						</div>
+						<ul _list>
+							<li>
+								Орфография по большей части фонетична (слышится как пишется, и наоборот). Относится ко всему, кроме смягчённой <b>Ж / Ш</b>, <b>Ч</b> перед твёрдой <b>Ж / Ш</b> и заимствованных слов.
+								<br><br>
+								Смягчённый согласный <b>Ж / Ш > [ж'ж'] / [ш'ш']</b>. Согласный <b>Ч</b> перед твёрдой <b>Ж / Ш</b> - <b>[ч]</b>. В заимствованных словах <b>Е > [э]</b>.
+							</li>
+							<li>
+								Апостроф <b>'</b> служит для отделения падежных окончаний от чисел, и для обозначения дубля предыдущей буквы (с учётом регистра) или себя - <b>16'ЫЙ > [шэснаццатый]</b>, <b>ЛУН'ЫЙ > [лунный]</b>. Обязан быть использован везде, кроме аббревиатур.
+								<br><br>
+								Смягчение всегда распространяется на всю последовательность (одинаковых) согласных, созданную с помощью апострофа. Так <b>Н'Ь > [н'н']</b>, или <b>С'''Я > [с'с'с'с'а]</b>, но <b>ЗЗЮ > [зз'у]</b>.
+							</li>
+							<li>Согласный <b>Г / Ґ</b> обозначает звук <b>[ɣ] / [g]</b>, а гласный/полугласный <b>У / Ў > [v] / [w]</b>.</li>
+							<li>Йотированный гласный <b>Е / Ё / Ю / Я</b>, стоящий после гласного, но не перед <b>Д</b>, при чтении разрешается произносить так же, как после согласной (с полным отсутствием йотации) - <b>ТАКОЕ > [такоэ<sup>и</sup>]</b>, <b>ВНИМАНИЕ > [вн'иман'иэ<sup>и</sup>]</b>, <b>ЦЭЛЕ' > [цэл'э<sup>и</sup>э<sup>и</sup>]</b>, <b>ТЕРЯ' > [тер'а<sup>и</sup>а<sup>и</sup>]</b>, <b>КЛЮ'Т > [кл'у<sup>и</sup>у<sup>и</sup>т]</b>, <b>ТЕ'РЬ > [тэ<sup>и</sup>э<sup>и</sup>р']</b>, <b>ТЕЯ > [т'э<sup>и</sup>а<sup>и</sup>]</b>, <b>ЗМЕ''Д > [зм'э<sup>и</sup>э<sup>и</sup>й'</sup>э<sup>и</sup>д]</b>.</li>
+							<li><b>ВАЖНО</b> Для корректного перевода использование гласного <b>Ё</b> и (при аканьи) расстановка словарных ударений над <b>О</b> (или <b>Ё / И</b>, переходящей в неё) обязательны; Аббревиатуры не учитываются, требуется самостоятельная правка после обработки; При большой объёме текста будут наблюдаться подтормаживания; Работоспособность в старых браузерах не гарантируется.</li>
+						</ul>
+					</div>
+					<div data-tab="saves" _flex="v">
+						<div _table data-translator-ref="savesTable"></div>
+						<div _flex="h">
+							<button title="Alt+C" data-translator-ref="downloadSaves">▼ Сохранить</button>
+							<label _file title="Alt+X">
+								<input type="file" onchange="Translator.upload(this, 'saves');" data-translator-ref="uploadSaves">
+								<div>▲ Загрузить</div>
+							</label>
+						</div>
+					</div>
+					<div data-tab="accents" _flex="v">
+						<div _table data-translator-ref="accentsTable"></div>
+						<div _flex="h">
+							<button title="Alt+B" data-translator-ref="downloadAccents">▼ Сохранить</button>
+							<label _file title="Alt+V">
+								<input type="file" onchange="Translator.upload(this, 'accents');" data-translator-ref="uploadAccents">
+								<div>▲ Загрузить</div>
+							</label>
+							<div __space></div>
+							<button title="Alt+R" data-translator-ref="displayAccents">Отобразить в поле для редактирования</button>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div _flex="v" data-tab="dictionary" data-tab-global-title="Словарь">
-			<div>Все официально существующие русские слова + Нижеперечисленные: Устаревшие, не литературные (разговорные) + Альтернативные из родственных языков + Искусственные.</div>
-			<div _table data-dictionary-ref="table"></div>
+			<div _flex="v" data-tab="dictionary" data-tab-global-title="Словарь">
+				<h2>Словарь</h2>
+				<div>Все официально существующие русские слова + Нижеперечисленные: Устаревшие, не литературные (разговорные) + Альтернативные из родственных языков + Искусственные.</div>
+				<div _table data-dictionary-ref="table"></div>
+			</div>
 		</div>
 	</div>
 </body>

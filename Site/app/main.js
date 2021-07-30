@@ -1,5 +1,5 @@
 window.Tab = class Tab {
-	static globalSuffix = ' ~ НГСР';
+	static globalPostfix = ' ~ НГСР';
 
 	static switch(a) {
 		let title = typeof a === 'string' ? a : a.srcElement.dataset.tabRef,
@@ -7,14 +7,20 @@ window.Tab = class Tab {
 
 		$(`[data-tab-ref="${ title }"], [data-tab="${ title }"]`).attr('current_', '').siblings().removeAttr('current_');
 		if(globalTitle) {
-			document.title = globalTitle+this.globalSuffix;
+			location.hash = title;
+			document.title = globalTitle+this.globalPostfix;
 			scrollTo(0, 0);
 		}
 	}
 
 	static initialize() {
+		let hash = location.hash.substring(1);
+
 		$('[data-tab-ref]').each(function() {
-			if($(this).prevAll('[data-tab-ref]').length === 0) {
+			if($(this).siblings('[data-tab-ref="'+hash+'"]').length > 0) {
+				return;
+			}
+			if($(this).attr('data-tab-ref') === hash || $(this).prevAll('[data-tab-ref]').length === 0) {
 				Tab.switch($(this).attr('data-tab-ref'));
 			}
 		});
@@ -469,6 +475,7 @@ window.Translator = class Translator {
 			}
 
 		$(this.ref('in')+', '+this.ref('out'))[a.length <= 128 ? 'attr' : 'removeAttr']('zoom_', '');
+		$(this.ref('clear'))[a.length > 0 ? 'attr': 'removeAttr']('onclick', 'Translator.clear();');
 
 		let parsed = this.parse(a),
 			replaceWithCase = (a, b) => {
@@ -557,21 +564,21 @@ window.Translator = class Translator {
 
 	static loadAccents() {
 		let a = this.in(),
-			b = JSON.parse(localStorage.getItem('accents')) ?? {},
+			accents = JSON.parse(localStorage.getItem('accents')) ?? {},
 			parsed = this.parse(a.value);
 
 		for(let v of parsed) {
 			let k = v.string.toLowerCase();
 
-			if(v.type !== 'word' || !b[k] || v.graveIndex != undefined || v.acuteIndex != undefined) {
+			if(v.type !== 'word' || !accents[k] || v.graveIndex != undefined || v.acuteIndex != undefined) {
 				continue;
 			}
 
-			if(b[k].graveIndex != undefined) {
-				v.graveIndex = b[k].graveIndex;
+			if(accents[k].graveIndex != undefined) {
+				v.graveIndex = accents[k].graveIndex;
 			}
-			if(b[k].acuteIndex != undefined) {
-				v.acuteIndex = b[k].acuteIndex;
+			if(accents[k].acuteIndex != undefined) {
+				v.acuteIndex = accents[k].acuteIndex;
 			}
 		}
 
@@ -581,7 +588,7 @@ window.Translator = class Translator {
 
 	static saveAccents() {
 		let a = this.in().value,
-			b = JSON.parse(localStorage.getItem('accents')) ?? {}
+			accents = JSON.parse(localStorage.getItem('accents')) ?? {}
 
 		for(let v of this.parse(a)) {
 			let k = v.string.toLowerCase();
@@ -590,44 +597,44 @@ window.Translator = class Translator {
 				continue;
 			}
 			if(v.graveIndex == undefined && v.acuteIndex == undefined) {
-				delete b[k]
+				delete accents[k]
 				continue;
 			}
 
-			b[k] = {
+			accents[k] = {
 				graveIndex: v.graveIndex,
 				acuteIndex: v.acuteIndex
 			}
 		}
 
-		localStorage.setItem('accents', JSON.stringify(b));
+		localStorage.setItem('accents', JSON.stringify(accents));
 		this.updateAccentsTable();
 	}
 
 	static displayAccents() {
 		let a = this.in(),
-			b = JSON.parse(localStorage.getItem('accents')) ?? {},
-			c = []
+			accents = JSON.parse(localStorage.getItem('accents')) ?? {},
+			accents_ = []
 
 		if(a.value.trim() !== '' && !confirm(`Отобразить базу ударений вместо текущего текста?`)) {
 			return;
 		}
 
-		for(let k in b) {
-			c.push({
+		for(let k in accents) {
+			accents_.push({
 				string: k,
-				graveIndex: b[k].graveIndex,
-				acuteIndex: b[k].acuteIndex
-			},);
+				graveIndex: accents[k].graveIndex,
+				acuteIndex: accents[k].acuteIndex
+			});
 		}
 
-		c.sort((a, b) => a.string > b.string ? 1 : a.string < b.string ? -1 : 0);
+		accents_.sort((a, b) => a.string > b.string ? 1 : a.string < b.string ? -1 : 0);
 
-		for(let k = c.length-1; k > 0; k--) {
-			c.splice(k, 0, { string: '\n' });
+		for(let k = accents_.length-1; k > 0; k--) {	// Переносы строк между словами
+			accents_.splice(k, 0, { string: '\n' });
 		}
 
-		a.value = Translator.unparse(c, true);
+		a.value = Translator.unparse(accents_, true);
 		a.oninput();
 		this.updateSaveButtons();
 		Tab.switch('translate');
@@ -666,35 +673,50 @@ window.Translator = class Translator {
 	static updateSavesTable() {
 		let a = $(this.ref('savesTable')),
 			b = $(this.ref('downloadSaves')),
-			c = JSON.parse(localStorage.getItem('saves')) ?? {}
+			saves = JSON.parse(localStorage.getItem('saves')) ?? {},
+			saves_ = []
 
 		a.html('');
-		for(let k in c) {
+		for(let k in saves) {
+			saves_.push({
+				timestamp: k,
+				string: saves[k]
+			});
+		}
+		saves_.sort((a, b) => a.timestamp > b.timestamp ? -1 : a.timestamp < b.timestamp ? 1 : 0);
+		for(let v of saves_) {
 			a.append(`
 				<div>
-					<div wide_>${ Characters.truncate(c[k], 128) }</div>
-					<div wrapless_>${ Timestamp.toDateString(k) }</div>
+					<div wide_>${ Characters.truncate(v.string, 128) }</div>
+					<div wrapless_>${ Timestamp.toDateString(v.timestamp) }</div>
 					<div>
 						<div _flex="h">
-							<button onclick="Translator.load('${ k }')">Загрузить</button>
-							<button onclick="Translator.delete('${ k }')">Удалить</button>
+							<button onclick="Translator.load('${ v.timestamp }')">Загрузить</button>
+							<button onclick="Translator.delete('${ v.timestamp }')">Удалить</button>
 						</div>
 					</div>
 				</div>
 			`);
 		}
-		if($.isEmptyObject(c)) {
-			a.append('<div><div>Пусто.</div></div>');
-			b.removeAttr('onclick');
-		} else {
+		if(saves_.length > 0) {
 			a.prepend(`
 				<div __header>
 					<div wide_>Краткое содержание</div>
 					<div wrapless_>Дата создания</div>
-					<div></div>
+					<div>
+						<!--
+						<div _flex="h">
+							<button>◀</button>
+							<button>▶</button>
+						</div>
+						-->
+					</div>
 				</div>
 			`);
 			b.attr('onclick', 'Translator.download(\'saves\');');
+		} else {
+			a.append('<div><div>Пусто.</div></div>');
+			b.removeAttr('onclick');
 		}
 	}
 
@@ -702,19 +724,18 @@ window.Translator = class Translator {
 		let a = $(this.ref('accentsTable')),
 			b = $(this.ref('downloadAccents')),
 			c = $(this.ref('displayAccents')),
-			d = JSON.parse(localStorage.getItem('accents')) ?? {},
-			e = []
+			accents = JSON.parse(localStorage.getItem('accents')) ?? {},
+			accents_ = []
 
 		a.html('');
-		for(let k in d) {
-			e.push({
+		for(let k in accents) {
+			accents_.push({
 				string: k,
-				graveIndex: d[k].graveIndex,
-				acuteIndex: d[k].acuteIndex
-			},);
+				...accents[k]
+			});
 		}
-		e.sort((a, b) => a.string > b.string ? 1 : a.string < b.string ? -1 : 0);
-		for(let v of e) {
+		accents_.sort((a, b) => a.string > b.string ? 1 : a.string < b.string ? -1 : 0);
+		for(let v of accents_) {
 			a.append(`
 				<div>
 					<div wrapless_>${ v.graveIndex != undefined ? v.graveIndex+1 : '' }</div>
@@ -723,11 +744,7 @@ window.Translator = class Translator {
 				</div>
 			`);
 		}
-		if($.isEmptyObject(d)) {
-			a.append('<div><div>Пусто.</div></div>');
-			b.removeAttr('onclick');
-			c.removeAttr('onclick');
-		} else {
+		if(accents_.length > 0) {
 			a.prepend(`
 				<div __header>
 					<div wrapless_>Позиция левого ударения</div>
@@ -737,6 +754,10 @@ window.Translator = class Translator {
 			`);
 			b.attr('onclick', 'Translator.download(\'accents\');');
 			c.attr('onclick', 'Translator.displayAccents();');
+		} else {
+			a.append('<div><div>Пусто.</div></div>');
+			b.removeAttr('onclick');
+			c.removeAttr('onclick');
 		}
 	}
 
@@ -745,19 +766,15 @@ window.Translator = class Translator {
 			b = $(this.ref('closeCurrent')),
 			c = $(this.ref('saveCurrent')),
 			d = $(this.ref('restoreCurrent')),
-			e = $(this.ref('deleteCurrent'));
+			e = $(this.ref('deleteCurrent')),
+			f = ['close', 'save', 'load', 'delete']
 
 		if(timestamp) {
 			a.text(Timestamp.toDateString(timestamp));
-			b.attr('onclick', 'Translator.close('+timestamp+');');
-			c.attr('onclick', 'Translator.save('+timestamp+');');
-			d.attr('onclick', 'Translator.load('+timestamp+');');
-			e.attr('onclick', 'Translator.delete('+timestamp+');');
+			[b, c, d, e].forEach(v => v.attr('onclick', 'Translator.'+f.shift()+'('+timestamp+');'));
 		} else {
 			a.text('');
-			for(let v of [b, c, d, e]) {
-				v.removeAttr('onclick');
-			}
+			[b, c, d, e].forEach(v => v.removeAttr('onclick'));
 		}
 	}
 
@@ -774,10 +791,9 @@ window.Translator = class Translator {
 
 	static close(timestamp) {
 		let a = this.in(),
-			b = document.querySelector(this.ref('date')).innerHTML,
-			c = JSON.parse(localStorage.getItem('saves')) ?? {}
+			saves = JSON.parse(localStorage.getItem('saves')) ?? {}
 
-		if(c[timestamp] !== a.value && !confirm(`Закрыть сохранение "${ Timestamp.toDateString(timestamp) }"?`)) {
+		if(saves[timestamp] !== a.value && !confirm(`Закрыть сохранение "${ Timestamp.toDateString(timestamp) }"?`)) {
 			return;
 		}
 
@@ -789,13 +805,13 @@ window.Translator = class Translator {
 	static load(timestamp) {
 		let a = this.in(),
 			b = document.querySelector(this.ref('date')).innerHTML,
-			c = JSON.parse(localStorage.getItem('saves')) ?? {}
+			saves = JSON.parse(localStorage.getItem('saves')) ?? {}
 
 		if(a.value.trim() !== '' && !confirm(`${ b === Timestamp.toDateString(timestamp) ? 'Восстановить' : 'Загрузить' } сохранение "${ Timestamp.toDateString(timestamp) }"?`)) {
 			return;
 		}
 
-		a.value = c[timestamp]
+		a.value = saves[timestamp]
 	//	a.scrollTop = 0;
 		a.oninput();
 		this.updateSavesTable();
@@ -804,46 +820,37 @@ window.Translator = class Translator {
 		scrollTo(0, 0);
 	}
 
-	static save(timestamp) {
+	static save(timestamp = Timestamp.current()) {
 		let a = this.in().value,
-			b = JSON.parse(localStorage.getItem('saves')) ?? {},
-			c = Timestamp.current();
+			b = document.querySelector(this.ref('date')).innerHTML,
+			saves = JSON.parse(localStorage.getItem('saves')) ?? {}
 
-		if(!timestamp) {
-			b = {
-				[c]: a,
-				...b
-			}
-			localStorage.setItem('saves', JSON.stringify(b));
-			this.updateSavesTable();
-			this.updateSaveButtons(c);
-		} else {
-			if(b[timestamp].trim() !== '' && !confirm(`Перезаписать сохранение "${ Timestamp.toDateString(timestamp) }"?`)) {
-				return;
-			}
+		if(saves[timestamp]?.trim().length > 0 && !confirm(`Перезаписать сохранение "${ Timestamp.toDateString(timestamp) }"?`)) {
+			return;
+		}
 
-			b[timestamp] = a;
-			localStorage.setItem('saves', JSON.stringify(b));
-			this.updateSavesTable();
+		saves[timestamp] = a;
+		localStorage.setItem('saves', JSON.stringify(saves));
+		this.updateSavesTable();
+		if(b !== Timestamp.toDateString(timestamp)) {
+			this.updateSaveButtons(timestamp);
 		}
 		this.saveAccents();
 	}
 
 	static delete(timestamp) {
 		let a = document.querySelector(this.ref('date')).innerHTML,
-			b = JSON.parse(localStorage.getItem('saves')) ?? {}
+			saves = JSON.parse(localStorage.getItem('saves')) ?? {}
 
-		if(b[timestamp].trim() !== '' && prompt(`Удалить сохранение "${ Timestamp.toDateString(timestamp) }"? ("Y" для подтверждения).`) !== 'Y') {
+		if(saves[timestamp].trim() !== '' && prompt(`Удалить сохранение "${ Timestamp.toDateString(timestamp) }"? ("Y" для подтверждения).`) !== 'Y') {
 			return;
 		}
 
-		b[timestamp] = undefined;
-		localStorage.setItem('saves', JSON.stringify(b));
+		saves[timestamp] = undefined;
+		localStorage.setItem('saves', JSON.stringify(saves));
+		this.updateSavesTable();
 		if(a === Timestamp.toDateString(timestamp)) {
-			this.updateSavesTable();
 			this.updateSaveButtons();
-		} else {
-			this.updateSavesTable();
 		}
 	}
 

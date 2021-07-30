@@ -1,3 +1,5 @@
+@import url(./font/import.css);
+
 * {
 	margin: 0;
 	padding: 0;
@@ -20,23 +22,13 @@ html {
 	background: var(--color-white);
 }
 
-body {
-	display: flex;
-
-	min-width: 768px;
-	min-height: 100%;
-	overflow-x: hidden;
-
-	background: var(--color-black-0625);
-}
-
 body,
 button,
 select,
 input,
 textarea {
 	color: var(--color-black);
-	font: 12px Arial;
+	font: 13px Roboto, Arial;
 	line-height: 16px;
 }
 
@@ -46,6 +38,51 @@ ul, ol {
 
 button:not(:disabled):hover {
 	cursor: pointer;
+}
+
+b {
+	display: inline-block;
+
+	padding: 0 4px;
+
+	background: var(--color-gray);
+	border-radius: 2px;
+
+	color: var(--color-orange);
+	font-weight: normal;
+	line-height: 16px;
+}
+
+sup {
+	display: inline-block;
+
+	margin-top: -4px;
+
+	vertical-align: top;
+	font-size: 10px;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+	word-break: break-word;
+}
+
+h1, h2 {
+	margin: -6px 0;
+}
+
+h1 {
+	font-size: 26px;
+	line-height: 48px;
+}
+
+h2 {
+	font-size: 20px;
+	line-height: 32px;
+}
+
+h3 {
+	font-size: 17px;
 }
 
 ::placeholder {
@@ -60,6 +97,15 @@ button:not(:disabled):hover {
 	color: var(--color-white);
 }
 
+[_wrapper] {
+	display: flex;
+
+	min-width: 768px;
+	min-height: 100%;
+
+	background: var(--color-black-0625);
+}
+
 ul[_navigation] {
 	display: flex;
 	flex-direction: column;
@@ -68,24 +114,18 @@ ul[_navigation] {
 	position: sticky;
 	top: 0;
 
-	width: 2px;
-	height: 100%;
+	width: 0;
+	height: 100vh;
 	box-sizing: border-box;
 
-	padding: 16px 0;
+	padding: 32px 0;
 	gap: 32px;
-
-	background: linear-gradient(to bottom,
-		var(--color-purple),
-		var(--color-purple) 75%,
-		var(--color-green) 75%,
-		var(--color-green)
-	);
 
 	transition: 250ms ease width;
 }
 
-ul[_navigation]:hover {
+ul[_navigation]:hover/*,
+ul[_navigation]:has(li[current_]:first-child)*/ {
 	width: 64px;
 }
 
@@ -111,11 +151,12 @@ ul[_navigation] li {
 
 	position: relative;
 
-	width: 64px;
+	width: 32px;
 	height: 32px;
 
 	transition: 250ms ease opacity;
 	cursor: pointer;
+	user-select: none;
 }
 
 ul[_navigation] li:not(:first-child) {
@@ -136,7 +177,7 @@ ul[_navigation] li:before {
 
 	position: absolute;
 	top: 0;
-	left: 0;
+	right: -16px;
 	bottom: 0;
 
 	width: 2px;
@@ -147,7 +188,7 @@ ul[_navigation] li:before {
 	transform: scaleY(0);
 }
 
-ul[_navigation] li[current_]:before {
+ul[_navigation]:hover li[current_]:before {
 	transform: scaleY(1);
 }
 
@@ -156,16 +197,27 @@ ul[_navigation] li img {
 }
 
 [_content] {
-	flex-shrink: 0;
-
-	width: calc(100% - 2px);
-	box-sizing: border-box;
+	flex: 1;
 
 	padding: 32px;
 }
 
 [_content] > *:not([current_]) {
 	display: none;
+}
+
+[_text] {
+	margin: -6px 0;
+
+	line-height: 24px;
+}
+
+[_image] {
+	max-width: 768px;
+
+	box-shadow: 0 8px 16px 8px var(--color-black-25);
+
+	transition: 250ms ease box-shadow;
 }
 
 [_flex] {
@@ -472,7 +524,7 @@ textarea:focus {
 textarea[zoom_] {
 	padding: 8px 16px;
 
-	font-size: 16px;
+	font-size: 17px;
 	line-height: 32px;
 }
 
@@ -562,29 +614,7 @@ ul[_list] li:nth-child(2n) {
 	background: var(--color-black-0625);
 }
 
-ul[_list] b {
-	display: inline-block;
-
-	padding: 0 4px;
-
-	background: var(--color-gray);
-	border-radius: 2px;
-
-	color: var(--color-orange);
-	font-weight: normal;
-	line-height: 16px;
-}
-
-ul[_list] sup {
-	display: inline-block;
-
-	margin-top: -4px;
-
-	vertical-align: top;
-	font-size: 10px;
-}
-
-div[_table] {
+[_table] {
 	display: table;
 
 	overflow: hidden;
@@ -596,21 +626,25 @@ div[_table] {
 	transition: 250ms ease box-shadow;
 }
 
-div[_table] > div {
+[_table="natural"] {
+	width: max-content;
+}
+
+[_table] > div {
 	display: table-row;
 }
 
-div[_table] > div:nth-child(2n) {
+[_table] > div:nth-child(2n) {
 	background: var(--color-black-0625);
 }
 
-div[_table] > div[__header] {
+[_table] > div[__header] {
 	background: var(--color-gray);
 
 	color: var(--color-orange);
 }
 
-div[_table] > div > div {
+[_table] > div > div {
 	display: table-cell;
 
 	padding: 16px;
@@ -618,45 +652,59 @@ div[_table] > div > div {
 	vertical-align: middle;
 }
 
-div[_table] > div > div:first-child {
+[_table] > div > div:first-child {
 	padding-right: 8px;
 }
 
-div[_table] > div > div:not(:first-child):not(:last-child) {
+[_table] > div > div:not(:first-child):not(:last-child) {
 	padding-left: 8px;
 	padding-right: 8px;
 }
 
-div[_table] > div > div:last-child {
+[_table] > div > div:last-child {
 	padding-left: 8px;
 
 	text-align: right;
 }
 
-div[_table] > div > div:only-child {
+[_table] > div > div:only-child {
 	padding: 16px;
 
 	text-align: left;
 }
 
-div[_table] > div > div[wide_] {
+[_table] > div > div[wide_] {
 	width: 100%;
 }
 
-div[_table] > div > div[narrow_] {
+[_table] > div > div[narrow_] {
 	width: 1%;
 }
 
-div[_table] > div > div[wrapless_] {
+[_table] > div > div[wrapless_] {
 	white-space: nowrap;
 }
 
-div[_table] > div[__header] > div {
+[_table] > div[__header] > div {
 	padding: 8px 16px;
 }
 
-div[_table] [_flex] {
+[_table] > div[__header] > div button {
+	min-width: 16px;
+
+	padding: 0;
+
+	background: none;
+
+	color: var(--color-orange);
+}
+
+[_table] > div > div [_flex] {
 	gap: 16px;
+}
+
+[_table] > div > div:last-child [_flex] {
+	justify-content: flex-end;
 }
 
 @media screen and (max-width: 1366px) {
@@ -670,6 +718,10 @@ div[_table] [_flex] {
 }
 
 @media screen and (max-width: 1024px) {
+	img[_image] {
+		box-shadow: 0 4px 8px 4px var(--color-black-25);
+	}
+
 	[_flex]:not([_flex~="stack"]) {
 		gap: 16px;
 	}
@@ -707,6 +759,10 @@ div[_table] [_flex] {
 		box-shadow:
 			0 4px 8px 4px var(--color-black-25),
 			0 0 0 2px var(--color-black-125);
+	}
+
+	[_table] {
+		box-shadow: 0 4px 8px 4px var(--color-black-25);
 	}
 }
 
