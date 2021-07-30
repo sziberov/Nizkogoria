@@ -100,7 +100,6 @@ h3 {
 [_wrapper] {
 	display: flex;
 
-	width: fit-content;
 	min-width: 768px;
 	min-height: 100%;
 
@@ -199,6 +198,8 @@ ul[_navigation] li img {
 
 [_content] {
 	flex: 1;
+
+	overflow: hidden;
 
 	padding: 32px;
 }
