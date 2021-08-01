@@ -98,18 +98,13 @@ h3 {
 }
 
 [_wrapper] {
-	display: flex;
+	display: grid;
+	grid-template-columns: min-content minmax(0, 100%);
 
 	min-width: 768px;
 	min-height: 100%;
 
 	background: var(--color-black-0625);
-}
-
-@keyframes Navigation {
-	0%		{ width: 0; }
-	50%		{ width: 64px; }
-	100%	{ width: 0; }
 }
 
 ul[_navigation] {
@@ -127,7 +122,6 @@ ul[_navigation] {
 	padding: 32px 0;
 	gap: 32px;
 
-	animation: Navigation 1s ease;
 	transition: 250ms ease width;
 }
 
@@ -137,19 +131,58 @@ ul[_navigation]:not([fixed_]):not(:has(li[current_]:first-child))*/ {
 	width: 64px;
 }
 
+ul[_navigation]:before,
 ul[_navigation]:after {
 	content: '';
 
 	position: absolute;
 	top: 0;
-	left: 100%;
 	bottom: 0;
 
 	width: 16px;
 }
 
+@keyframes Navigation {
+	from	{ background-position-y: -100vh; }
+	to		{ background-position-y: 100vh; }
+}
+
+ul[_navigation]:before {
+	left: 0;
+
+	background: radial-gradient(at left,
+		var(--color-orange),
+		transparent 75%
+	);
+	background-size: 100% 100vh;
+	background-repeat: no-repeat;
+	background-position-y: -100vh;
+
+	opacity: 1;
+	animation: Navigation 4s ease;
+	transition: 250ms ease opacity;
+}
+
+ul[_navigation]:hover:before,
+ul[_navigation][fixed_]:before {
+	opacity: 0;
+}
+
+ul[_navigation]:after {
+	left: 100%;
+}
+
 ul[_navigation]:hover:after {
 	width: 32px;
+}
+
+ul[_navigation] > *:not(:first-child) {
+	opacity: 0.5;
+	transition: 250ms ease opacity;
+}
+
+ul[_navigation] > *:not(:first-child):hover {
+	opacity: 1;
 }
 
 ul[_navigation] li {
@@ -162,20 +195,14 @@ ul[_navigation] li {
 	width: 32px;
 	height: 32px;
 
-	transition: 250ms ease opacity;
 	cursor: pointer;
 	user-select: none;
-}
-
-ul[_navigation] li:not(:first-child) {
-	opacity: 0.5;
 }
 
 ul[_navigation] li:not([data-tab-ref]):not([current_]) {
 	pointer-events: none;
 }
 
-ul[_navigation] li:hover,
 ul[_navigation] li[current_] {
 	opacity: 1;
 }
@@ -205,11 +232,37 @@ ul[_navigation] li img {
 	pointer-events: none;
 }
 
+ul[_navigation] button {
+	position: relative;
+
+	width: 32px;
+	height: 16px;
+
+	background: var(--color-black-0625);
+	box-shadow: none;
+}
+
+ul[_navigation] button:after {
+	content: '';
+
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	width: 16px;
+	height: 16px;
+
+	border-radius: 2px;
+	background: var(--color-gray);
+
+	transition: 250ms ease transform;
+}
+
+ul[_navigation][fixed_] button:after {
+	transform: translateX(100%);
+}
+
 [_content] {
-	flex: 1;
-
-	overflow: hidden;
-
 	padding: 32px;
 }
 

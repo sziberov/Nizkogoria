@@ -18,6 +18,7 @@
 			<li data-tab-ref="main"><img src="./app/image/logo.svg"></li>
 			<li data-tab-ref="translator"><img src="./app/image/translator.svg"></li>
 			<li data-tab-ref="dictionary"><img src="./app/image/dictionary.svg"></li>
+			<button onclick="Navigation.toggle();"></button>
 		</ul>
 		<div _content _flex="v">
 			<div _flex="v" data-tab="main" data-tab-global-title="Главная">
@@ -63,7 +64,7 @@
 				<div _tab>
 					<div data-tab="translate" _flex="v">
 						<div _flex="wrap" data-translator-ref="setting">
-							<div label_="А" tip_="О">
+							<div label_="А" tip_="О : Стандарт">
 								<label _switch>
 									<input type="checkbox" data-translator-setting="-1" checked>
 									<div></div>
@@ -93,7 +94,7 @@
 									<div></div>
 								</label>
 							</div>
-							<div label_="Ў" tip_="В / Л / Ф">
+							<div label_="Ў" tip_="В / Л / Ф : Стандарт">
 								<label _switch>
 									<input type="checkbox" data-translator-setting="4" checked>
 									<div></div>

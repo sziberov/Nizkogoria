@@ -27,6 +27,37 @@ window.Tab = class Tab {
 	}
 }
 
+window.Navigation = class Navigation {
+	static toggle() {
+		let settings = JSON.parse(localStorage.getItem('settings')) ?? {}
+
+		if(!settings.navigation) {
+			settings.navigation = {}
+		}
+		$('[_navigation]').attr('fixed_', (a, b) => {
+			if(b === '') {
+				settings.navigation.fixed = undefined;
+
+				return null;
+			} else {
+				settings.navigation.fixed = true;
+
+				return '';
+			}
+		});
+
+		localStorage.setItem('settings', JSON.stringify(settings));
+	}
+
+	static initialize() {
+		let settings = JSON.parse(localStorage.getItem('settings')) ?? {}
+
+		if(settings.navigation?.fixed) {
+			$('[_navigation]').attr('fixed_',  '');
+		}
+	}
+}
+
 window.Characters = class Characters {
 	static grave = '̀';
 	static acute = '́';
@@ -477,8 +508,7 @@ window.Translator = class Translator {
 		$(this.ref('in')+', '+this.ref('out'))[a.length <= 128 ? 'attr' : 'removeAttr']('zoom_', '');
 		$(this.ref('clear'))[a.length > 0 ? 'attr': 'removeAttr']('onclick', 'Translator.clear();');
 
-		let parsed = this.parse(a),
-			replaceWithCase = (a, b) => {
+		let replaceWithCase = (a, b) => {
 				let c = '';
 
 				for(let i = 0; i < Math.max(a.length, b.length); i++) {
@@ -497,16 +527,18 @@ window.Translator = class Translator {
 				return b ? c ? true : d : c ? a : a[0]
 			}
 
+		// Применение общих правил замены (не в цикле обработки заради чуть более высокой производительности и менее громоздкой реализации)
+
+		for(let k in c) a = shouldReplace(c[k], true) ? a.replace(new RegExp('(?<=^|[\\s\\d\\p{P}])'+k+'(?=\\S)',	'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(c[k]).replace('$1', cg ?? ''))) : a;
+		for(let k in d) a = shouldReplace(d[k], true) ? a.replace(new RegExp(k,										'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(d[k]).replace('$1', cg ?? ''))) : a;
+		for(let k in e) a = shouldReplace(e[k], true) ? a.replace(new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])',	'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(e[k]).replace('$1', cg ?? ''))) : a;
+
+		let parsed = this.parse(a);
+
 		for(let v of parsed) {
 			if(v.type !== 'word') {
 				continue;
 			}
-
-			// Применение общих правил замены
-
-			for(let k in c) v.string = shouldReplace(c[k], true) ? v.string.replace(new RegExp('^'+k+'(?=\\S)',		'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(c[k]).replace('$1', cg ?? ''))) : v.string;
-			for(let k in d) v.string = shouldReplace(d[k], true) ? v.string.replace(new RegExp(k,					'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(d[k]).replace('$1', cg ?? ''))) : v.string;
-			for(let k in e) v.string = shouldReplace(e[k], true) ? v.string.replace(new RegExp('(?<=\\S)'+k+'$',	'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(e[k]).replace('$1', cg ?? ''))) : v.string;
 
 			// Замена безударного "О" на "А"
 
@@ -540,26 +572,42 @@ window.Translator = class Translator {
 		b.value = this.unparse(parsed);
 	}
 
-	static loadSettings(event) {
-		let settings;
+	static loadSettings(initialisation) {
+		let settings = JSON.parse(localStorage.getItem('settings')) ?? {}
 
-		if(!event) {
-			settings = document.querySelectorAll('[data-translator-setting]');	// localStorage.getItem('settings');
+		this.settings = {}
 
-			this.settings = {}
-		} else {
-			settings = [event.srcElement]
+		if(!settings.translator) {
+			this.saveSettings();
 		}
+		for(let k in settings.translator) {
+			this.settings[k] = settings.translator[k]
 
-		for(let v of settings) {
-			let k = v.dataset.translatorSetting;
-
-			if(k) {
-				this.settings[k] = v.checked;
+			if(initialisation) {
+				document.querySelector('[data-translator-setting="'+k+'"]').checked = settings.translator[k]
 			}
 		}
 
 		this.go();
+	}
+
+	static saveSettings(event) {
+		let settings = JSON.parse(localStorage.getItem('settings')) ?? {},
+			inDOMSettings = !event ? document.querySelectorAll('[data-translator-setting]') : [event.srcElement]
+
+		if(!event || !settings.translator) {
+			settings.translator = {}
+		}
+		for(let v of inDOMSettings) {
+			let k = v.dataset.translatorSetting;
+
+			if(k) {
+				settings.translator[k] = v.checked;
+			}
+		}
+
+		localStorage.setItem('settings', JSON.stringify(settings));
+		this.loadSettings();
 	}
 
 	static loadAccents() {
@@ -1627,7 +1675,7 @@ window.Dictionary = class Dictionary {
 
 document.addEventListener('click', (e) => {
 	if(e.target.matches('[data-tab-ref]:not([current_])'))	Tab.switch(e);
-	if(e.target.matches('[data-translator-setting]'))		Translator.loadSettings(e);
+	if(e.target.matches('[data-translator-setting]'))		Translator.saveSettings(e);
 }, false);
 
 let keydownTimeout;
@@ -1661,12 +1709,12 @@ document.addEventListener('keydown', (e) => {
 						let checks = Translator.ref('setting')+' input[type="checkbox"]';
 
 						$(checks).prop('checked', !$(checks).first()[0].checked);
-						Translator.loadSettings();
+						Translator.saveSettings();
 					}
 				})[e.code]?.();
 			}
 			if(e.code === 'KeyN') {
-				$('[_navigation]').attr('fixed_', (a, b) => b === '' ? null : '');
+				Navigation.toggle();
 			}
 		}
 	}
@@ -1685,9 +1733,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		localStorage.removeItem('accent');
 	}
 
+	Tab.initialize();
+	Navigation.initialize();
 	Translator.updateSavesTable();
 	Translator.updateAccentsTable();
-	Translator.loadSettings();
+	Translator.loadSettings(true);
 	Dictionary.updateTable();
-	Tab.initialize();
 });
