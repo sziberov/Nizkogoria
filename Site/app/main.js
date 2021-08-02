@@ -29,30 +29,30 @@ window.Tab = class Tab {
 
 window.Navigation = class Navigation {
 	static toggle() {
-		let settings = JSON.parse(localStorage.getItem('settings')) ?? {}
+		let preferences = JSON.parse(localStorage.getItem('preferences')) ?? {}
 
-		if(!settings.navigation) {
-			settings.navigation = {}
+		if(!preferences.navigation) {
+			preferences.navigation = {}
 		}
 		$('[_navigation]').attr('fixed_', (a, b) => {
 			if(b === '') {
-				settings.navigation.fixed = undefined;
+				preferences.navigation.fixed = undefined;
 
 				return null;
 			} else {
-				settings.navigation.fixed = true;
+				preferences.navigation.fixed = true;
 
 				return '';
 			}
 		});
 
-		localStorage.setItem('settings', JSON.stringify(settings));
+		localStorage.setItem('preferences', JSON.stringify(preferences));
 	}
 
 	static initialize() {
-		let settings = JSON.parse(localStorage.getItem('settings')) ?? {}
+		let preferences = JSON.parse(localStorage.getItem('preferences')) ?? {}
 
-		if(settings.navigation?.fixed) {
+		if(preferences.navigation?.fixed) {
 			$('[_navigation]').attr('fixed_',  '');
 		}
 	}
@@ -62,12 +62,33 @@ window.Characters = class Characters {
 	static grave = '̀';
 	static acute = '́';
 
+	static replacePreservingCase(of, to) {
+		let a = '';
+
+		for(let i = 0; i < Math.max(of.length, to.length); i++) {
+			let b = of[i] ?? of.slice(-1),
+				c = to[i] ?? '';
+
+			a += b === b.toUpperCase() && b !== b.toLowerCase() ? c.toUpperCase() : c;
+		}
+
+		return a;
+	}
+
 	static replaceAt(string, index, replacement) {
 		return string.substring(0, index)+replacement+string.substring(index+replacement.length);
 	}
 
 	static insertAt(string, index, insertement) {
 		return string.slice(0, index)+insertement+string.slice(index);
+	}
+
+	static applyCaptureGroups(string, ...cg) {
+		for(let v of string.match(/\$(\d)/g) ?? []) {
+			string = string.replaceAll(v, cg[v.substring(1)-1] ?? '');
+		}
+
+		return string;
 	}
 
 	static truncate(string, length) {
@@ -411,10 +432,14 @@ window.Translator = class Translator {
 			'([^еёиюя])\\1':								'$1'
 		}
 	}
-	static prefixes = ['а', 'ана', 'анти', 'архи', 'без', 'бес', 'в', 'вз', 'во', 'воз', 'возо', 'вос', 'вс', 'вы', 'гипер', 'гипо', 'де', 'дез', 'дис', 'до', 'за', 'зкстра', 'из', 'изо', 'ин', 'интер', 'инфра', 'ис', 'квази', 'кило', 'контр', 'макро', 'мата', 'мега', 'микро', 'мульти', 'на', 'над', 'надо', 'наи', 'не', 'недо', 'низ', 'низо', 'нис', 'о', 'об', 'обез', 'обес', 'обо', 'орто', 'от', 'ото', 'па', 'пан', 'пара', 'пере', 'по', 'под', 'подо', 'пост', 'пра', 'пре', 'пред', 'предо', 'при', 'про', 'прото', 'раз', 'разо', 'рас', 'ре', 'с', 'со', 'су', 'суб', 'супер', 'транс', 'ультра', 'через', 'черес', 'чрез', 'экс']
-	static posfixes = ['а', 'ам', 'ами', 'ат', 'ах', 'ая', 'е', 'его', 'ее', 'ей', 'ем', 'ему', 'ет', 'ете', 'ешь', 'и', 'ие', 'ий', 'им', 'ими', 'ит', 'ите', 'их', 'ишь', 'о', 'ов', 'ого', 'ое', 'ой', 'ом', 'ому', 'у', 'ут', 'ую', 'ы', 'ые', 'ый', 'ым', 'ыми', 'ых', 'ю', 'ют', 'юю', 'я', 'ям', 'ями', 'ят', 'ях', 'яя']
+	static parts = {
+		left: ['а', 'ана', 'анти', 'архи', 'без', 'бес', 'в', 'вз', 'во', 'воз', 'возо', 'вос', 'вс', 'вы', 'гипер', 'гипо', 'де', 'дез', 'дис', 'до', 'за', 'зкстра', 'из', 'изо', 'ин', 'интер', 'инфра', 'ис', 'квази', 'кило', 'контр', 'макро', 'мата', 'мега', 'микро', 'мульти', 'на', 'над', 'надо', 'наи', 'не', 'недо', 'низ', 'низо', 'нис', 'о', 'об', 'обез', 'обес', 'обо', 'орто', 'от', 'ото', 'па', 'пан', 'пара', 'пере', 'по', 'под', 'подо', 'пост', 'пра', 'пре', 'пред', 'предо', 'при', 'про', 'прото', 'раз', 'разо', 'рас', 'ре', 'с', 'со', 'су', 'суб', 'супер', 'транс', 'ультра', 'через', 'черес', 'чрез', 'экс'],
+		middle: ['а', 'ащ', 'в', 'вш', 'вши', 'е', 'ев', 'ева', 'еват', 'ек', 'ем', 'енн', 'енок', 'еньк', 'ечк', 'и', 'ив', 'ива', 'ик', 'им', 'ист', 'ичк', 'к', 'л', 'лив', 'н', 'ник', 'ниц', 'нн', 'о', 'ов', 'ова', 'оват', 'овит', 'ок', 'ом', 'онк', 'онок ', 'оньк', 'очк', 'ск', 'т', 'тель', 'ти', 'ть', 'у', 'ушк', 'ущ', 'чив', 'чик', 'чь', 'ш', 'ши', 'щик', 'ыва', 'ышк', 'юшк', 'ющ', 'я', 'ящ', 'ёк'],
+		right: ['а', 'ам', 'ами', 'ат', 'ах', 'ая', 'е', 'его', 'ее', 'ей', 'ем', 'ему', 'ет', 'ете', 'ешь', 'и', 'ие', 'ий', 'им', 'ими', 'ит', 'ите', 'их', 'ишь', 'о', 'ов', 'ого', 'ое', 'ой', 'ом', 'ому', 'у', 'ут', 'ую', 'ы', 'ые', 'ый', 'ым', 'ыми', 'ых', 'ю', 'ют', 'юю', 'я', 'ям', 'ями', 'ят', 'ях', 'яя'],
+		rightmost: ['-ка', '-либо', '-нибудь', '-таки', '-то', 'сь', 'ся', 'те']
+	}
 
-	static settings = {}
+	static preferences = {}
 
 	static ref = (title) => `[data-translator-ref="${ title }"]`;
 
@@ -516,32 +541,20 @@ window.Translator = class Translator {
 		$(this.ref('in')+', '+this.ref('out'))[a.length <= 128 ? 'attr' : 'removeAttr']('zoom_', '');
 		$(this.ref('clear'))[a.length > 0 ? 'attr': 'removeAttr']('onclick', 'Translator.clear();');
 
-		let replaceWithCase = (a, b) => {
-				let c = '';
+		let shouldReplace = (a, getReplacement) => {
+			let c = !Array.isArray(a),
+				d = this.preferences[a[1]]
 
-				for(let i = 0; i < Math.max(a.length, b.length); i++) {
-					let d = a[i] ?? a.slice(-1),
-						e = b[i] ?? '';
-
-					c += d === d.toUpperCase() && d !== d.toLowerCase() ? e.toUpperCase() : e;
-				}
-
-				return c;
-			},
-			shouldReplace = (a, b) => {
-				let c = !Array.isArray(a),
-					d = this.settings[a[1]]
-
-				return b ? c ? true : d : c ? a : a[0]
-			}
+			return !getReplacement ? c ? true : d : c ? a : a[0]
+		}
 
 		// Применение общих правил замены
 		//
 		// TODO Перенести в цикл обработки, чтобы не было проблем с заменой слов с ударениями, при этом не забыть про многословные правила
 
-		for(let k in c) a = shouldReplace(c[k], true) ? a.replace(new RegExp('(?<=^|[\\s\\d\\p{P}])'+k+'(?=\\S)',	'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(c[k]).replace('$1', cg ?? ''))) : a;
-		for(let k in d) a = shouldReplace(d[k], true) ? a.replace(new RegExp(k,										'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(d[k]).replace('$1', cg ?? ''))) : a;
-		for(let k in e) a = shouldReplace(e[k], true) ? a.replace(new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])',	'giu'), (sr, cg) => replaceWithCase(sr, shouldReplace(e[k]).replace('$1', cg ?? ''))) : a;
+		for(let k in c) a = shouldReplace(c[k]) ? a.replace(new RegExp('(?<=^|[\\s\\d\\p{P}])'+k+'(?=\\S)',	'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(c[k], true), ...cg))) : a;
+		for(let k in d) a = shouldReplace(d[k]) ? a.replace(new RegExp(k,									'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(d[k], true), ...cg))) : a;
+		for(let k in e) a = shouldReplace(e[k]) ? a.replace(new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])',	'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(e[k], true), ...cg))) : a;
 
 		let parsed = this.parse(a);
 
@@ -552,7 +565,7 @@ window.Translator = class Translator {
 
 			// Замена безударного "О" на "А"
 
-			if(this.settings[-1] && v.vowelsCount > 0) {
+			if(this.preferences[-1] && v.vowelsCount > 0) {
 				let vowelIndex = -1;
 
 				for(let i = 0; i < v.string.length; i++) {
@@ -562,7 +575,7 @@ window.Translator = class Translator {
 
 					vowelIndex++;
 					if(vowelIndex !== v.graveIndex && vowelIndex !== v.acuteIndex && /о/i.test(v.string[i])) {
-						v.string = Characters.replaceAt(v.string, i, replaceWithCase(v.string[i], 'а'));
+						v.string = Characters.replaceAt(v.string, i, Characters.replacePreservingCase(v.string[i], 'а'));
 					}
 				}
 			}
@@ -582,66 +595,91 @@ window.Translator = class Translator {
 		b.value = this.unparse(parsed);
 	}
 
-	static loadSettings(initialisation) {
-		let settings = JSON.parse(localStorage.getItem('settings')) ?? {}
+	static loadPreferences(initialisation) {
+		let preferences = JSON.parse(localStorage.getItem('preferences')) ?? {}
 
-		this.settings = {}
+		this.preferences = {}
 
-		if(!settings.translator) {
-			this.saveSettings();
+		if(!preferences.translator) {
+			this.savePreferences();
 		}
-		for(let k in settings.translator) {
-			this.settings[k] = settings.translator[k]
+		for(let k in preferences.translator) {
+			this.preferences[k] = preferences.translator[k]
 
 			if(initialisation) {
-				document.querySelector('[data-translator-setting="'+k+'"]').checked = settings.translator[k]
+				document.querySelector('[data-translator-preference="'+k+'"]').checked = preferences.translator[k]
 			}
 		}
 
 		this.go();
 	}
 
-	static saveSettings(event) {
-		let settings = JSON.parse(localStorage.getItem('settings')) ?? {},
-			inDOMSettings = !event ? document.querySelectorAll('[data-translator-setting]') : [event.srcElement]
+	static savePreferences(event) {
+		let preferences = JSON.parse(localStorage.getItem('preferences')) ?? {},
+			inDOMPreferences = !event ? document.querySelectorAll('[data-translator-preference]') : [event.srcElement]
 
-		if(!event || !settings.translator) {
-			settings.translator = {}
+		if(!event || !preferences.translator) {
+			preferences.translator = {}
 		}
-		for(let v of inDOMSettings) {
-			let k = v.dataset.translatorSetting;
+		for(let v of inDOMPreferences) {
+			let k = v.dataset.translatorPreference;
 
 			if(k) {
-				settings.translator[k] = v.checked;
+				preferences.translator[k] = v.checked;
 			}
 		}
 
-		localStorage.setItem('settings', JSON.stringify(settings));
-		this.loadSettings();
+		localStorage.setItem('preferences', JSON.stringify(preferences));
+		this.loadPreferences();
 	}
 
 	static loadAccents() {
 		let a = this.in(),
 			accents = JSON.parse(localStorage.getItem('accents')) ?? {},
 			parsed = this.parse(a.value),
-			prefixes = this.prefixes,
-			postfixes = this.posfixes;
+			left = this.parts.left,
+			right = this.parts.right;
 
 		for(let v of parsed) {
-			let k = v.string.toLowerCase();
+			let k = v.string.toLowerCase(),
+				k_,
+				k__,
+				k___,
+				k____;
 
-			if(v.type !== 'word' || !accents[k] || v.graveIndex != undefined || v.acuteIndex != undefined) {
+			if(v.type !== 'word' || v.graveIndex != undefined || v.acuteIndex != undefined) {
 				continue;
 			}
 
 			// TODO Добавить поддержку игнорирования приставок и окончаний
 
-			if(accents[k].graveIndex != undefined) {
-				v.graveIndex = accents[k].graveIndex;
+			if(k in accents) {
+				if(accents[k].graveIndex != undefined) {
+					v.graveIndex = accents[k].graveIndex;
+				}
+				if(accents[k].acuteIndex != undefined) {
+					v.acuteIndex = accents[k].acuteIndex;
+				}
+
+				break;
 			}
-			if(accents[k].acuteIndex != undefined) {
-				v.acuteIndex = accents[k].acuteIndex;
+
+			for(let v of left.sort((a, b) => a.length > b.length ? -1 : a.length < b.length ? 1 : 0)) {
+				if(k.startsWith(v)) {
+					k_ = k.replace(v, '');
+
+					break;
+				}
 			}
+			for(let v of right.sort((a, b) => a.length > b.length ? -1 : a.length < b.length ? 1 : 0)) {
+				if(k.endsWith(v)) {
+					k___ = k.replace(new RegExp(v+'$', 'i'), '');
+
+					break;
+				}
+			}
+
+			console.log(k, k_, k__, k___, k____);
 		}
 
 		a.value = this.unparse(parsed, true);
@@ -1689,7 +1727,7 @@ window.Dictionary = class Dictionary {
 
 document.addEventListener('click', (e) => {
 	if(e.target.matches('[data-tab-ref]:not([current_])'))	Tab.switch(e);
-	if(e.target.matches('[data-translator-setting]'))		Translator.saveSettings(e);
+	if(e.target.matches('[data-translator-preference]'))	Translator.savePreferences(e);
 }, false);
 
 let keydownTimeout;
@@ -1723,7 +1761,7 @@ document.addEventListener('keydown', (e) => {
 						let checks = Translator.ref('setting')+' input[type="checkbox"]';
 
 						$(checks).prop('checked', !$(checks).first()[0].checked);
-						Translator.saveSettings();
+						Translator.savePreferences();
 					}
 				})[e.code]?.();
 			}
@@ -1736,7 +1774,8 @@ document.addEventListener('keydown', (e) => {
 
 document.addEventListener('DOMContentLoaded', () => {
 	let a = localStorage.getItem('save'),
-		b = localStorage.getItem('accent');
+		b = localStorage.getItem('accent'),
+		c = localStorage.getItem('settings');
 
 	if(a != undefined) {
 		localStorage.setItem('saves', a);
@@ -1746,11 +1785,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		localStorage.setItem('accents', b);
 		localStorage.removeItem('accent');
 	}
+	if(c != undefined) {
+		localStorage.setItem('preferences', c);
+		localStorage.removeItem('settings');
+	}
 
 	Tab.initialize();
 	Navigation.initialize();
 	Translator.updateSavesTable();
 	Translator.updateAccentsTable();
-	Translator.loadSettings(true);
+	Translator.loadPreferences(true);
 	Dictionary.updateTable();
 });
