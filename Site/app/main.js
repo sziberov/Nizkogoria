@@ -434,7 +434,7 @@ window.Translator = class Translator {
 	}
 	static parts = {
 		left: ['а', 'ана', 'анти', 'архи', 'без', 'бес', 'в', 'вз', 'во', 'воз', 'возо', 'вос', 'вс', 'вы', 'гипер', 'гипо', 'де', 'дез', 'дис', 'до', 'за', 'зкстра', 'из', 'изо', 'ин', 'интер', 'инфра', 'ис', 'квази', 'кило', 'контр', 'макро', 'мата', 'мега', 'микро', 'мульти', 'на', 'над', 'надо', 'наи', 'не', 'недо', 'низ', 'низо', 'нис', 'о', 'об', 'обез', 'обес', 'обо', 'орто', 'от', 'ото', 'па', 'пан', 'пара', 'пере', 'по', 'под', 'подо', 'пост', 'пра', 'пре', 'пред', 'предо', 'при', 'про', 'прото', 'раз', 'разо', 'рас', 'ре', 'с', 'со', 'су', 'суб', 'супер', 'транс', 'ультра', 'через', 'черес', 'чрез', 'экс'],
-		middle: ['а', 'ащ', 'в', 'вш', 'вши', 'е', 'ев', 'ева', 'еват', 'ек', 'ем', 'енн', 'енок', 'еньк', 'ечк', 'и', 'ив', 'ива', 'ик', 'им', 'ист', 'ичк', 'к', 'л', 'лив', 'н', 'ник', 'ниц', 'нн', 'о', 'ов', 'ова', 'оват', 'овит', 'ок', 'ом', 'онк', 'онок ', 'оньк', 'очк', 'ск', 'т', 'тель', 'ти', 'ть', 'у', 'ушк', 'ущ', 'чив', 'чик', 'чь', 'ш', 'ши', 'щик', 'ыва', 'ышк', 'юшк', 'ющ', 'я', 'ящ', 'ёк'],
+	//	middle: ['а', 'ащ', 'в', 'вш', 'вши', 'е', 'ев', 'ева', 'еват', 'ек', 'ем', 'енн', 'енок', 'еньк', 'ечк', 'и', 'ив', 'ива', 'ик', 'им', 'ист', 'ичк', 'к', 'л', 'лив', 'н', 'ник', 'ниц', 'нн', 'о', 'ов', 'ова', 'оват', 'овит', 'ок', 'ом', 'онк', 'онок ', 'оньк', 'очк', 'ск', 'т', 'тель', 'ти', 'ть', 'у', 'ушк', 'ущ', 'чив', 'чик', 'чь', 'ш', 'ши', 'щик', 'ыва', 'ышк', 'юшк', 'ющ', 'я', 'ящ', 'ёк'],
 		right: ['а', 'ам', 'ами', 'ат', 'ах', 'ая', 'е', 'его', 'ее', 'ей', 'ем', 'ему', 'ет', 'ете', 'ешь', 'и', 'ие', 'ий', 'им', 'ими', 'ит', 'ите', 'их', 'ишь', 'о', 'ов', 'ого', 'ое', 'ой', 'ом', 'ому', 'у', 'ут', 'ую', 'ы', 'ые', 'ый', 'ым', 'ыми', 'ых', 'ю', 'ют', 'юю', 'я', 'ям', 'ями', 'ят', 'ях', 'яя'],
 		rightmost: ['-ка', '-либо', '-нибудь', '-таки', '-то', 'сь', 'ся', 'те']
 	}
@@ -637,21 +637,18 @@ window.Translator = class Translator {
 		let a = this.in(),
 			accents = JSON.parse(localStorage.getItem('accents')) ?? {},
 			parsed = this.parse(a.value),
-			left = this.parts.left,
-			right = this.parts.right;
+			longToShort = (a, b) => a.length > b.length ? -1 : a.length < b.length ? 1 : 0,
+			left = this.parts.left.sort(longToShort),
+			right = this.parts.right.sort(longToShort),
+			rightmost = this.parts.rightmost.sort(longToShort);
 
 		for(let v of parsed) {
 			let k = v.string.toLowerCase(),
-				k_,
-				k__,
-				k___,
-				k____;
+				parts = {}
 
 			if(v.type !== 'word' || v.graveIndex != undefined || v.acuteIndex != undefined) {
 				continue;
 			}
-
-			// TODO Добавить поддержку игнорирования приставок и окончаний
 
 			if(k in accents) {
 				if(accents[k].graveIndex != undefined) {
@@ -661,25 +658,34 @@ window.Translator = class Translator {
 					v.acuteIndex = accents[k].acuteIndex;
 				}
 
-				break;
+				continue;
 			}
 
-			for(let v of left.sort((a, b) => a.length > b.length ? -1 : a.length < b.length ? 1 : 0)) {
-				if(k.startsWith(v)) {
-					k_ = k.replace(v, '');
+			// TODO Дописать поддержку игнорирования приставок и окончаний
+
+			for(let v of left) {
+				if(k.startsWith(v) && k.length > v.length) {
+					parts.left = v;
 
 					break;
 				}
 			}
-			for(let v of right.sort((a, b) => a.length > b.length ? -1 : a.length < b.length ? 1 : 0)) {
-				if(k.endsWith(v)) {
-					k___ = k.replace(new RegExp(v+'$', 'i'), '');
+			for(let v of rightmost) {
+				if(k.endsWith(v) && k.length > v.length) {
+					parts.rightmost = v;
+
+					break;
+				}
+			}
+			for(let v of right) {
+				if(k.endsWith(v+(parts.rightmost ?? '')) && k.length-(parts.rightmost?.length ?? 0) > v.length) {
+					parts.right = v;
 
 					break;
 				}
 			}
 
-			console.log(k, k_, k__, k___, k____);
+			console.log(k, parts);
 		}
 
 		a.value = this.unparse(parsed, true);
