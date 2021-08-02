@@ -432,12 +432,12 @@ window.Translator = class Translator {
 			'([^еёиюя])\\1':								'$1'
 		}
 	}
-	static parts = {
-		left: ['а', 'ана', 'анти', 'архи', 'без', 'бес', 'в', 'вз', 'во', 'воз', 'возо', 'вос', 'вс', 'вы', 'гипер', 'гипо', 'де', 'дез', 'дис', 'до', 'за', 'зкстра', 'из', 'изо', 'ин', 'интер', 'инфра', 'ис', 'квази', 'кило', 'контр', 'макро', 'мата', 'мега', 'микро', 'мульти', 'на', 'над', 'надо', 'наи', 'не', 'недо', 'низ', 'низо', 'нис', 'о', 'об', 'обез', 'обес', 'обо', 'орто', 'от', 'ото', 'па', 'пан', 'пара', 'пере', 'по', 'под', 'подо', 'пост', 'пра', 'пре', 'пред', 'предо', 'при', 'про', 'прото', 'раз', 'разо', 'рас', 'ре', 'с', 'со', 'су', 'суб', 'супер', 'транс', 'ультра', 'через', 'черес', 'чрез', 'экс'],
+	static parts = ((a) => { for(let k in a) { a[k] = a[k].sort((a, b) => a.length > b.length ? -1 : a.length < b.length ? 1 : 0); } return a; })({
+		left: ['а', 'ана', 'анти', 'архи', 'без', 'бес', 'в', 'вз', 'во', 'воз', 'возо', 'вос', 'вс', 'вы', 'гипер', 'гипо', 'де', 'дез', 'дис', 'до', 'за', 'зкстра', 'из', 'изо', 'ин', 'интер', 'инфра', 'ис', 'квази', 'кило', 'контр', 'макро', 'мата', 'мега', 'микро', 'мульти', 'на', 'над', 'надо', 'наи', 'не', 'недо', 'низ', 'низо', 'нис', 'о', 'об', 'обез', 'обес', 'обо', 'орто', 'от', 'ото', 'па', 'пан', 'пара', 'пере', 'по', 'под', 'подо', 'пол', 'полу', 'пост', 'пра', 'пре', 'пред', 'предо', 'при', 'про', 'прото', 'раз', 'разо', 'рас', 'ре', 'с', 'со', 'су', 'суб', 'супер', 'транс', 'ультра', 'через', 'черес', 'чрез', 'экс'],
 	//	middle: ['а', 'ащ', 'в', 'вш', 'вши', 'е', 'ев', 'ева', 'еват', 'ек', 'ем', 'енн', 'енок', 'еньк', 'ечк', 'и', 'ив', 'ива', 'ик', 'им', 'ист', 'ичк', 'к', 'л', 'лив', 'н', 'ник', 'ниц', 'нн', 'о', 'ов', 'ова', 'оват', 'овит', 'ок', 'ом', 'онк', 'онок ', 'оньк', 'очк', 'ск', 'т', 'тель', 'ти', 'ть', 'у', 'ушк', 'ущ', 'чив', 'чик', 'чь', 'ш', 'ши', 'щик', 'ыва', 'ышк', 'юшк', 'ющ', 'я', 'ящ', 'ёк'],
 		right: ['а', 'ам', 'ами', 'ат', 'ах', 'ая', 'е', 'его', 'ее', 'ей', 'ем', 'ему', 'ет', 'ете', 'ешь', 'и', 'ие', 'ий', 'им', 'ими', 'ит', 'ите', 'их', 'ишь', 'о', 'ов', 'ого', 'ое', 'ой', 'ом', 'ому', 'у', 'ут', 'ую', 'ы', 'ые', 'ый', 'ым', 'ыми', 'ых', 'ю', 'ют', 'юю', 'я', 'ям', 'ями', 'ят', 'ях', 'яя'],
 		rightmost: ['-ка', '-либо', '-нибудь', '-таки', '-то', 'сь', 'ся', 'те']
-	}
+	});
 
 	static preferences = {}
 
@@ -637,31 +637,36 @@ window.Translator = class Translator {
 		let a = this.in(),
 			accents = JSON.parse(localStorage.getItem('accents')) ?? {},
 			parsed = this.parse(a.value),
-			longToShort = (a, b) => a.length > b.length ? -1 : a.length < b.length ? 1 : 0,
-			left = this.parts.left.sort(longToShort),
-			right = this.parts.right.sort(longToShort),
-			rightmost = this.parts.rightmost.sort(longToShort);
+			left = this.parts.left,
+			right = this.parts.right,
+			rightmost = this.parts.rightmost,
+			apply = (a, b, c = 0) => {
+				if(b in accents) {
+					console.log(b);
+
+					if(accents[b].graveIndex != undefined) {
+						a.graveIndex = accents[b].graveIndex+c;
+					}
+					if(accents[b].acuteIndex != undefined) {
+						a.acuteIndex = accents[b].acuteIndex+c;
+					}
+
+					return true;
+				}
+			}
 
 		for(let v of parsed) {
-			let k = v.string.toLowerCase(),
-				parts = {}
+			let k = v.string.toLowerCase();
 
-			if(v.type !== 'word' || v.graveIndex != undefined || v.acuteIndex != undefined) {
+			if(v.type !== 'word' || v.graveIndex != undefined || v.acuteIndex != undefined || apply(v, k)) {
 				continue;
 			}
 
-			if(k in accents) {
-				if(accents[k].graveIndex != undefined) {
-					v.graveIndex = accents[k].graveIndex;
-				}
-				if(accents[k].acuteIndex != undefined) {
-					v.acuteIndex = accents[k].acuteIndex;
-				}
-
-				continue;
+			let parts = {
+				left: '',
+				right: '',
+				rightmost: ''
 			}
-
-			// TODO Дописать поддержку игнорирования приставок и окончаний
 
 			for(let v of left) {
 				if(k.startsWith(v) && k.length > v.length) {
@@ -678,14 +683,30 @@ window.Translator = class Translator {
 				}
 			}
 			for(let v of right) {
-				if(k.endsWith(v+(parts.rightmost ?? '')) && k.length-(parts.rightmost?.length ?? 0) > v.length) {
+				if(k.endsWith(v+parts.rightmost) && k.length-parts.rightmost.length > v.length) {
 					parts.right = v;
 
 					break;
 				}
 			}
 
-			console.log(k, parts);
+			parts.string = k.replace(new RegExp('^'+parts.left+'|'+parts.right+parts.rightmost+'$', 'gi'), '');
+
+			if(apply(v, parts.string+parts.right+parts.rightmost, parts.left.match(/[аеёиоуыэюя]/gi)?.length)) {
+				continue;
+			}
+			if(apply(v, parts.string+parts.right, parts.left.match(/[аеёиоуыэюя]/gi)?.length)) {
+				continue;
+			}
+			if(apply(v, parts.string, parts.left.match(/[аеёиоуыэюя]/gi)?.length)) {
+				continue;
+			}
+			if(apply(v, parts.left+parts.string+parts.right)) {
+				continue;
+			}
+			if(apply(v, parts.left+parts.string)) {
+				continue;
+			}
 		}
 
 		a.value = this.unparse(parsed, true);
