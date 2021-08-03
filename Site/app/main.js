@@ -651,14 +651,8 @@ window.Translator = class Translator {
 		let a = this.in(),
 			accents = JSON.parse(localStorage.getItem('accents')) ?? {},
 			parsed = this.parse(a.value),
-			prefixes = this.parts.prefixes,
-			suffixes = this.parts.suffixes,
-			endings = this.parts.endings,
-			postfixes = this.parts.postfixes,
 			apply = (a, b, c = 0) => {
 				if(b in accents) {
-					console.log(b);
-
 					if(accents[b].graveIndex != undefined) {
 						a.graveIndex = accents[b].graveIndex+c;
 					}
@@ -686,28 +680,28 @@ window.Translator = class Translator {
 				},
 				offset;
 
-			for(let v of prefixes) {
+			for(let v of this.parts.prefixes) {
 				if(k.startsWith(v) && k.length > v.length) {
 					parts.prefix = v;
 
 					break;
 				}
 			}
-			for(let v of postfixes) {
+			for(let v of this.parts.postfixes) {
 				if(k.endsWith(v) && k.length > v.length) {
 					parts.postfix = v;
 
 					break;
 				}
 			}
-			for(let v of endings) {
+			for(let v of this.parts.endings) {
 				if(k.endsWith(v+parts.postfix) && k.length-parts.postfix.length > v.length) {
 					parts.ending = v;
 
 					break;
 				}
 			}
-			for(let v of suffixes) {
+			for(let v of this.parts.suffixes) {
 				if(k.endsWith(v+parts.ending+parts.postfix) && k.length-parts.ending.length-parts.postfix.length > v.length) {
 					parts.suffix = v;
 
@@ -717,44 +711,28 @@ window.Translator = class Translator {
 
 			parts.root = k.replace(new RegExp('^'+parts.prefix+'|'+parts.suffix+parts.ending+parts.postfix+'$', 'gi'), '');
 			offset = parts.prefix.match(/[аеёиоуыэюя]/gi)?.length;
-			console.log(k, parts);
-			if(apply(v, parts.root+parts.suffix+parts.ending+parts.postfix, offset)) {
-				continue;
-			}
-			if(apply(v, parts.root+parts.suffix+parts.ending, offset)) {
-				continue;
-			}
-			if(apply(v, parts.root+parts.suffix, offset)) {
-				continue;
-			}
-			if(apply(v, parts.root, offset)) {
-				continue;
-			}
-			if(apply(v, parts.prefix+parts.root+parts.suffix+parts.ending)) {
-				continue;
-			}
-			if(apply(v, parts.prefix+parts.root+parts.suffix)) {
-				continue;
-			}
-			if(apply(v, parts.prefix+parts.root)) {
-				continue;
-			}
+
+			if(apply(v, parts.root+parts.suffix+parts.ending+parts.postfix, offset))	continue;
+			if(apply(v, parts.root+parts.suffix+parts.ending, offset))					continue;
+			if(apply(v, parts.root+parts.suffix, offset))								continue;
+			if(apply(v, parts.root, offset))											continue;
+			if(apply(v, parts.prefix+parts.root+parts.suffix+parts.ending))				continue;
+			if(apply(v, parts.prefix+parts.root+parts.suffix))							continue;
+			if(apply(v, parts.prefix+parts.root))										continue;
 		}
 
 		a.value = this.unparse(parsed, true);
 		a.oninput();
 	}
 
-	static saveAccents() {
-		// Добавить возможность сохранения ударения только для одного слова через контекстное меню, используя маркеры положения токенов
-
-		let a = this.in().value,
+	static saveAccents(currentWord) {
+		let a = this.in(),
 			accents = JSON.parse(localStorage.getItem('accents')) ?? {}
 
-		for(let v of this.parse(a)) {
+		for(let v of this.parse(a.value)) {
 			let k = v.string.toLowerCase();
 
-			if(v.type !== 'word') {
+			if(v.type !== 'word' || currentWord && (a.selectionStart < v.start || a.selectionEnd > v.end)) {
 				continue;
 			}
 			if(v.graveIndex == undefined && v.acuteIndex == undefined) {
@@ -766,6 +744,8 @@ window.Translator = class Translator {
 				graveIndex: v.graveIndex,
 				acuteIndex: v.acuteIndex
 			}
+
+			console.log(k);
 		}
 
 		localStorage.setItem('accents', JSON.stringify(accents));
