@@ -433,10 +433,10 @@ window.Translator = class Translator {
 		}
 	}
 	static parts = ((a) => { for(let k in a) { a[k] = a[k].sort((a, b) => a.length > b.length ? -1 : a.length < b.length ? 1 : 0); } return a; })({
-		left: ['а', 'ана', 'анти', 'архи', 'без', 'бес', 'в', 'вз', 'во', 'воз', 'возо', 'вос', 'вс', 'вы', 'гипер', 'гипо', 'де', 'дез', 'дис', 'до', 'за', 'зкстра', 'из', 'изо', 'ин', 'интер', 'инфра', 'ис', 'квази', 'кило', 'контр', 'макро', 'мата', 'мега', 'микро', 'мульти', 'на', 'над', 'надо', 'наи', 'не', 'недо', 'низ', 'низо', 'нис', 'о', 'об', 'обез', 'обес', 'обо', 'орто', 'от', 'ото', 'па', 'пан', 'пара', 'пере', 'по', 'под', 'подо', 'пол', 'полу', 'пост', 'пра', 'пре', 'пред', 'предо', 'при', 'про', 'прото', 'раз', 'разо', 'рас', 'ре', 'с', 'со', 'су', 'суб', 'супер', 'транс', 'ультра', 'через', 'черес', 'чрез', 'экс'],
-	//	middle: ['а', 'ащ', 'в', 'вш', 'вши', 'е', 'ев', 'ева', 'еват', 'ек', 'ем', 'енн', 'енок', 'еньк', 'ечк', 'и', 'ив', 'ива', 'ик', 'им', 'ист', 'ичк', 'к', 'л', 'лив', 'н', 'ник', 'ниц', 'нн', 'о', 'ов', 'ова', 'оват', 'овит', 'ок', 'ом', 'онк', 'онок ', 'оньк', 'очк', 'ск', 'т', 'тель', 'ти', 'ть', 'у', 'ушк', 'ущ', 'чив', 'чик', 'чь', 'ш', 'ши', 'щик', 'ыва', 'ышк', 'юшк', 'ющ', 'я', 'ящ', 'ёк'],
-		right: ['а', 'ам', 'ами', 'ат', 'ах', 'ая', 'е', 'его', 'ее', 'ей', 'ем', 'ему', 'ет', 'ете', 'ешь', 'и', 'ие', 'ий', 'им', 'ими', 'ит', 'ите', 'ить', 'их', 'ишь', 'й', 'о', 'ов', 'ого', 'ое', 'ой', 'ом', 'ому', 'у', 'ут', 'ую', 'ы', 'ые', 'ый', 'ым', 'ыми', 'ых', 'ю', 'ют', 'юю', 'я', 'ям', 'ями', 'ят', 'ях', 'яя'],
-		rightmost: ['-ка', '-либо', '-нибудь', '-таки', '-то', 'сь', 'ся', 'те']
+		prefixes: ['а', 'ана', 'анти', 'архи', 'без', 'бес', 'в', 'вз', 'во', 'воз', 'возо', 'вос', 'вс', 'вы', 'гипер', 'гипо', 'де', 'дез', 'дис', 'до', 'за', 'зкстра', 'из', 'изо', 'ин', 'интер', 'инфра', 'ис', 'квази', 'кило', 'контр', 'макро', 'мата', 'мега', 'микро', 'мульти', 'на', 'над', 'надо', 'наи', 'не', 'недо', 'низ', 'низо', 'нис', 'о', 'об', 'обез', 'обес', 'обо', 'орто', 'от', 'ото', 'па', 'пан', 'пара', 'пере', 'по', 'под', 'подо', 'пол', 'полу', 'пост', 'пра', 'пре', 'пред', 'предо', 'при', 'про', 'прото', 'раз', 'разо', 'рас', 'ре', 'с', 'со', 'су', 'суб', 'супер', 'транс', 'ультра', 'через', 'черес', 'чрез', 'экс'],
+		suffixes: ['а', 'ащ', 'в', 'вш', 'вши', 'е', 'ев', 'ева', 'еват', 'ек', 'ем', 'ен', 'енн', 'енок', 'еньк', 'ечк', 'и', 'ив', 'ива', 'ик', 'им', 'ист', 'ичк', 'к', 'л', 'лив', 'н', 'ник', 'ниц', 'нн', 'о', 'ов', 'ова', 'оват', 'овит', 'ок', 'ом', 'онк', 'онок ', 'оньк', 'очк', 'ск', 'т', 'тель', 'ти', 'ть', 'у', 'ушк', 'ущ', 'чив', 'чик', 'чь', 'ш', 'ши', 'щик', 'ыва', 'ышк', 'юшк', 'ющ', 'я', 'ящ', 'ёк'],
+		endings: ['а', 'ам', 'ами', 'ат', 'ать', 'ах', 'ая', 'е', 'его', 'ее', 'ей', 'ем', 'ему', 'ет', 'ете', 'ешь', 'ём', 'ёму', 'ёт', 'ёте', 'ёшь', 'и', 'ие', 'ий', 'им', 'ими', 'ит', 'ите', 'ить', 'их', 'ишь', 'й', 'о', 'ов', 'ого', 'ое', 'ой', 'ом', 'ому', 'у', 'ут', 'ую', 'ы', 'ые', 'ый', 'ым', 'ыми', 'ых', 'ю', 'ют', 'юю', 'я', 'ям', 'ями', 'ят', 'ях', 'яя'],
+		postfixes: ['-ка', '-либо', '-нибудь', '-таки', '-то', 'сь', 'ся', 'те']
 	});
 
 	static preferences = {}
@@ -447,6 +447,8 @@ window.Translator = class Translator {
 	static out = () => document.querySelector(this.ref('out'));
 
 	static parse(raw) {
+		// TODO Оптимизировать парсер, используя .matchAll() вместо прохода по каждому символу
+
 		let parsed = [],
 			tokenStart = 0,
 			tokenType,
@@ -542,26 +544,38 @@ window.Translator = class Translator {
 		$(this.ref('clear'))[a.length > 0 ? 'attr': 'removeAttr']('onclick', 'Translator.clear();');
 
 		let shouldReplace = (a, getReplacement) => {
-			let c = !Array.isArray(a),
-				d = this.preferences[a[1]]
+				let c = !Array.isArray(a),
+					d = this.preferences[a[1]]
 
-			return !getReplacement ? c ? true : d : c ? a : a[0]
-		}
-
-		// Применение общих правил замены
-		//
-		// TODO Перенести в цикл обработки, чтобы не было проблем с заменой слов с ударениями, при этом не забыть про многословные правила
-
-		for(let k in c) a = shouldReplace(c[k]) ? a.replace(new RegExp('(?<=^|[\\s\\d\\p{P}])'+k+'(?=\\S)',	'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(c[k], true), ...cg))) : a;
-		for(let k in d) a = shouldReplace(d[k]) ? a.replace(new RegExp(k,									'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(d[k], true), ...cg))) : a;
-		for(let k in e) a = shouldReplace(e[k]) ? a.replace(new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])',	'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(e[k], true), ...cg))) : a;
+				return !getReplacement ? c ? true : d : c ? a : a[0]
+			},
+			microParse = (a) => a.match(new RegExp('[абвгґдеёжзийклмнопрстуўфхцчшщъыьэюя-]+|[^абвгґдеёжзийклмнопрстуўфхцчшщъыьэюя-]+', 'gi'));
 
 		let parsed = this.parse(a);
 
-		for(let v of parsed) {
+		for(let k in parsed) {
+			let v = parsed[k]
+
 			if(v.type !== 'word') {
 				continue;
 			}
+
+			// Применение общих правил замены
+
+			k = k*1;
+
+			let leftmost = parsed[k-2]?.string ?? '',
+				left = parsed[k-1]?.string ?? '',
+				right = parsed[k+1]?.string ?? '',
+				rightmost = parsed[k+2]?.string ?? '';
+
+			v.string = leftmost+left+v.string+right+rightmost;
+
+			for(let k in c) v.string = shouldReplace(c[k]) ? v.string.replace(new RegExp('(?<=^|[\\s\\d\\p{P}])'+k+'(?=\\S)',	'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(c[k], true), ...cg))) : v.string;
+			for(let k in d) v.string = shouldReplace(d[k]) ? v.string.replace(new RegExp(k,										'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(d[k], true), ...cg))) : v.string;
+			for(let k in e) v.string = shouldReplace(e[k]) ? v.string.replace(new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])',	'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(e[k], true), ...cg))) : v.string;
+
+			v.string = microParse(v.string)[leftmost && left ? 2 : left ? 1 : 0] ?? '';
 
 			// Замена безударного "О" на "А"
 
@@ -637,9 +651,10 @@ window.Translator = class Translator {
 		let a = this.in(),
 			accents = JSON.parse(localStorage.getItem('accents')) ?? {},
 			parsed = this.parse(a.value),
-			left = this.parts.left,
-			right = this.parts.right,
-			rightmost = this.parts.rightmost,
+			prefixes = this.parts.prefixes,
+			suffixes = this.parts.suffixes,
+			endings = this.parts.endings,
+			postfixes = this.parts.postfixes,
 			apply = (a, b, c = 0) => {
 				if(b in accents) {
 					console.log(b);
@@ -663,48 +678,72 @@ window.Translator = class Translator {
 			}
 
 			let parts = {
-				left: '',
-				right: '',
-				rightmost: ''
-			}
+					prefix: '',
+					root: '',
+					suffix: '',
+					ending: '',
+					postfix: ''
+				},
+				offset;
 
-			for(let v of left) {
+			for(let v of prefixes) {
 				if(k.startsWith(v) && k.length > v.length) {
-					parts.left = v;
+					parts.prefix = v;
 
 					break;
 				}
 			}
-			for(let v of rightmost) {
+			for(let v of postfixes) {
 				if(k.endsWith(v) && k.length > v.length) {
-					parts.rightmost = v;
+					parts.postfix = v;
 
 					break;
 				}
 			}
-			for(let v of right) {
-				if(k.endsWith(v+parts.rightmost) && k.length-parts.rightmost.length > v.length) {
-					parts.right = v;
+			for(let v of endings) {
+				if(k.endsWith(v+parts.postfix) && k.length-parts.postfix.length > v.length) {
+					parts.ending = v;
+
+					break;
+				}
+			}
+			for(let v of suffixes) {
+				if(k.endsWith(v+parts.ending+parts.postfix) && k.length-parts.ending.length-parts.postfix.length > v.length) {
+					parts.suffix = v;
 
 					break;
 				}
 			}
 
-			parts.string = k.replace(new RegExp('^'+parts.left+'|'+parts.right+parts.rightmost+'$', 'gi'), '');
-
-			if(apply(v, parts.string+parts.right+parts.rightmost, parts.left.match(/[аеёиоуыэюя]/gi)?.length)) {
+			parts.root = k.replace(new RegExp('^'+parts.prefix+'|'+parts.suffix+parts.ending+parts.postfix+'$', 'gi'), '');
+			offset = parts.prefix.match(/[аеёиоуыэюя]/gi)?.length;
+			console.log(k, parts);
+			if(apply(v, parts.root+parts.suffix+parts.ending+parts.postfix, offset)) {
+				console.log(0);
 				continue;
 			}
-			if(apply(v, parts.string+parts.right, parts.left.match(/[аеёиоуыэюя]/gi)?.length)) {
+			if(apply(v, parts.root+parts.suffix+parts.ending, offset)) {
+				console.log(1);
 				continue;
 			}
-			if(apply(v, parts.string, parts.left.match(/[аеёиоуыэюя]/gi)?.length)) {
+			if(apply(v, parts.root+parts.suffix, offset)) {
+				console.log(2);
 				continue;
 			}
-			if(apply(v, parts.left+parts.string+parts.right)) {
+			if(apply(v, parts.root, offset)) {
+				console.log(3);
 				continue;
 			}
-			if(apply(v, parts.left+parts.string)) {
+			if(apply(v, parts.prefix+parts.root+parts.suffix+parts.ending)) {
+				console.log(4);
+				continue;
+			}
+			if(apply(v, parts.prefix+parts.root+parts.suffix)) {
+				console.log(5);
+				continue;
+			}
+			if(apply(v, parts.prefix+parts.root)) {
+				console.log(6);
 				continue;
 			}
 		}
@@ -714,6 +753,8 @@ window.Translator = class Translator {
 	}
 
 	static saveAccents() {
+		// Добавить возможность сохранения ударения только для одного слова через контекстное меню, используя маркеры положения токенов
+
 		let a = this.in().value,
 			accents = JSON.parse(localStorage.getItem('accents')) ?? {}
 
@@ -784,6 +825,8 @@ window.Translator = class Translator {
 	}
 
 	static insertAccent(grave) {
+		// TODO Добавить проверку на дубли знаков ударения во всём слове, используя парсер и его маркеры положения токенов
+
 		let a = this.in(),
 			b = a.value,
 			c = a.selectionEnd-a.selectionStart === 1 ? a.selectionEnd : a.selectionStart;
