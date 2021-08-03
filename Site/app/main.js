@@ -549,7 +549,7 @@ window.Translator = class Translator {
 
 				return !getReplacement ? c ? true : d : c ? a : a[0]
 			},
-			microParse = (a) => a.match(new RegExp('[абвгґдеёжзийклмнопрстуўфхцчшщъыьэюя-]+|[^абвгґдеёжзийклмнопрстуўфхцчшщъыьэюя-]+', 'gi'));
+			microParse = (a) => a.match(new RegExp('[абвгґдеёжзийклмнопрстуўфхцчшщъыьэюя\'-]+|[^абвгґдеёжзийклмнопрстуўфхцчшщъыьэюя\'-]+', 'gi'));
 
 		let parsed = this.parse(a);
 
@@ -719,31 +719,24 @@ window.Translator = class Translator {
 			offset = parts.prefix.match(/[аеёиоуыэюя]/gi)?.length;
 			console.log(k, parts);
 			if(apply(v, parts.root+parts.suffix+parts.ending+parts.postfix, offset)) {
-				console.log(0);
 				continue;
 			}
 			if(apply(v, parts.root+parts.suffix+parts.ending, offset)) {
-				console.log(1);
 				continue;
 			}
 			if(apply(v, parts.root+parts.suffix, offset)) {
-				console.log(2);
 				continue;
 			}
 			if(apply(v, parts.root, offset)) {
-				console.log(3);
 				continue;
 			}
 			if(apply(v, parts.prefix+parts.root+parts.suffix+parts.ending)) {
-				console.log(4);
 				continue;
 			}
 			if(apply(v, parts.prefix+parts.root+parts.suffix)) {
-				console.log(5);
 				continue;
 			}
 			if(apply(v, parts.prefix+parts.root)) {
-				console.log(6);
 				continue;
 			}
 		}
