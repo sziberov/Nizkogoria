@@ -59,8 +59,8 @@ window.Navigation = class Navigation {
 }
 
 window.Characters = class Characters {
-	static grave = '̀';
-	static acute = '́';
+	static grave = '\u0300';
+	static acute = '\u0301';
 
 	static replacePreservingCase(of, to) {
 		let a = '';
@@ -447,31 +447,20 @@ window.Translator = class Translator {
 	static out = () => document.querySelector(this.ref('out'));
 
 	static parse(raw) {
-		// TODO Оптимизировать парсер, используя .matchAll() вместо прохода по каждому символу
+		let alphabet = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя',
+			word = `([${ alphabet+Characters.grave+Characters.acute }-])+`,
+			symbol = `([^${ alphabet+Characters.grave+Characters.acute }-])+`,
+			parsed = this.in().value.match(new RegExp(word+'|'+symbol, 'gi')) ?? []
 
-		let parsed = [],
-			tokenStart = 0,
-			tokenType,
-			tokenString = '';
+		for(let k in parsed) {
+			let string = parsed[k],
+				start = typeof parsed[k-1] === 'object' ? parsed[k-1].end+1 : 0;
 
-		for(let i = 0; i <= raw.length; i++) {
-			let character = raw[i],
-				characterType = new RegExp('[абвгдеёжзийклмнопрстуфхцчшщъыьэюя-]|['+Characters.grave+'|'+Characters.acute+']', 'i').test(character) ? 'word' : 'symbol';
-
-			if((characterType !== tokenType || i === raw.length) && tokenString !== '') {
-				parsed.push({
-					start: tokenStart,
-					end: i-1,
-					type: tokenType,
-					string: tokenString
-				});
-
-				tokenStart = i;
-				tokenString = '';
-			}
-			if(i !== raw.length) {
-				tokenType = characterType;
-				tokenString += character;
+			parsed[k] = {
+				start: start,
+				end: start+string.length-1,
+				type: new RegExp(word, 'gi').test(string) ? 'word' : 'symbol',
+				string: string
 			}
 		}
 		for(let v of parsed) {
@@ -561,6 +550,8 @@ window.Translator = class Translator {
 			}
 
 			// Применение общих правил замены
+			//
+			// TODO Переписать всё через доп. функцию в .replace() с проверкой изменений длин строк вместо этой говнины
 
 			k = k*1;
 
@@ -569,13 +560,45 @@ window.Translator = class Translator {
 				right = parsed[k+1]?.string ?? '',
 				rightmost = parsed[k+2]?.string ?? '';
 
+			console.log('0: '+v.string);
+
 			v.string = leftmost+left+v.string+right+rightmost;
+
+			console.log('1: '+v.string);
 
 			for(let k in c) v.string = shouldReplace(c[k]) ? v.string.replace(new RegExp('(?<=^|[\\s\\d\\p{P}])'+k+'(?=\\S)',	'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(c[k], true), ...cg))) : v.string;
 			for(let k in d) v.string = shouldReplace(d[k]) ? v.string.replace(new RegExp(k,										'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(d[k], true), ...cg))) : v.string;
 			for(let k in e) v.string = shouldReplace(e[k]) ? v.string.replace(new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])',	'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(e[k], true), ...cg))) : v.string;
 
+			console.log('2: '+v.string);
+
 			v.string = microParse(v.string)[leftmost && left ? 2 : left ? 1 : 0] ?? '';
+
+			console.log('3: '+v.string);
+
+			/*
+			let leftmost = /\S+/gi.test(parsed[k-2]?.string ?? '') ? parsed[k-2].string : '',
+				rightmost = /\S+/gi.test(parsed[k+2]?.string ?? '') ? parsed[k+2].string : '',
+				left = leftmost && /\s+/gi.test(parsed[k-1]?.string ?? '') ? parsed[k-1].string : '',
+				right = rightmost && /\s+/gi.test(parsed[k+1]?.string ?? '') ? parsed[k+1].string : '';
+
+			console.log('0: '+v.string);
+
+			v.string = left ? leftmost+left+v.string : v.string;
+			v.string = right ? v.string+right+rightmost : v.string;
+
+			console.log('1: '+v.string);
+
+			for(let k in c) v.string = shouldReplace(c[k]) ? v.string.replace(new RegExp('(?<=^|[\\s\\d\\p{P}])'+k+'(?=\\S)',	'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(c[k], true), ...cg))) : v.string;
+			for(let k in d) v.string = shouldReplace(d[k]) ? v.string.replace(new RegExp(k,										'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(d[k], true), ...cg))) : v.string;
+			for(let k in e) v.string = shouldReplace(e[k]) ? v.string.replace(new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])',	'giu'), (sr, ...cg) => Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(e[k], true), ...cg))) : v.string;
+
+			console.log('2: '+v.string);
+
+			v.string = left ? v.string.match(/\S+/gi)[1] ?? '' : v.string.match(/\S+/gi)[0] ?? '';
+
+			console.log('3: '+v.string);
+			*/
 
 			// Замена безударного "О" на "А"
 
