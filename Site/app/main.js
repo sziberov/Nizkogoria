@@ -1794,8 +1794,12 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('focus', (e) => {
-	if(!$(e.target).parents('[_dropdown]').length) {
-		$('[_dropdown]').removeAttr('active_');
+	if(!e.target.matches('[_dropdown]') || e.target !== e.relatedTarget) {
+		$('[_dropdown]').each(function() {
+			if(this !== e.target && !$(this).find(e.target).length) {
+				$(this).removeAttr('active_');
+			}
+		});
 	}
 }, true);
 
