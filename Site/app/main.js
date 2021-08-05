@@ -604,12 +604,14 @@ window.Translator = class Translator {
 
 			// Замена дублирующихся букв на апострофы
 
-			for(let i = v.string.length-1; i > -1; i--) {
-				if(v.string[i] === '-') {
-					continue;
-				}
-				if(v.string[i] === v.string[i-1]) {
-					v.string = Characters.replaceAt(v.string, i, `'`);
+			if(this.preferences[-2]) {
+				for(let i = v.string.length-1; i > -1; i--) {
+					if(v.string[i] === '-') {
+						continue;
+					}
+					if(v.string[i] === v.string[i-1]) {
+						v.string = Characters.replaceAt(v.string, i, `'`);
+					}
 				}
 			}
 		}

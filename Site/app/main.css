@@ -277,8 +277,10 @@ ul[_navigation][fixed_] button:after {
 }
 
 [_image] {
-	max-width: 768px;
+	min-width: 0;
+	max-width: 62.5vw;
 
+	background: var(--color-white);
 	box-shadow: 0 8px 16px 8px var(--color-black-25);
 
 	transition: 250ms ease box-shadow;
@@ -776,6 +778,10 @@ ul[_list] li:nth-child(2n) {
 	width: max-content;
 }
 
+[_table="wide"] {
+	flex: 1;
+}
+
 [_table] > div {
 	display: table-row;
 }
@@ -832,6 +838,8 @@ ul[_list] li:nth-child(2n) {
 }
 
 [_table] > div[__header] > div {
+	height: 0;
+
 	padding: 8px 16px;
 }
 
