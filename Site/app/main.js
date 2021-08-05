@@ -58,6 +58,12 @@ window.Navigation = class Navigation {
 	}
 }
 
+window.Dropdown = class Dropdown {
+	static initialize() {
+		$('[_dropdown]').attr('tabindex', 0).find('button').attr('tabindex', 0);
+	}
+}
+
 window.Characters = class Characters {
 	static grave = '\u0300';
 	static acute = '\u0301';
@@ -533,7 +539,7 @@ window.Translator = class Translator {
 		$(this.ref('clear'))[a.length > 0 ? 'attr': 'removeAttr']('onclick', 'Translator.clear();');
 
 		let parsed = this.parse(a),
-			shouldReplace = (a, returnReplacement) => {
+			ruleEnabled = (a, returnReplacement) => {
 				let b = !Array.isArray(a),
 					c = this.preferences[a[1]]
 
@@ -572,9 +578,9 @@ window.Translator = class Translator {
 
 			v.string = leftmost+left+v.string+right+rightmost;
 
-			for(let k in c) v.string = shouldReplace(c[k]) ? v.string.replace(new RegExp('(?<=^|[\\s\\d\\p{P}])'+k+'(?=\\S)',	'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(c[k], true), ...cg)), cg[cg.length-2])) : v.string;
-			for(let k in d) v.string = shouldReplace(d[k]) ? v.string.replace(new RegExp(k,										'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(d[k], true), ...cg)), cg[cg.length-2])) : v.string;
-			for(let k in e) v.string = shouldReplace(e[k]) ? v.string.replace(new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])',	'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(shouldReplace(e[k], true), ...cg)), cg[cg.length-2])) : v.string;
+			for(let k in c) v.string = ruleEnabled(c[k]) ? v.string.replace(new RegExp('(?<=^|[\\s\\d\\p{P}])'+k+'(?=\\S)',	'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(ruleEnabled(c[k], true), ...cg)), cg[cg.length-2])) : v.string;
+			for(let k in d) v.string = ruleEnabled(d[k]) ? v.string.replace(new RegExp(k,									'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(ruleEnabled(d[k], true), ...cg)), cg[cg.length-2])) : v.string;
+			for(let k in e) v.string = ruleEnabled(e[k]) ? v.string.replace(new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])',	'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(ruleEnabled(e[k], true), ...cg)), cg[cg.length-2])) : v.string;
 
 			v.string = v.string.substring(position, position+length);
 
@@ -726,14 +732,14 @@ window.Translator = class Translator {
 		a.oninput();
 	}
 
-	static saveAccents(currentWord) {
+	static saveAccents(selected) {
 		let a = this.in(),
 			accents = JSON.parse(localStorage.getItem('accents')) ?? {}
 
 		for(let v of this.parse(a.value)) {
 			let k = v.string.toLowerCase();
 
-			if(v.type !== 'word' || currentWord && (a.selectionStart < v.start || a.selectionEnd > v.end)) {
+			if(v.type !== 'word' || selected && (a.selectionStart === a.selectionEnd ? a.selectionStart < v.start || a.selectionEnd-1 > v.end : a.selectionStart > v.start || a.selectionEnd-1 < v.end)) {
 				continue;
 			}
 			if(v.graveIndex == undefined && v.acuteIndex == undefined) {
@@ -745,8 +751,6 @@ window.Translator = class Translator {
 				graveIndex: v.graveIndex,
 				acuteIndex: v.acuteIndex
 			}
-
-			console.log(k);
 		}
 
 		localStorage.setItem('accents', JSON.stringify(accents));
@@ -979,7 +983,6 @@ window.Translator = class Translator {
 		if(b !== Timestamp.toDateString(timestamp)) {
 			this.updateSaveButtons(timestamp);
 		}
-		this.saveAccents();
 	}
 
 	static delete(timestamp) {
@@ -1026,12 +1029,12 @@ window.Translator = class Translator {
 window.Dictionary = class Dictionary {
 	static data = [
 		{
-			strings: ['Áко', 'éси'],
+			strings: ['А́ка', 'е́си'],
 			meanings: ['Если'],
 			origins: ['Альт.', 'разг.']
 		},
 		{
-			strings: ['Áнеж', 'нéж'],
+			strings: ['А́неж', 'не́ж'],
 			meanings: ['Чем', 'нежели'],
 			origins: ['Альт.']
 		},
@@ -1046,12 +1049,12 @@ window.Dictionary = class Dictionary {
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Блѐсковка'],
+			strings: ['Бле́скаўка'],
 			meanings: ['Молния'],
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Бо́', 'то́шò'],
+			strings: ['Бо́', 'то́шо̀'],
 			meanings: ['Потому что'],
 			origins: ['Альт., иск.']
 		},
@@ -1081,42 +1084,42 @@ window.Dictionary = class Dictionary {
 			origins: ['Иск.']
 		},
 		{
-			strings: ['Вéльмо', 'ду́жэ'],
+			strings: ['Ве́льма', 'ду́жэ'],
 			meanings: ['Очень'],
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Внату́ре'],
+			strings: ['Ўнату́ре'],
 			meanings: ['Именно, точно (грубо)'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Внедоро́жъе'],
+			strings: ['Ўнедаро́жъе'],
 			meanings: ['Бездорожье'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Врѐмяпровождéние'],
+			strings: ['Ўрѐмяправажде́ние'],
 			meanings: ['Времяпрепровождение'],
 			origins: ['Иск.']
 		},
 		{
-			strings: ['Вря́тли'],
+			strings: ['Ўря́тли'],
 			meanings: ['Вряд ли'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Вру́г'],
+			strings: ['Ўру́г'],
 			meanings: ['Враг, притворяющийся другом'],
 			origins: ['Иск.']
 		},
 		{
-			strings: ['Вофсюда́'],
+			strings: ['Ваўсюда́'],
 			meanings: ['(В) везде'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Вошé'],
+			strings: ['Ваше́'],
 			meanings: ['Вообще'],
 			origins: ['Разг.']
 		},
@@ -1146,12 +1149,12 @@ window.Dictionary = class Dictionary {
 			origins: ['Альт.', 'разг.']
 		},
 		{
-			strings: ['Деесло́во'],
+			strings: ['Деесло́ва'],
 			meanings: ['Глагол'],
 			origins: ['Альт.']
 		},
 		{
-			strings: ['До́си', 'досихпо́р'],
+			strings: ['До́си', 'дасихпо́р'],
 			meanings: ['До сих пор'],
 			origins: ['Альт.', 'разг.']
 		},
@@ -1166,12 +1169,12 @@ window.Dictionary = class Dictionary {
 			origins: ['Устар.']
 		},
 		{
-			strings: ['Еж\'а́й', 'éхай'],
+			strings: ['Еж\'а́й', 'е́хай'],
 			meanings: ['Едь'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Заклопо́тан'],
+			strings: ['Заклапо́тан'],
 			meanings: ['Сильно занят'],
 			origins: ['Альт.']
 		},
@@ -1196,7 +1199,7 @@ window.Dictionary = class Dictionary {
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Зя́', 'мо́но'],
+			strings: ['Зя́', 'мо́на'],
 			meanings: ['Можно'],
 			origins: ['Разг.']
 		},
@@ -1241,12 +1244,12 @@ window.Dictionary = class Dictionary {
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Конéш', 'конéшно'],
+			strings: ['Кане́ш', 'кане́шна'],
 			meanings: ['Конечно'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Кордо́н'],
+			strings: ['Кардо́н'],
 			meanings: ['Граница'],
 			origins: ['Альт.']
 		},
@@ -1261,17 +1264,17 @@ window.Dictionary = class Dictionary {
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Лéпый'],
+			strings: ['Ле́пый'],
 			meanings: ['Хороший'],
 			origins: ['Устар.']
 		},
 		{
-			strings: ['Лéпшэ'],
+			strings: ['Ле́пшэ'],
 			meanings: ['Лучше'],
 			origins: ['Альт.', 'разг.']
 		},
 		{
-			strings: ['Ложы́ть'],
+			strings: ['Лажы́ть'],
 			meanings: ['Класть'],
 			origins: ['Разг.']
 		},
@@ -1301,7 +1304,7 @@ window.Dictionary = class Dictionary {
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Менé'],
+			strings: ['Мене́'],
 			meanings: ['Мне'],
 			origins: ['Устар.']
 		},
@@ -1331,32 +1334,32 @@ window.Dictionary = class Dictionary {
 			origins: ['Альт.']
 		},
 		{
-			strings: ['На́жно', 'ну́до'],
+			strings: ['На́жна', 'ну́да'],
 			meanings: ['Нужно', 'надо'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Наро́шно'],
+			strings: ['Наро́шна'],
 			meanings: ['Нарочно'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Нема́', 'нéту'],
+			strings: ['Нема́', 'не́ту'],
 			meanings: ['Нет <кого/чего-либо>'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Немо́жно', 'немо́но'],
+			strings: ['Немо́жна', 'немо́на'],
 			meanings: ['Нельзя'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Нéсть'],
+			strings: ['Не́сть'],
 			meanings: ['Нести'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Нечя́йно'],
+			strings: ['Нечя́йна'],
 			meanings: ['Нечаянно'],
 			origins: ['Разг.']
 		},
@@ -1366,27 +1369,27 @@ window.Dictionary = class Dictionary {
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Огурки́'],
+			strings: ['Агурки́'],
 			meanings: ['Огурцы'],
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Ополо́ник'],
+			strings: ['Апало́ник'],
 			meanings: ['Половник'],
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Особли́во'],
+			strings: ['Асабли́ва'],
 			meanings: ['Особенно'],
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Осторожа́ц\'а'],
+			strings: ['Астаража́ц\'а'],
 			meanings: ['Остерегаться'],
 			origins: ['Иск.']
 		},
 		{
-			strings: ['Отсю́дова'],
+			strings: ['Атсю́дава'],
 			meanings: ['Отсюда'],
 			origins: ['Разг.']
 		},
@@ -1401,57 +1404,57 @@ window.Dictionary = class Dictionary {
 			origins: ['Иск.', 'разг.']
 		},
 		{
-			strings: ['Подшы́бник'],
+			strings: ['Падшы́бник'],
 			meanings: ['Подшипник'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Пожа́луста'],
+			strings: ['Пажа́луста'],
 			meanings: ['Пожалуйста'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Покла́сть'],
+			strings: ['Пакла́сть'],
 			meanings: ['Положить'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Помо́йму'],
+			strings: ['Памо́йму'],
 			meanings: ['По-моему'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Поря́дошный'],
+			strings: ['Паря́дашный'],
 			meanings: ['Порядочный'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Последо́вник'],
+			strings: ['Паследо́ўник'],
 			meanings: ['Последователь'],
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Последо́вность'],
+			strings: ['Паследо́ўнасть'],
 			meanings: ['Последовательность'],
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Пота́нывает'],
+			strings: ['Пата́нывает'],
 			meanings: ['Тонет'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Потво́йму'],
+			strings: ['Патво́йму'],
 			meanings: ['По-твоему'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Поча́ть'],
+			strings: ['Пача́ть'],
 			meanings: ['Начать'],
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Пра́льно'],
+			strings: ['Пра́льна'],
 			meanings: ['Правильно'],
 			origins: ['Разг.']
 		},
@@ -1466,12 +1469,12 @@ window.Dictionary = class Dictionary {
 			origins: ['Иск.']
 		},
 		{
-			strings: ['Противополо́жэн\'ый'],
+			strings: ['Пративапало́жэн\'ый'],
 			meanings: ['Противоположный'],
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Разумéть'],
+			strings: ['Разуме́ть'],
 			meanings: ['Понимать'],
 			origins: ['Устар.']
 		},
@@ -1486,7 +1489,7 @@ window.Dictionary = class Dictionary {
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Сé', 'се\'́ '],
+			strings: ['Се́', 'се\'́ '],
 			meanings: ['Себе'],
 			origins: ['Разг.']
 		},
@@ -1496,7 +1499,7 @@ window.Dictionary = class Dictionary {
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Сéдьмица'],
+			strings: ['Се́дьмица'],
 			meanings: ['Неделя'],
 			origins: ['Устар.']
 		},
@@ -1526,12 +1529,12 @@ window.Dictionary = class Dictionary {
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Слéч\'ий'],
+			strings: ['Сле́ч\'ий'],
 			meanings: ['Следователь'],
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Сразумéло'],
+			strings: ['Сразуме́ла'],
 			meanings: ['Понятно'],
 			origins: ['Альт.']
 		},
@@ -1561,12 +1564,12 @@ window.Dictionary = class Dictionary {
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Тé', 'те\'́ '],
+			strings: ['Те́', 'те\'́ '],
 			meanings: ['Тебе'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Те\'́рь', 'тéрь'],
+			strings: ['Те\'́рь', 'те́рь'],
 			meanings: ['Теперь'],
 			origins: ['Разг.']
 		},
@@ -1581,12 +1584,12 @@ window.Dictionary = class Dictionary {
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Ти́по'],
+			strings: ['Ти́па'],
 			meanings: ['Вроде'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['То́бто', 'тэé'],
+			strings: ['То́бта', 'тэе́'],
 			meanings: ['То есть'],
 			origins: ['Альт.', 'иск.']
 		},
@@ -1596,7 +1599,7 @@ window.Dictionary = class Dictionary {
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Тря́пошный'],
+			strings: ['Тря́пашный'],
 			meanings: ['Тряпочный'],
 			origins: ['Разг.']
 		},
@@ -1611,27 +1614,27 @@ window.Dictionary = class Dictionary {
 			origins: ['Иск.']
 		},
 		{
-			strings: ['Тэ́то'],
+			strings: ['Тэ́та'],
 			meanings: ['Вот это'],
 			origins: ['Иск.']
 		},
 		{
-			strings: ['Ужошя́ть'],
+			strings: ['Ужашя́ть'],
 			meanings: ['Ужесточать'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Усé'],
+			strings: ['Усе́'],
 			meanings: ['Все'],
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Фсеравно́'],
+			strings: ['Ўсераўно́'],
 			meanings: ['Всё равно'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Фсéхний'],
+			strings: ['Ўсе́хний'],
 			meanings: ['Всех', 'общий'],
 			origins: ['Разг.']
 		},
@@ -1656,17 +1659,17 @@ window.Dictionary = class Dictionary {
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Хоро́ш'],
+			strings: ['Харо́ш'],
 			meanings: ['Хватит'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Хотéю', 'хотю́'],
+			strings: ['Хате́ю', 'хатю́'],
 			meanings: ['Хочу'],
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Хоти́т'],
+			strings: ['Хати́т'],
 			meanings: ['Хочет'],
 			origins: ['Разг.']
 		},
@@ -1705,7 +1708,7 @@ window.Dictionary = class Dictionary {
 			meanings: [
 				'Или',
 				'[Усиливает вопросительный (иногда риторический) характер предложения, в начале или возле обращения]',
-				'[В паре с отрицательной частицой /нé/ или /ни́/ может означать презительное отношение к кому/чему-либо]'
+				'[В паре с отрицательной частицой /не́/ или /ни́/ может означать презительное отношение к кому/чему-либо]'
 			],
 			origins: ['Альт.']
 		},
@@ -1739,7 +1742,17 @@ window.Dictionary = class Dictionary {
 			meanings: ['Сейчас'],
 			origins: ['Разг.']
 		},
-	]
+		{
+			strings: ['Што́сь'],
+			meanings: ['Что-то'],
+			origins: ['Альт.']
+		},
+		{
+			strings: ['Хто́сь'],
+			meanings: ['Кто-то'],
+			origins: ['Альт.']
+		}
+	].sort((a, b) => a.strings[0] > b.strings[0] ? 1 : a.strings[0] < b.strings[0] ? -1 : 0);
 
 	static updateTable() {
 		let a = $('[data-dictionary-ref="table"]'),
@@ -1772,7 +1785,18 @@ window.Dictionary = class Dictionary {
 document.addEventListener('click', (e) => {
 	if(e.target.matches('[data-tab-ref]:not([current_])'))	Tab.switch(e);
 	if(e.target.matches('[data-translator-preference]'))	Translator.savePreferences(e);
-}, false);
+	if(e.target.matches('[_dropdown]')) {
+		$(e.target).attr('active_', (a, b) => b === '' ? null : '');
+	} else {
+		$('[_dropdown]').removeAttr('active_');
+	}
+});
+
+document.addEventListener('focus', (e) => {
+	if(!$(e.target).parents('[_dropdown]').length) {
+		$('[_dropdown]').removeAttr('active_');
+	}
+}, true);
 
 let keydownTimeout;
 
@@ -1814,6 +1838,15 @@ document.addEventListener('keydown', (e) => {
 			}
 		}
 	}
+	if(e.target.matches('[_dropdown]') && e.code === 'Space') {
+		e.preventDefault();
+	}
+});
+
+document.addEventListener('keyup', (e) => {
+	if(e.target.matches('[_dropdown]') && e.code === 'Space') {
+		$(e.target).attr('active_', (a, b) => b === '' ? null : '');
+	}
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1836,6 +1869,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	Tab.initialize();
 	Navigation.initialize();
+	Dropdown.initialize();
 	Translator.updateSavesTable();
 	Translator.updateAccentsTable();
 	Translator.loadPreferences(true);

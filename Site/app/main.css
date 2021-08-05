@@ -288,18 +288,54 @@ ul[_navigation][fixed_] button:after {
 	display: flex;
 }
 
-[_flex]:not([_flex~="stack"]) {
+[_flex] {
 	gap: 32px;
 
 	transition: 250ms ease gap;
+}
+
+[_flex][_flex~="stack"] {
+	gap: 2px;
 }
 
 [_flex~="h"] {
 	flex-direction: row;
 }
 
+[_flex~="h"][_flex~="stack"] > * {
+	border-radius: 0;
+}
+
+[_flex~="h"][_flex~="stack"] > *:first-child {
+	border-radius: 2px 0 0 2px;
+}
+
+[_flex~="h"][_flex~="stack"] > *:last-child {
+	border-radius: 0 2px 2px 0;
+}
+
+[_flex~="h"][_flex~="stack"] > *:only-child {
+	border-radius: 2px;
+}
+
 [_flex~="v"] {
 	flex-direction: column;
+}
+
+[_flex~="v"][_flex~="stack"] > * {
+	border-radius: 0;
+}
+
+[_flex~="v"][_flex~="stack"] > *:first-child {
+	border-radius: 2px 2px 0 0;
+}
+
+[_flex~="v"][_flex~="stack"] > *:last-child {
+	border-radius: 0 0 2px 2px;
+}
+
+[_flex~="v"][_flex~="stack"] > *:only-child {
+	border-radius: 2px;
 }
 
 [_flex~="wrap"] {
@@ -617,7 +653,7 @@ button {
 	white-space: nowrap;
 
 	transition: 250ms ease;
-	transition-property: margin-top, margin-left, background-color, box-shadow, color, opacity!important;
+	transition-property: background-color, box-shadow, color, opacity!important;
 	user-select: none;
 }
 
@@ -638,24 +674,68 @@ button:not([onclick]) {
 	pointer-events: none;
 }
 
-[_flex~="h"][_flex~="stack"] > button {
-	border-radius: 0;
+[_dropdown] {
+	display: flex;
+
+	position: relative;
 }
 
-[_flex~="h"][_flex~="stack"] > button:first-child {
-	border-radius: 2px 0 0 2px;
+[_dropdown]:before {
+	content: '▼';
+
+	min-width: 16px;
+
+	padding: 8px;
+
+	background: var(--color-orange);
+	border-radius: inherit;
+	box-shadow: 0 0 0 16px transparent;
+
+	color: var(--color-white);
+	text-align: center;
+
+	transition: 250ms ease;
+	transition-property: box-shadow, opacity;
+	cursor: pointer;
 }
 
-[_flex~="h"][_flex~="stack"] > button:not(:last-child) {
-	margin-right: 2px;
+[_dropdown]:not([active_]):hover:before {
+	opacity: 0.5;
 }
 
-[_flex~="h"][_flex~="stack"] > button:last-child {
-	border-radius: 0 2px 2px 0;
+[_dropdown]:focus:before {
+	box-shadow: 0 0 0 2px var(--color-black-125);
 }
 
-[_flex~="h"][_flex~="stack"] > button:only-child {
-	border-radius: 2px;
+[_dropdown] > [_flex] {
+	position: absolute;
+	top: calc(100% + 16px);
+	left: 0;
+
+	transition: 250ms ease;
+	transition-property: opacity, visibility;
+}
+
+[_dropdown]:not([active_]) > [_flex] {
+	opacity: 0;
+	visibility: hidden;
+}
+
+[_dropdown] button {
+	background: var(--color-white-75);
+	backdrop-filter: blur(2px);
+	box-shadow:
+		0 2px 4px var(--color-black-25),
+		0 0 0 16px transparent;
+
+	color: var(--color-black);
+	text-align: left;
+}
+
+[_dropdown] button:focus {
+	box-shadow:
+		0 2px 4px var(--color-black-25),
+		0 0 0 2px var(--color-black-125);
 }
 
 ul[_list] {
@@ -788,7 +868,7 @@ ul[_list] li:nth-child(2n) {
 		box-shadow: 0 4px 8px 4px var(--color-black-25);
 	}
 
-	[_flex]:not([_flex~="stack"]) {
+	[_flex] {
 		gap: 16px;
 	}
 
