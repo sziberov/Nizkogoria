@@ -861,6 +861,39 @@ ul[_list] li:nth-child(2n) {
 	justify-content: flex-end;
 }
 
+ul[_notifications] {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+
+	position: fixed;
+	top: 16px;
+	right: 16px;
+
+	gap: 16px;
+
+	max-width: 384px;
+}
+
+@keyframes Notification {
+	0%		{ filter: blur(4px);	opacity: 0; transform: translateX(calc(100% + 32px)); }
+	12.5%	{ filter: blur(0);		opacity: 1; transform: translateX(0); }
+	87.5%	{ filter: blur(0);		opacity: 1; transform: translateX(0); }
+	100%	{ filter: blur(4px);	opacity: 0; transform: translateX(calc(100% + 32px)); }
+}
+
+ul[_notifications] li {
+	padding: 8px;
+
+	background: var(--color-white-75);
+	backdrop-filter: blur(2px);
+	box-shadow: 0 2px 4px var(--color-black-25);
+
+	opacity: 0;
+	animation: Notification 8s ease;
+	pointer-events: none;
+}
+
 @media screen and (max-width: 1366px) {
 	label[_switch] {
 		width: 32px;

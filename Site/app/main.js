@@ -58,6 +58,18 @@ window.Navigation = class Navigation {
 	}
 }
 
+window.Notifications = class Notifications {
+	static list = () => $('ul[_notifications]');
+
+	static push(string) {
+		let notification = $('<li/>').text(string).appendTo(this.list());
+
+		console.log(string);
+
+		setTimeout(() => notification.remove(), 8000);
+	}
+}
+
 window.Dropdown = class Dropdown {
 	static initialize() {
 		$('[_dropdown]').attr('tabindex', 0).find('button').attr('tabindex', 0);
@@ -99,6 +111,13 @@ window.Characters = class Characters {
 
 	static truncate(string, length) {
 		return string.length > length ? string.slice(0, length-1)+'...' : string;
+	}
+
+	static numberPostfix(number) {
+		let a = number.toString().slice(-1),
+			b = 'штук';
+
+		return a === '1' ? b+'а' : ['2', '3', '4'].includes(a) ? b+'и' : b;
 	}
 }
 
@@ -737,7 +756,12 @@ window.Translator = class Translator {
 
 	static saveAccents(selected) {
 		let a = this.in(),
-			accents = JSON.parse(localStorage.getItem('accents')) ?? {}
+			accents = JSON.parse(localStorage.getItem('accents')) ?? {},
+			notifications = {
+				added: [],
+				updated: [],
+				deleted: []
+			}
 
 		for(let v of this.parse(a.value)) {
 			let k = v.string.toLowerCase();
@@ -746,10 +770,15 @@ window.Translator = class Translator {
 				continue;
 			}
 			if(v.graveIndex == undefined && v.acuteIndex == undefined) {
-				delete accents[k]
+				if(accents[k] != undefined) {
+					notifications.deleted.push(k);
+					delete accents[k]
+				}
+
 				continue;
 			}
 
+			notifications[accents[k] != undefined ? 'updated' : 'added'].push(k);
 			accents[k] = {
 				graveIndex: v.graveIndex,
 				acuteIndex: v.acuteIndex
@@ -758,6 +787,11 @@ window.Translator = class Translator {
 
 		localStorage.setItem('accents', JSON.stringify(accents));
 		this.updateAccentsTable();
+		for(let k in notifications) {
+			if(notifications[k].length > 0) {
+				Notifications.push(`${ k === 'added' ? 'Добавлено' : k === 'updated' ? 'Обновлено' : 'Удалено' } ударение для: ${ notifications[k].join(', ') }`);
+			}
+		}
 	}
 
 	static displayAccents() {
@@ -855,6 +889,7 @@ window.Translator = class Translator {
 					<div wide_>Краткое содержание</div>
 					<div wrapless_>Дата создания</div>
 					<div>
+						${ saves_.length+' '+Characters.numberPostfix(saves_.length) }
 						<!--
 						<div _flex="h">
 							<button>◀</button>
@@ -900,7 +935,7 @@ window.Translator = class Translator {
 				<div __header>
 					<div wrapless_>Позиция левого ударения</div>
 					<div wrapless_>Позиция правого ударения</div>
-					<div wide_></div>
+					<div wide_>${ accents_.length+' '+Characters.numberPostfix(accents_.length) }</div>
 				</div>
 			`);
 			b.attr('onclick', 'Translator.download(\'accents\');');
@@ -1823,6 +1858,7 @@ document.addEventListener('keydown', (e) => {
 			if(location.hash.substring(1) === 'translator') {
 				({
 					KeyS: () => Translator.save(),
+					KeyD: () => Translator.saveAccents(true),
 					KeyQ: () => Translator.insertAccent(true),
 					KeyW: () => Translator.loadAccents(),
 					KeyE: () => Translator.insertAccent(),
