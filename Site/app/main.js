@@ -458,12 +458,6 @@ window.Translator = class Translator {
 			'([^еёиюя])\\1':								'$1'
 		}
 	}
-	static parts = ((a) => { for(let k in a) { a[k] = a[k].sort((a, b) => a.length > b.length ? -1 : a.length < b.length ? 1 : 0); } return a; })({
-		prefixes: ['а', 'ана', 'анти', 'архи', 'без', 'бес', 'в', 'вз', 'во', 'воз', 'возо', 'вос', 'вс', 'вы', 'гипер', 'гипо', 'де', 'дез', 'дис', 'до', 'за', 'зкстра', 'из', 'изо', 'ин', 'интер', 'инфра', 'ис', 'квази', 'кило', 'контр', 'макро', 'мата', 'мега', 'микро', 'мульти', 'на', 'над', 'надо', 'наи', 'не', 'недо', 'низ', 'низо', 'нис', 'о', 'об', 'обез', 'обес', 'обо', 'орто', 'от', 'ото', 'па', 'пан', 'пара', 'пере', 'по', 'под', 'подо', 'пол', 'полу', 'пост', 'пра', 'пре', 'пред', 'предо', 'при', 'про', 'прото', 'раз', 'разо', 'рас', 'ре', 'с', 'со', 'су', 'суб', 'супер', 'транс', 'ультра', 'через', 'черес', 'чрез', 'экс'],
-		suffixes: ['а', 'ащ', 'в', 'вш', 'вши', 'е', 'ев', 'ева', 'еват', 'ек', 'ем', 'ен', 'енн', 'енок', 'еньк', 'ечк', 'и', 'ив', 'ива', 'ик', 'им', 'ист', 'ичк', 'к', 'л', 'лив', 'н', 'ник', 'ниц', 'нн', 'о', 'ов', 'ова', 'оват', 'овит', 'ок', 'ом', 'онк', 'онок ', 'оньк', 'очк', 'ск', 'т', 'тель', 'ти', 'ть', 'у', 'ушк', 'ущ', 'чив', 'чик', 'чь', 'ш', 'ши', 'щик', 'ыва', 'ышк', 'юшк', 'ющ', 'я', 'ящ', 'ёк'],
-		endings: ['а', 'ам', 'ами', 'ат', 'ать', 'ах', 'ая', 'е', 'его', 'ее', 'ей', 'ем', 'ему', 'ет', 'ете', 'ешь', 'ём', 'ёму', 'ёт', 'ёте', 'ёшь', 'и', 'ие', 'ий', 'им', 'ими', 'ит', 'ите', 'ить', 'их', 'ишь', 'й', 'о', 'ов', 'ого', 'ое', 'ой', 'ом', 'ому', 'у', 'ут', 'ую', 'ы', 'ые', 'ый', 'ым', 'ыми', 'ых', 'ю', 'ют', 'юю', 'я', 'ям', 'ями', 'ят', 'ях', 'яя'],
-		postfixes: ['-ка', '-либо', '-нибудь', '-таки', '-то', 'сь', 'ся', 'те']
-	});
 
 	static preferences = {}
 
@@ -676,88 +670,29 @@ window.Translator = class Translator {
 		this.loadPreferences();
 	}
 
-	static closestAccent(string) {
-		let accents = JSON.parse(localStorage.getItem('accents')) ?? {},
-			closest = Object.entries(accents).filter(v => string.includes(v[0])).sort((a, b) => a[0].length > b[0].length ? -1 : a[0].length < b[0].length ? 1 : 0)[0]
-
-		if(closest) {
-			return closest;
-		}
-	}
-
 	static loadAccents() {
 		let a = this.in(),
-			accents = JSON.parse(localStorage.getItem('accents')) ?? {},
-			parsed = this.parse(a.value),
-			apply = (a, b, c = 0) => {
-				if(b in accents) {
-					if(accents[b].graveIndex != undefined) {
-						a.graveIndex = accents[b].graveIndex+c;
-					}
-					if(accents[b].acuteIndex != undefined) {
-						a.acuteIndex = accents[b].acuteIndex+c;
-					}
-
-					return true;
-				}
-			}
+			accents = Object.entries(JSON.parse(localStorage.getItem('accents')) ?? {}),
+			parsed = this.parse(a.value);
 
 		for(let v of parsed) {
-			let k = v.string.toLowerCase();
-
-			if(v.type !== 'word' || v.graveIndex != undefined || v.acuteIndex != undefined || apply(v, k)) {
+			if(v.type !== 'word' || v.graveIndex != undefined || v.acuteIndex != undefined) {
 				continue;
 			}
 
-			let parts = {
-					prefix: '',
-					root: '',
-					suffix: '',
-					ending: '',
-					postfix: ''
-				},
-				offset;
+			let string = v.string.toLowerCase(),
+				closest = accents.filter(v => string.includes(v[0])).sort((a, b) => a[0].length > b[0].length ? -1 : a[0].length < b[0].length ? 1 : 0)[0]
 
-			for(let v of this.parts.prefixes) {
-				if(k.startsWith(v) && k.length > v.length) {
-					parts.prefix = v;
+			if(closest) {
+				let offset = string.substring(0, string.indexOf(closest[0])).match(/[аеёиоуыэюя]/gi)?.length ?? 0;
 
-					break;
+				if(closest[1].graveIndex != undefined) {
+					v.graveIndex = closest[1].graveIndex+offset;
+				}
+				if(closest[1].acuteIndex != undefined) {
+					v.acuteIndex = closest[1].acuteIndex+offset;
 				}
 			}
-			for(let v of this.parts.postfixes) {
-				if(k.endsWith(v) && k.length > v.length) {
-					parts.postfix = v;
-
-					break;
-				}
-			}
-			for(let v of this.parts.endings) {
-				if(k.endsWith(v+parts.postfix) && k.length-parts.postfix.length > v.length) {
-					parts.ending = v;
-
-					break;
-				}
-			}
-			for(let v of this.parts.suffixes) {
-				if(k.endsWith(v+parts.ending+parts.postfix) && k.length-parts.ending.length-parts.postfix.length > v.length) {
-					parts.suffix = v;
-
-					break;
-				}
-			}
-
-			parts.root = k.replace(new RegExp('^'+parts.prefix+'|'+parts.suffix+parts.ending+parts.postfix+'$', 'gi'), '');
-			offset = parts.prefix.match(/[аеёиоуыэюя]/gi)?.length;
-
-			if(apply(v, parts.prefix+parts.root+parts.suffix+parts.ending+parts.postfix))			continue;
-			if(apply(v,              parts.root+parts.suffix+parts.ending+parts.postfix, offset))	continue;
-			if(apply(v, parts.prefix+parts.root+parts.suffix+parts.ending))							continue;
-			if(apply(v,              parts.root+parts.suffix+parts.ending, offset))					continue;
-			if(apply(v, parts.prefix+parts.root+parts.suffix))										continue;
-			if(apply(v,              parts.root+parts.suffix, offset))								continue;
-			if(apply(v, parts.prefix+parts.root))													continue;
-			if(apply(v,              parts.root, offset))											continue;
 		}
 
 		a.value = this.unparse(parsed, true);
