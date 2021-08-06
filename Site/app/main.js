@@ -676,6 +676,15 @@ window.Translator = class Translator {
 		this.loadPreferences();
 	}
 
+	static closestAccent(string) {
+		let accents = JSON.parse(localStorage.getItem('accents')) ?? {},
+			closest = Object.entries(accents).filter(v => string.includes(v[0])).sort((a, b) => a[0].length > b[0].length ? -1 : a[0].length < b[0].length ? 1 : 0)[0]
+
+		if(closest) {
+			return closest;
+		}
+	}
+
 	static loadAccents() {
 		let a = this.in(),
 			accents = JSON.parse(localStorage.getItem('accents')) ?? {},
