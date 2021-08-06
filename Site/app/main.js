@@ -741,13 +741,14 @@ window.Translator = class Translator {
 			parts.root = k.replace(new RegExp('^'+parts.prefix+'|'+parts.suffix+parts.ending+parts.postfix+'$', 'gi'), '');
 			offset = parts.prefix.match(/[аеёиоуыэюя]/gi)?.length;
 
-			if(apply(v, parts.root+parts.suffix+parts.ending+parts.postfix, offset))	continue;
-			if(apply(v, parts.root+parts.suffix+parts.ending, offset))					continue;
-			if(apply(v, parts.root+parts.suffix, offset))								continue;
-			if(apply(v, parts.root, offset))											continue;
-			if(apply(v, parts.prefix+parts.root+parts.suffix+parts.ending))				continue;
-			if(apply(v, parts.prefix+parts.root+parts.suffix))							continue;
-			if(apply(v, parts.prefix+parts.root))										continue;
+			if(apply(v, parts.prefix+parts.root+parts.suffix+parts.ending+parts.postfix))			continue;
+			if(apply(v,              parts.root+parts.suffix+parts.ending+parts.postfix, offset))	continue;
+			if(apply(v, parts.prefix+parts.root+parts.suffix+parts.ending))							continue;
+			if(apply(v,              parts.root+parts.suffix+parts.ending, offset))					continue;
+			if(apply(v, parts.prefix+parts.root+parts.suffix))										continue;
+			if(apply(v,              parts.root+parts.suffix, offset))								continue;
+			if(apply(v, parts.prefix+parts.root))													continue;
+			if(apply(v,              parts.root, offset))											continue;
 		}
 
 		a.value = this.unparse(parsed, true);
