@@ -266,7 +266,7 @@ window.Translator = class Translator {
 			'из-под':		'с-под',
 			'иил':			'ил',
 			'индекс':		'индэкс',
-			'инерт':		'инэрт',
+			'инер(?=т|ц)':	'инэр',
 			'интегр':		'интэгр',
 			'интер(?!ес)':	'интэр',
 			'искусст':		'искуст',
@@ -365,14 +365,14 @@ window.Translator = class Translator {
 			'цю':	'цу',
 			'ця':	'цца',
 
-			'ча':			'чя',
-		//	'чески':		'чны',
-			'ч(?=ж|ш)':		['д', 2],
-			'что(?![вл])':	'што',
-			'чо':			'чё',
-			'чу':			'чю',
-			'чэ':			'че',
-			'чють-чють':	'чючють',
+			'ча':				'чя',
+		//	'чески':			'чны',
+			'ч(?=ж|ш)':			['д', 2],
+			'что(?![вл])':		'што',
+			'чо':				'чё',
+			'чу':				'чю',
+			'чэ':				'че',
+			'чють(?=-чють)':	'чю',
 
 			'ше':				'шэ',
 			'шё':				'шо',
@@ -407,7 +407,7 @@ window.Translator = class Translator {
 			'в(?=ь?[ \\t\\p{P}]+[кпстфхцчшщ])':									'ф',
 			'(?<=^|[\\s\\d\\p{P}]+)[вф](?=[ \\t\\p{P}]+[^аеёиоуыэюя])':			['ў', 4],
 			'(?<=^|[\\s\\d\\p{P}]+|[аеёиоуыэюя])[влф](?![аеёиоуъыьэюя])':		['ў', 4],
-			'вот[- \\t]+так':													'о-так',
+			'вот(?=[- \\t]+так)':												'о',
 			'(г|ґ)енез':														'$1енэз',
 			'[дт]ь?(?=(д|т)[еёиьюя])':											'$1',
 		//	'(?<=\\S{4,})евае':													'иё',
@@ -468,8 +468,8 @@ window.Translator = class Translator {
 
 	static parse(raw) {
 		let alphabet = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя',
-			word = `([${ alphabet+Characters.grave+Characters.acute }-])+`,
-			symbol = `([^${ alphabet+Characters.grave+Characters.acute }-])+`,
+			word = `([${ alphabet+Characters.grave+Characters.acute }])+`,
+			symbol = `([^${ alphabet+Characters.grave+Characters.acute }])+`,
 			parsed = this.in().value.match(new RegExp(word+'|'+symbol, 'gi')) ?? []
 
 		for(let k in parsed) {
@@ -675,15 +675,18 @@ window.Translator = class Translator {
 			accents = Object.entries(JSON.parse(localStorage.getItem('accents')) ?? {}),
 			parsed = this.parse(a.value);
 
-		for(let v of parsed) {
+		for(let k in parsed) {
+			let v = parsed[k]
+
 			if(v.type !== 'word' || v.graveIndex != undefined || v.acuteIndex != undefined) {
 				continue;
 			}
 
-			let string = v.string.toLowerCase(),
-				closest = accents.filter(v => string.includes(v[0])).sort((a, b) => a[0].length > b[0].length ? -1 : a[0].length < b[0].length ? 1 : 0)[0]
+			let string = v.string.toLowerCase()/*.replace(/-то$/g, '')*/,
+				closest = accents.filter(v => string.includes(v[0])).sort((a, b) => a[0].length > b[0].length ? -1 : a[0].length < b[0].length ? 1 : 0)[0],
+				exception = string === 'то' && parsed[k-1]?.string === '-' && parsed[k-2]?.type === 'word';	// Изначально безударное '-то'
 
-			if(closest) {
+			if(closest && !exception) {
 				let offset = string.substring(0, string.indexOf(closest[0])).match(/[аеёиоуыэюя]/gi)?.length ?? 0;
 
 				if(closest[1].graveIndex != undefined) {

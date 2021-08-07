@@ -876,10 +876,10 @@ ul[_notifications] {
 }
 
 @keyframes Notification {
-	0%		{ filter: blur(4px);	opacity: 0; transform: translateX(calc(100% + 32px)); }
+	0%		{ filter: blur(8px);	opacity: 0; transform: translateX(calc(100% + 32px)); }
 	12.5%	{ filter: blur(0);		opacity: 1; transform: translateX(0); }
 	87.5%	{ filter: blur(0);		opacity: 1; transform: translateX(0); }
-	100%	{ filter: blur(4px);	opacity: 0; transform: translateX(calc(100% + 32px)); }
+	100%	{ filter: blur(8px);	opacity: 0; transform: translateX(calc(100% + 32px)); }
 }
 
 ul[_notifications] li {
