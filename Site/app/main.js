@@ -115,9 +115,10 @@ window.Characters = class Characters {
 
 	static numberPostfix(number) {
 		let a = number.toString().slice(-1),
-			b = 'штук';
+			b = number.toString().slice(-2, -1),
+			c = 'штук';
 
-		return a === '1' ? b+'а' : ['2', '3', '4'].includes(a) ? b+'и' : b;
+		return b !== '1' ? a === '1' ? c+'а' : ['2', '3', '4'].includes(a) ? c+'и' : c : c;
 	}
 }
 
@@ -181,6 +182,7 @@ window.Translator = class Translator {
 		//	'респу':	'репу',
 			'скево':	'скео',
 			'скрупу':	'скурпу',
+			'сним':		['сым', 0],
 			'тби':		'тыби',
 			'тщ':		'ч',
 			'чка':		'чека',
@@ -188,7 +190,6 @@ window.Translator = class Translator {
 			'эсте':		'эстэ',
 
 		//	'(б|т)?рен':				'$1рэн',
-			'(в|п|кр)?ещ(?=е|ё)':		['$1ящ', 0],
 			'г(?!..?г)':				'ґ',
 		//	'(ис)?под(?=[кпстфхцчшщ])':	'$1пот',
 			'че?ре[зс](?!л)':			'через'
@@ -598,9 +599,9 @@ window.Translator = class Translator {
 
 			v.string = v.string.substring(position, position+length);
 
-			// Замена безударного "О" на "А"
+			// Замена безударного "О" на "А" и предударного "Е" на "Я"
 
-			if(this.preferences[-1] && v.vowelsCount > 0) {
+			if((this.preferences[-2] || this.preferences[-1]) && v.vowelsCount > 0) {
 				let vowelIndex = -1;
 
 				for(let i = 0; i < v.string.length; i++) {
@@ -609,19 +610,19 @@ window.Translator = class Translator {
 					}
 
 					vowelIndex++;
-					if(vowelIndex !== v.graveIndex && vowelIndex !== v.acuteIndex && /о/i.test(v.string[i])) {
+					if(this.preferences[-2] && /о/i.test(v.string[i]) && vowelIndex !== v.graveIndex && vowelIndex !== v.acuteIndex) {
 						v.string = Characters.replaceAt(v.string, i, Characters.replacePreservingCase(v.string[i], 'а'));
+					}
+					if(this.preferences[-1] && /е/i.test(v.string[i]) && vowelIndex < (v.graveIndex ?? Infinity) && vowelIndex < (v.acuteIndex ?? Infinity)) {
+						v.string = Characters.replaceAt(v.string, i, Characters.replacePreservingCase(v.string[i], 'я'));
 					}
 				}
 			}
 
 			// Замена дублирующихся букв на апострофы
 
-			if(this.preferences[-2]) {
+			if(this.preferences[-3]) {
 				for(let i = v.string.length-1; i > -1; i--) {
-					if(v.string[i] === '-') {
-						continue;
-					}
 					if(v.string[i] === v.string[i-1]) {
 						v.string = Characters.replaceAt(v.string, i, `'`);
 					}
