@@ -422,7 +422,7 @@ window.Translator = class Translator {
 			'(?<=[бвгджз][ \\t]+)и':										['ы', 6],
 			'(?<=[^аеёийоучщыьэюя\\p{P}][ \\t]+)(е(?=во|ё)|и)':				['ы', 6],
 		//	'(?<=[чщь][ \\t]+)е(?=ё)':										['и', 6],
-			'(?<=\\S{4,}[^бвгдкх])ива([еёйюя]\\S*)':						['ю$1', 7],
+			'(?<=\\S{3,}[^бвгдкх])ива([еёйюя]\\S*)':						['ю$1', 7],
 			'(?<=\\S{4,})(?<!б|[дзк]р|[пс]л)[иы]ва([еёйюя]\\S*)':			['у$1', 7],
 			'(?<=\\S([бвзнпртф]))ир(?=ов|у(?!с))':							'',
 			'(?<=\\Sл)иро':													'я',
@@ -432,7 +432,6 @@ window.Translator = class Translator {
 			'(?<!ка)пле(?=е|й)':											'плэ',
 			'(?<!пе)рейд':													'рэйд',
 			'(ф|хв)анер':													'$1анэр',
-			'(ф|хв)ицыр':													'$1ик',
 			'(ф|хв)онет':													'$1онэт',
 			'т(?=[еёиюья])':												['ц', 8],
 			'щ(?=[еёищюя])':												'ш',
@@ -1080,6 +1079,11 @@ window.Dictionary = class Dictionary {
 			origins: ['Альт.']
 		},
 		{
+			strings: ['Ўважа́ть'],
+			meanings: ['Считать <что-то/кого-то> <чем-то/кем-то/каким-то>'],
+			origins: ['Альт.']
+		},
+		{
 			strings: ['Ўнату́ре'],
 			meanings: ['Именно, точно (грубо)'],
 			origins: ['Разг.']
@@ -1110,7 +1114,7 @@ window.Dictionary = class Dictionary {
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Ваше́'],
+			strings: ['Вабше́', 'ваше́'],
 			meanings: ['Вообще'],
 			origins: ['Разг.']
 		},
@@ -1142,6 +1146,11 @@ window.Dictionary = class Dictionary {
 		{
 			strings: ['Деесло́ва'],
 			meanings: ['Глагол'],
+			origins: ['Альт.']
+		},
+		{
+			strings: ['До́ка'],
+			meanings: ['Пока'],
 			origins: ['Альт.']
 		},
 		{
@@ -1202,6 +1211,11 @@ window.Dictionary = class Dictionary {
 		{
 			strings: ['Инэ́т'],
 			meanings: ['Интернет'],
+			origins: ['Разг.']
+		},
+		{
+			strings: ['Исхажда́ть'],
+			meanings: ['Исходить (что делать?)'],
 			origins: ['Разг.']
 		},
 		{
@@ -1325,6 +1339,11 @@ window.Dictionary = class Dictionary {
 			origins: ['Альт.']
 		},
 		{
+			strings: ['Набалда́жник'],
+			meanings: ['Наболдашник'],
+			origins: ['Разг.']
+		},
+		{
 			strings: ['На́жна', 'ну́да'],
 			meanings: ['Нужно', 'надо'],
 			origins: ['Разг.']
@@ -1336,7 +1355,7 @@ window.Dictionary = class Dictionary {
 		},
 		{
 			strings: ['Нема́', 'не́ту'],
-			meanings: ['Нет <кого/чего-либо>'],
+			meanings: ['Нет <чего/кого-либо>'],
 			origins: ['Разг.']
 		},
 		{
@@ -1390,11 +1409,6 @@ window.Dictionary = class Dictionary {
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Пинкадзу́й', 'шуру́й'],
-			meanings: ['Иди (грубо)'],
-			origins: ['Иск.', 'разг.']
-		},
-		{
 			strings: ['Падшы́бник'],
 			meanings: ['Подшипник'],
 			origins: ['Разг.']
@@ -1443,6 +1457,16 @@ window.Dictionary = class Dictionary {
 			strings: ['Пача́ть'],
 			meanings: ['Начать'],
 			origins: ['Альт.']
+		},
+		{
+			strings: ['Пинкадзу́й', 'шуру́й'],
+			meanings: ['Иди (грубо)'],
+			origins: ['Иск.', 'разг.']
+		},
+		{
+			strings: ['Плинтуа́р'],
+			meanings: ['Тротуар'],
+			origins: ['Иск.']
 		},
 		{
 			strings: ['Пра́льна'],
@@ -1500,8 +1524,8 @@ window.Dictionary = class Dictionary {
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Сига́й'],
-			meanings: ['Прыгай <вниз/вдаль>'],
+			strings: ['Сига́ть'],
+			meanings: ['Далеко прыгать (в т.ч. под воду)'],
 			origins: ['Разг.']
 		},
 		{
@@ -1528,6 +1552,16 @@ window.Dictionary = class Dictionary {
 			strings: ['Сразуме́ла'],
 			meanings: ['Понятно'],
 			origins: ['Альт.']
+		},
+		{
+			strings: ['Стаё́т'],
+			meanings: ['Становится'],
+			origins: ['Альт.']
+		},
+		{
+			strings: ['Старадре́вний'],
+			meanings: ['Стародавний, очень древний'],
+			origins: ['Разг.']
 		},
 		{
 			strings: ['Стери́'],
