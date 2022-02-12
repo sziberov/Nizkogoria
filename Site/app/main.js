@@ -1879,7 +1879,7 @@ document.addEventListener('keyup', (e) => {
 	}
 });
 
-let initialize = () => {
+document.addEventListener('DOMContentLoaded', () => {
 	let a = localStorage.getItem('save'),
 		b = localStorage.getItem('accent'),
 		c = localStorage.getItem('settings');
@@ -1903,12 +1903,5 @@ let initialize = () => {
 	Translator.updateSavesTable();
 	Translator.updateAccentsTable();
 	Translator.loadPreferences(true);
-	Translator.go();
 	Dictionary.updateTable();
-}
-
-if(document.readyState !== 'loading') {
-	initialize();
-} else {
-	document.addEventListener('DOMContentLoaded', initialize);
-}
+});
