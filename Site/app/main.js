@@ -1879,7 +1879,7 @@ document.addEventListener('keyup', (e) => {
 	}
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+let initialize = () => {
 	let a = localStorage.getItem('save'),
 		b = localStorage.getItem('accent'),
 		c = localStorage.getItem('settings');
@@ -1905,4 +1905,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	Translator.loadPreferences(true);
 	Translator.go();
 	Dictionary.updateTable();
-});
+}
+
+if(document.readyState !== 'loading') {
+	initialize();
+} else {
+	document.addEventListener('DOMContentLoaded', initialize);
+}
