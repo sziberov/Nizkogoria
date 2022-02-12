@@ -1903,5 +1903,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	Translator.updateSavesTable();
 	Translator.updateAccentsTable();
 	Translator.loadPreferences(true);
+	Translator.go();
 	Dictionary.updateTable();
 });
