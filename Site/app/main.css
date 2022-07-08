@@ -509,6 +509,8 @@ label {
 label input {
 	width: 0;
 	height: 0;
+
+	appearance: none;
 }
 
 label[_switch] {
@@ -542,6 +544,12 @@ label[_switch] div {
 
 label[_switch]:hover div {
 	opacity: 0.5;
+}
+
+label[_switch]:hover input:active + div {
+	filter: brightness(0.5);
+
+	opacity: 1;
 }
 
 label[_switch] input:focus + div {
@@ -655,12 +663,18 @@ button {
 	white-space: nowrap;
 
 	transition: 250ms ease;
-	transition-property: background-color, box-shadow, color, opacity!important;
+	transition-property: background-color, box-shadow, filter, color, opacity!important;
 	user-select: none;
 }
 
 button:hover {
 	opacity: 0.5;
+}
+
+button:hover:active {
+	filter: brightness(0.75);
+
+	opacity: 1;
 }
 
 button:focus {
@@ -703,6 +717,12 @@ button:not([onclick]) {
 
 [_dropdown]:not([active_]):hover:before {
 	opacity: 0.5;
+}
+
+[_dropdown][active_]:before {
+	filter: brightness(0.75);
+
+	opacity: 1;
 }
 
 [_dropdown]:focus:before {
