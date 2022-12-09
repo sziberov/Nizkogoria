@@ -1164,6 +1164,11 @@ window.Dictionary = class Dictionary {
 			origins: ['Альт.', 'разг.']
 		},
 		{
+			strings: ['Дало́нь'],
+			meanings: ['Ладонь'],
+			origins: ['Альт.']
+		},
+		{
 			strings: ['Деесло́ва'],
 			meanings: ['Глагол'],
 			origins: ['Альт.']
