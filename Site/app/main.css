@@ -26,7 +26,8 @@ body,
 button,
 select,
 input,
-textarea {
+textarea,
+[_textarea] {
 	color: var(--color-black);
 	font: 13px Roboto, Arial;
 	line-height: 16px;
@@ -514,6 +515,7 @@ label input {
 }
 
 label[_switch] {
+	display: flex;
 	flex-shrink: 0;
 
 	width: 64px;
@@ -610,10 +612,12 @@ label[_file] input:focus + div {
 	box-shadow: 0 0 0 2px var(--color-black-125);
 }
 
-textarea {
+textarea,
+[_textarea] {
 	flex: 1;
 
 	min-height: 256px;
+	resize: none;
 
 	padding: 16px;
 
@@ -627,24 +631,69 @@ textarea {
 	transition-property: margin-top, margin-left, padding, box-shadow, font-size, line-height!important;
 }
 
-textarea:focus {
+textarea:focus,
+[_textarea]:focus {
 	box-shadow:
 		0 8px 16px 8px var(--color-black-25),
 		0 0 0 2px var(--color-black-125);
 }
 
-textarea[zoom_] {
+textarea[zoom_],
+[_textarea][zoom_] {
 	padding: 8px 16px;
 
 	font-size: 17px;
 	line-height: 32px;
 }
 
-textarea[readonly] {
+textarea[readonly],
+[_textarea]:not([contenteditable]),
+[_textarea][contenteditable="false"] {
 	flex: 1;
 
 	background: var(--color-black-0625);
 	box-shadow: none;
+}
+
+[_textarea] {
+	background: var(--color-white);
+
+	white-space: pre-wrap;
+}
+
+[_textarea][placeholder]:empty::before {
+	content: attr(placeholder);
+
+	color: var(--color-gray);
+
+	cursor: text;
+}
+
+[_textarea] a[accent_] {
+	color: var(--color-gray);
+
+	transition: 250ms ease;
+	transition-property: filter, color, opacity;
+	cursor: pointer;
+}
+
+[_textarea] a[accent_]:hover {
+	opacity: 0.5;
+}
+
+[_textarea] a[accent_]:hover:active {
+	filter: brightness(0.75);
+
+	opacity: 1;
+}
+
+[_textarea] a[accent_="active"] {
+	color: var(--color-green);
+	text-decoration: underline;
+}
+
+[_textarea] > * {
+	display: inline;
 }
 
 button {
@@ -914,7 +963,7 @@ ul[_notifications] li {
 	pointer-events: none;
 }
 
-@media screen and (max-width: 1366px) {
+@media screen and (max-width: 1024px) {
 	label[_switch] {
 		width: 32px;
 	}
@@ -924,7 +973,7 @@ ul[_notifications] li {
 	}
 }
 
-@media screen and (max-width: 1024px) {
+@media screen and (max-width: 768px) {
 	img[_image] {
 		box-shadow: 0 4px 8px 4px var(--color-black-25);
 	}

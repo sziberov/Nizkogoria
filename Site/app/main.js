@@ -1,5 +1,5 @@
 window.Tab = class Tab {
-	static globalPostfix = ' ~ НГСР';
+	static globalPostfix = ' ☆ НССР';
 
 	static switch(a) {
 		let title = typeof a === 'string' ? a : a.srcElement.dataset.tabRef,
@@ -70,6 +70,85 @@ window.Notifications = class Notifications {
 	}
 }
 
+window.Editor = class {
+	static initialize(element, beforeinput) {
+		if(element.attributes['_textarea'] == null) {
+			return;
+		}
+
+		element.setAttribute('contenteditable', true);
+		element.spellcheck = false;
+		element.onbeforeinput = beforeinput;
+	}
+
+	static getText(element) {
+		let value = element.innerText;
+
+		if(value.at(-1) === '\n') {
+			value = value.slice(0, -1);
+		}
+
+		return value;
+	}
+
+	static getTextSelection(element) {
+		let selection = getSelection(),
+			range,
+			range_,
+			start,
+			end;
+
+		if(selection != null && selection.rangeCount > 0) {
+			range = selection.getRangeAt(0);
+			range_ = range.cloneRange();
+
+			range_.selectNodeContents(element);
+			range_.setEnd(range.startContainer, range.startOffset);
+
+			start = range_.toString().length;
+
+			range_.setEnd(range.endContainer, range.endOffset);
+
+			end = range_.toString().length;
+		} else {
+			return;
+		}
+
+		return {
+			start: start,
+			end: end
+		}
+	}
+
+	static setTextSelection(element, position) {
+		let length = 0;
+
+		for(let node of element.childNodes) {
+			let innerText = node.innerText ?? node.nodeValue ?? '';
+
+			length = length+innerText.length;
+
+			if(position <= length) {
+				let selection = window.getSelection(),
+					range = document.createRange(),
+					offset = position-(length-innerText.length);
+
+				if(node.nodeName !== '#text') {
+					offset = offset > innerText.length/2 ? 1 : 0;
+				}
+
+				range.setStart(node, offset);
+				range.collapse(true);
+
+				selection.removeAllRanges();
+				selection.addRange(range);
+
+				return;
+			}
+		}
+	}
+}
+
 window.Dropdown = class Dropdown {
 	static initialize() {
 		$('[_dropdown]').attr('tabindex', 0).find('button').attr('tabindex', 0);
@@ -99,6 +178,10 @@ window.Characters = class Characters {
 
 	static insertAt(string, index, insertement) {
 		return string.slice(0, index)+insertement+string.slice(index);
+	}
+
+	static removeAt(string, index, length) {
+		return string.substring(0, index)+string.substring(index+length);
 	}
 
 	static applyCaptureGroups(string, ...cg) {
@@ -470,11 +553,14 @@ window.Translator = class Translator {
 	static in = () => document.querySelector(this.ref('in'));
 	static out = () => document.querySelector(this.ref('out'));
 
+	static raw = '';
+	static parsed = []
+
 	static parse(raw) {
 		let alphabet = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя',
 			word = `([${ alphabet+Characters.grave+Characters.acute }])+`,
 			symbol = `([^${ alphabet+Characters.grave+Characters.acute }])+`,
-			parsed = this.in().value.match(new RegExp(word+'|'+symbol, 'gi')) ?? []
+			parsed = raw.match(new RegExp(word+'|'+symbol, 'gi')) ?? []
 
 		for(let k in parsed) {
 			let string = parsed[k],
@@ -547,16 +633,10 @@ window.Translator = class Translator {
 	}
 
 	static go() {
-		let a = this.in().value,
-			b = this.out(),
-			c = this.rules.beginning,
-			d = this.rules.everywhere,
-			e = this.rules.ending;
-
-		$(this.ref('in')+', '+this.ref('out'))[a.length <= 128 ? 'attr' : 'removeAttr']('zoom_', '');
-		$(this.ref('clear'))[a.length > 0 ? 'attr': 'removeAttr']('onclick', 'Translator.clear();');
-
-		let parsed = this.parse(a),
+		let rbe = this.rules.beginning,
+			rev = this.rules.everywhere,
+			ren = this.rules.ending,
+			parsed = this.parse(this.raw),
 			ruleEnabled = (a, returnReplacement) => {
 				let b = !Array.isArray(a),
 					c = this.preferences[a[1]]
@@ -596,9 +676,9 @@ window.Translator = class Translator {
 
 			v.string = leftmost+left+v.string+right+rightmost;
 
-			for(let k in c) v.string = ruleEnabled(c[k]) ? v.string.replace(new RegExp('(?<=^|[\\s\\d\\p{P}])'+k+'(?=\\S)',	'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(ruleEnabled(c[k], true), ...cg)), cg[cg.length-2])) : v.string;
-			for(let k in d) v.string = ruleEnabled(d[k]) ? v.string.replace(new RegExp(k,									'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(ruleEnabled(d[k], true), ...cg)), cg[cg.length-2])) : v.string;
-			for(let k in e) v.string = ruleEnabled(e[k]) ? v.string.replace(new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])',	'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(ruleEnabled(e[k], true), ...cg)), cg[cg.length-2])) : v.string;
+			for(let k in rbe) v.string = ruleEnabled(rbe[k]) ? v.string.replace(new RegExp('(?<=^|[\\s\\d\\p{P}])'+k+'(?=\\S)',	'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(ruleEnabled(rbe[k], true), ...cg)), cg[cg.length-2])) : v.string;
+			for(let k in rev) v.string = ruleEnabled(rev[k]) ? v.string.replace(new RegExp(k,									'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(ruleEnabled(rev[k], true), ...cg)), cg[cg.length-2])) : v.string;
+			for(let k in ren) v.string = ruleEnabled(ren[k]) ? v.string.replace(new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])',	'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(ruleEnabled(ren[k], true), ...cg)), cg[cg.length-2])) : v.string;
 
 			v.string = v.string.substring(position, position+length);
 
@@ -633,7 +713,7 @@ window.Translator = class Translator {
 			}
 		}
 
-		b.value = this.unparse(parsed);
+		this.out().value = this.unparse(parsed);
 	}
 
 	static loadPreferences(initialisation) {
@@ -674,10 +754,125 @@ window.Translator = class Translator {
 		this.loadPreferences();
 	}
 
+	static loadEditor() {
+		Editor.initialize(this.in(), this.editorBeforeinput.bind(this));
+		this.updateEditor();
+	}
+
+	static updateEditor(selectionStart) {
+		let input = this.in(),
+			output = this.out(),
+			value = '';
+
+		selectionStart ??= Editor.getTextSelection(input)?.start ?? 0;
+		this.parsed = this.parse(this.raw);
+
+		for(let k in this.parsed) {
+			let v = this.parsed[k],
+				string = v.string;
+
+			if(v.type === 'symbol') {
+				value += string;
+
+				continue;
+			}
+
+			let vowelIndex = -1,
+				active;
+
+			for(let character of string) {
+				if(!/[аеёиоуыэюя]/i.test(character)) {
+					value += character;
+				} else {
+					vowelIndex++;
+					active = '';
+
+					if([v.graveIndex, v.acuteIndex].includes(vowelIndex)) {
+						active = 'active';
+						character = character+(v.graveIndex !== vowelIndex ? Characters.acute : Characters.grave);
+					}
+
+					value += '<a role="button" onclick="Translator.insertAccentBy('+k+', '+vowelIndex+');" accent_="'+active+'">'+character+'</a>';
+				}
+			}
+		}
+
+		input.innerHTML = value;
+
+		if(this.raw.length <= 128) {
+			input.setAttribute('zoom_', '');
+			output.setAttribute('zoom_', '');
+		} else {
+			input.removeAttribute('zoom_');
+			output.removeAttribute('zoom_');
+		}
+		Editor.setTextSelection(input, selectionStart);
+		$(this.ref('clear'))[this.raw.length > 0 ? 'attr': 'removeAttr']('onclick', 'Translator.clear();');
+		this.go();
+	}
+
+	static async editorBeforeinput(event) {
+		event.preventDefault();
+
+	//	console.log(event);
+
+		let selection = Editor.getTextSelection(this.in());
+
+		if(selection == null) {
+			return;
+		}
+
+		let type = event.inputType;
+
+		if(['insertText', 'insertParagraph', 'insertFromPaste', 'insertFromDrop'].includes(type)) {
+			if(selection.start < selection.end) {
+				this.raw = Characters.removeAt(this.raw, selection.start, selection.end-selection.start);
+			}
+
+			let data = event.data ?? '';
+
+			if(type === 'insertParagraph') {
+				data = '\n';
+			}
+			if(type === 'insertFromPaste') {
+				data = await navigator.clipboard.readText();
+			}
+			if(type === 'insertFromDrop') {
+				data = event.dataTransfer.getData('text');
+			}
+
+			this.raw = Characters.insertAt(this.raw, selection.start, data);
+
+			if(type === 'insertFromPaste') {
+				selection.start = selection.start+data.length;
+			} else {
+				selection.start++;
+			}
+		}
+		if(type === 'deleteContentBackward' && selection.start === selection.end) {
+			if(selection.start === 0) {
+				return;
+			}
+
+			let length = 1;
+
+			if([Characters.grave, Characters.acute].includes(this.raw[selection.start-length])) {
+				length++;
+			}
+
+			this.raw = Characters.removeAt(this.raw, selection.start-length, length);
+			selection.start -= length;
+		} else
+		if(['deleteContentBackward', 'deleteByCut', 'deleteByDrag'].includes(type)) {
+			this.raw = Characters.removeAt(this.raw, selection.start, Math.max(selection.end-selection.start, 1));
+		}
+
+		this.updateEditor(selection.start);
+	}
+
 	static loadAccents() {
-		let a = this.in(),
-			accents = Object.entries(JSON.parse(localStorage.getItem('accents')) ?? {}),
-			parsed = this.parse(a.value);
+		let accents = Object.entries(JSON.parse(localStorage.getItem('accents')) ?? {}),
+			parsed = this.parse(this.raw);
 
 		for(let k in parsed) {
 			let v = parsed[k]
@@ -702,12 +897,12 @@ window.Translator = class Translator {
 			}
 		}
 
-		a.value = this.unparse(parsed, true);
-		a.oninput();
+		this.raw = this.unparse(parsed, true);
+		this.updateEditor();
 	}
 
-	static saveAccents(selected) {
-		let a = this.in(),
+	static saveAccents(ofSelected) {
+		let selection = Editor.getTextSelection(this.in()),
 			accents = JSON.parse(localStorage.getItem('accents')) ?? {},
 			notifications = {
 				added: [],
@@ -715,10 +910,10 @@ window.Translator = class Translator {
 				deleted: []
 			}
 
-		for(let v of this.parse(a.value)) {
+		for(let v of this.parse(this.raw)) {
 			let k = v.string.toLowerCase();
 
-			if(v.type !== 'word' || selected && (a.selectionStart === a.selectionEnd ? a.selectionStart < v.start || a.selectionEnd-1 > v.end : a.selectionStart > v.start || a.selectionEnd-1 < v.end)) {
+			if(v.type !== 'word' || ofSelected && (selection.start === selection.end ? selection.start < v.start || selection.end-1 > v.end : selection.start > v.start || selection.end-1 < v.end)) {
 				continue;
 			}
 			if(v.graveIndex == undefined && v.acuteIndex == undefined) {
@@ -747,11 +942,10 @@ window.Translator = class Translator {
 	}
 
 	static displayAccents() {
-		let a = this.in(),
-			accents = JSON.parse(localStorage.getItem('accents')) ?? {},
+		let accents = JSON.parse(localStorage.getItem('accents')) ?? {},
 			accents_ = []
 
-		if(a.value.trim() !== '' && !confirm(`Отобразить базу ударений вместо текущего текста?`)) {
+		if(this.raw.trim() !== '' && !confirm(`Отобразить базу ударений вместо текущего текста?`)) {
 			return;
 		}
 
@@ -769,42 +963,78 @@ window.Translator = class Translator {
 			accents_.splice(k, 0, { string: '\n' });
 		}
 
-		a.value = Translator.unparse(accents_, true);
-		a.oninput();
+		this.raw = this.unparse(accents_, true);
+		this.updateEditor();
 		this.updateSaveButtons();
 		Tab.switch('translate');
 		scrollTo(0, 0);
 	}
 
 	static scrolled(element) {
-		let a = this.in(),
-			b = this.out(),
-			c = $(this.ref(element.dataset.translatorRef)+':hover').length > 0;	// element.matches(':hover');
+		let input = this.in(),
+			output = this.out(),
+			scrolled = $(this.ref(element.dataset.translatorRef)+':hover').length > 0;	// element.matches(':hover');
 
-		if(c) {
-			if(element === a) {
-				b.scrollTop = a.scrollTop;
+		if(scrolled) {
+			if(element === input) {
+				output.scrollTop = input.scrollTop;
 			}
-			if(element === b) {
-				a.scrollTop = b.scrollTop;
+			if(element === output) {
+				input.scrollTop = output.scrollTop;
 			}
 		}
 	}
 
 	static insertAccent(grave) {
-		// TODO Добавить проверку на дубли знаков ударения во всём слове, используя парсер и его маркеры положения токенов
+		// TODO: Убрать возможность создания фактической повторной диакритики в каждом слове, невидимой при этом в редакторе, используя вывод парсера
 
-		let a = this.in(),
-			b = a.value,
-			c = a.selectionEnd-a.selectionStart === 1 ? a.selectionEnd : a.selectionStart;
+		let selection = Editor.getTextSelection(this.in()),
+			selectionStart = selection.end-selection.start === 1 ? selection.end : selection.start;
 
-		if(/[аеёиоуыэюя]/i.test(b[c-1]) && ![Characters.grave, Characters.acute].includes(b[c])) {
-			a.value = Characters.insertAt(b, c, !grave ? Characters.acute : Characters.grave);
+		/*
+		let word = this.parsed.find(v => v.start >= selectionStart-1 && v.end <= selectionStart-1);
+
+		if(word == null) {
+			return;
+		}
+		*/
+
+		if(![Characters.grave, Characters.acute].includes(this.raw[selectionStart-1])) {
+			if(/[аеёиоуыэюя]/i.test(this.raw[selectionStart-1])) {
+				this.raw = Characters.insertAt(this.raw, selectionStart, !grave ? Characters.acute : Characters.grave);
+				this.updateEditor(selectionStart+1);
+			}
+		} else {
+			this.raw = Characters.removeAt(this.raw, selectionStart-1, 1);
+			this.updateEditor(selectionStart-1);
+		}
+	}
+
+	static insertAccentBy(wordIndex, vowelIndex) {
+		let word = this.parsed[wordIndex]
+
+		if(word == null) {
+			return;
 		}
 
-		a.focus({ preventScroll: true });
-		a.setSelectionRange(c, c);
-		a.oninput();
+		if(word.acuteIndex == null) {
+			word.graveIndex = undefined;
+			word.acuteIndex = vowelIndex;
+		} else
+		if(word.acuteIndex === vowelIndex) {
+			word.acuteIndex = word.graveIndex;
+			word.graveIndex = undefined;
+		} else
+		if(word.acuteIndex < vowelIndex) {
+			word.acuteIndex = vowelIndex;
+		}
+
+		if(word.acuteIndex > vowelIndex) {
+			word.graveIndex = word.graveIndex !== vowelIndex ? vowelIndex : undefined;
+		}
+
+		this.raw = this.unparse(this.parsed, true);
+		this.updateEditor();
 	}
 
 	static updateSavesTable() {
@@ -917,41 +1147,36 @@ window.Translator = class Translator {
 	}
 
 	static clear() {
-		let a = this.in();
-
-		if(a.value.trim() !== '' && !confirm(`Очистить поле ввода?`)) {
+		if(this.raw.trim() !== '' && !confirm(`Очистить поле ввода?`)) {
 			return;
 		}
 
-		a.value = '';
-		a.oninput();
+		this.raw = '';
+		this.updateEditor();
 	}
 
 	static close(timestamp) {
-		let a = this.in(),
-			saves = JSON.parse(localStorage.getItem('saves')) ?? {}
+		let saves = JSON.parse(localStorage.getItem('saves')) ?? {}
 
-		if(saves[timestamp] !== a.value && !confirm(`Закрыть сохранение "${ Timestamp.toDateString(timestamp) }"?`)) {
+		if(saves[timestamp] !== this.raw && !confirm(`Закрыть сохранение "${ Timestamp.toDateString(timestamp) }"?`)) {
 			return;
 		}
 
-		a.value = '';
-		a.oninput();
+		this.raw = '';
+		this.updateEditor();
 		this.updateSaveButtons();
 	}
 
 	static load(timestamp) {
-		let a = this.in(),
-			b = document.querySelector(this.ref('date')).innerHTML,
+		let date = document.querySelector(this.ref('date')).innerHTML,
 			saves = JSON.parse(localStorage.getItem('saves')) ?? {}
 
-		if(a.value.trim() !== '' && !confirm(`${ b === Timestamp.toDateString(timestamp) ? 'Восстановить' : 'Загрузить' } сохранение "${ Timestamp.toDateString(timestamp) }"?`)) {
+		if(this.raw.trim() !== '' && !confirm(`${ date === Timestamp.toDateString(timestamp) ? 'Восстановить' : 'Загрузить' } сохранение "${ Timestamp.toDateString(timestamp) }"?`)) {
 			return;
 		}
 
-		a.value = saves[timestamp]
-	//	a.scrollTop = 0;
-		a.oninput();
+		this.raw = saves[timestamp]
+		this.updateEditor();
 		this.updateSavesTable();
 		this.updateSaveButtons(timestamp);
 		Tab.switch('translate');
@@ -959,24 +1184,23 @@ window.Translator = class Translator {
 	}
 
 	static save(timestamp = Timestamp.current()) {
-		let a = this.in().value,
-			b = document.querySelector(this.ref('date')).innerHTML,
+		let date = document.querySelector(this.ref('date')).innerHTML,
 			saves = JSON.parse(localStorage.getItem('saves')) ?? {}
 
 		if(saves[timestamp]?.trim().length > 0 && !confirm(`Перезаписать сохранение "${ Timestamp.toDateString(timestamp) }"?`)) {
 			return;
 		}
 
-		saves[timestamp] = a;
+		saves[timestamp] = this.raw;
 		localStorage.setItem('saves', JSON.stringify(saves));
 		this.updateSavesTable();
-		if(b !== Timestamp.toDateString(timestamp)) {
+		if(date !== Timestamp.toDateString(timestamp)) {
 			this.updateSaveButtons(timestamp);
 		}
 	}
 
 	static delete(timestamp) {
-		let a = document.querySelector(this.ref('date')).innerHTML,
+		let date = document.querySelector(this.ref('date')).innerHTML,
 			saves = JSON.parse(localStorage.getItem('saves')) ?? {}
 
 		if(saves[timestamp].trim() !== '' && prompt(`Удалить сохранение "${ Timestamp.toDateString(timestamp) }"? ("Y" для подтверждения).`) !== 'Y') {
@@ -986,7 +1210,7 @@ window.Translator = class Translator {
 		saves[timestamp] = undefined;
 		localStorage.setItem('saves', JSON.stringify(saves));
 		this.updateSavesTable();
-		if(a === Timestamp.toDateString(timestamp)) {
+		if(date === Timestamp.toDateString(timestamp)) {
 			this.updateSaveButtons();
 		}
 	}
@@ -1965,28 +2189,12 @@ document.addEventListener('keyup', (e) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-	let a = localStorage.getItem('save'),
-		b = localStorage.getItem('accent'),
-		c = localStorage.getItem('settings');
-
-	if(a != undefined) {
-		localStorage.setItem('saves', a);
-		localStorage.removeItem('save');
-	}
-	if(b != undefined) {
-		localStorage.setItem('accents', b);
-		localStorage.removeItem('accent');
-	}
-	if(c != undefined) {
-		localStorage.setItem('preferences', c);
-		localStorage.removeItem('settings');
-	}
-
 	Tab.initialize();
 	Navigation.initialize();
 	Dropdown.initialize();
 	Translator.updateSavesTable();
 	Translator.updateAccentsTable();
 	Translator.loadPreferences(true);
+	Translator.loadEditor();
 	Dictionary.updateTable();
 });
