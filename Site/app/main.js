@@ -811,7 +811,9 @@ window.Translator = class Translator {
 		this.go();
 	}
 
-	static async editorBeforeinput(event) {
+	static compositionData;
+
+	static editorBeforeinput(event) {
 		event.preventDefault();
 
 	//	console.log(event);
@@ -824,6 +826,11 @@ window.Translator = class Translator {
 
 		let type = event.inputType;
 
+		if(type === 'insertCompositionText') {
+			this.compositionData = event.data;
+
+			return;
+		}
 		if(['insertText', 'insertParagraph', 'insertFromPaste', 'insertFromDrop'].includes(type)) {
 			if(selection.start < selection.end) {
 				this.raw = Characters.removeAt(this.raw, selection.start, selection.end-selection.start);
@@ -831,13 +838,14 @@ window.Translator = class Translator {
 
 			let data = event.data ?? '';
 
+			if(this.compositionData != null) {
+				data = this.compositionData+data;
+				this.compositionData = undefined;
+			}
 			if(type === 'insertParagraph') {
 				data = '\n';
 			}
-			if(type === 'insertFromPaste') {
-				data = await navigator.clipboard.readText();
-			}
-			if(type === 'insertFromDrop') {
+			if(['insertFromPaste', 'insertFromDrop'].includes(type)) {
 				data = event.dataTransfer.getData('text');
 			}
 
@@ -845,12 +853,19 @@ window.Translator = class Translator {
 
 			if(type === 'insertFromPaste') {
 				selection.start = selection.start+data.length;
-			} else {
+			} else
+			if(type !== 'insertCompositionText') {
 				selection.start++;
 			}
 		}
 		if(type === 'deleteContentBackward' && selection.start === selection.end) {
 			if(selection.start === 0) {
+				return;
+			}
+
+			if(this.compositionData != null) {
+				this.compositionData = undefined;
+
 				return;
 			}
 
