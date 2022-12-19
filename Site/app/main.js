@@ -660,7 +660,8 @@ window.Translator = class Translator {
 						regex = new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])', 'giu');
 					}
 
-					let originalStart = start;
+					let originalStart = start,
+						originalLength = length;
 
 					v.string = v.string.replace(regex, (match, ...captureGroups) => {
 						let replacement = ruleEnabled(rules[k], true),
@@ -674,7 +675,7 @@ window.Translator = class Translator {
 						if(matchStart < originalStart) {
 							start -= difference;
 						} else
-						if(matchStart < originalStart+length) {
+						if(matchStart < originalStart+originalLength) {
 							length -= difference;
 
 							if(v.graveIndex > matchStart-originalStart) {
