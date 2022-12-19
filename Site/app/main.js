@@ -636,24 +636,7 @@ window.Translator = class Translator {
 				right = parsed[k+1]?.string ?? '',
 				rightmost = parsed[k+2]?.string ?? '',
 				start = leftmost.length+left.length,
-				end = start+v.string.length-1,
-				synchronizeLengths = (match, replacement, matchStart) => {
-					let difference = match.length-replacement.length;
-
-					if(matchStart < start) {
-						start -= difference;
-					}
-					if(matchStart >= start && matchStart <= end) {
-						end -= difference;
-
-						if(v.graveIndex > matchStart) {
-							v.graveIndex -= difference;
-						}
-						if(v.acuteIndex > matchStart) {
-							v.acuteIndex -= difference;
-						}
-					}
-				}
+				length = v.string.length;
 
 			v.string = leftmost+left+v.string+right+rightmost;
 
@@ -677,6 +660,8 @@ window.Translator = class Translator {
 						regex = new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])', 'giu');
 					}
 
+					let originalStart = start;
+
 					v.string = v.string.replace(regex, (match, ...captureGroups) => {
 						let replacement = ruleEnabled(rules[k], true),
 							matchStart = captureGroups[captureGroups.length-2]
@@ -684,14 +669,28 @@ window.Translator = class Translator {
 						replacement = Characters.applyCaptureGroups(replacement, ...captureGroups);
 						replacement = Characters.replacePreservingCase(match, replacement);
 
-						synchronizeLengths(match, replacement, matchStart);
+						let difference = match.length-replacement.length;
+
+						if(matchStart < originalStart) {
+							start -= difference;
+						} else
+						if(matchStart < originalStart+length) {
+							length -= difference;
+
+							if(v.graveIndex > matchStart-originalStart) {
+								v.graveIndex -= difference;
+							}
+							if(v.acuteIndex > matchStart-originalStart) {
+								v.acuteIndex -= difference;
+							}
+						}
 
 						return replacement;
 					});
 				}
 			}
 
-			v.string = v.string.substring(start, end+1);
+			v.string = v.string.substring(start, start+length);
 
 			// Замена безударного "О" на "А" и предударного "Е" на "Я"
 
