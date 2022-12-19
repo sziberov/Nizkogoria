@@ -121,9 +121,9 @@
 							<button data-translator-ref="deleteCurrent">Удалить</button>
 						</div>
 						<ul _list>
-							<li>Для корректного перевода обязательны использование гласного <b>Ё</b>, при аканьи расстановка ударений над <b>О</b> (или <b>Ё / И</b>, переходящей в неё) и при яканьи над любым ударным гласным после и включая саму <b>Е</b>.</li>
+							<li>Для корректного перевода обязательны использование гласного <b>Ё</b> и (в некоторых случаях) расстановка ударений.</li>
 							<li>Аббревиатуры не учитываются, требуется самостоятельная правка после обработки.</li>
-							<li>Вследствии алгоритимического перевода, при большом объёме текста могут и вероятно будут наблюдаться подтормаживания.</li>
+							<li>Вследствии алгоритимического перевода, при большом объёме текста могут и, вероятно, будут наблюдаться подтормаживания.</li>
 							<li>Работоспособность в устаревших браузерах не гарантируется.</li>
 						</ul>
 					</div>
@@ -131,6 +131,7 @@
 						<div _table>
 							<div __header>
 								<div wide_>Пример</div>
+								<div wide_>Ударения</div>
 								<div wrapless_>Стандарт</div>
 								<div wrapless_>Оригинал</div>
 								<div wrapless_>Замена</div>
@@ -138,96 +139,104 @@
 							</div>
 							<div>
 								<div wide_>Аббатство > Аб'атство, Зоообъединение > Зо''бъединение</div>
+								<div wide_></div>
 								<div wrapless_>+</div>
 								<div wrapless_>**</div>
 								<div wrapless_>*'</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="-3" checked>
+										<input type="checkbox" data-translator-preference="apostrophe" checked>
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Колокольня > Калакольня, Молоко > Малако</div>
+								<div wide_>Над <b>О</b> и <b>Ё / И</b>, переходящей в неё</div>
 								<div wrapless_>+</div>
 								<div wrapless_>О</div>
 								<div wrapless_>А</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="-2" checked>
+										<input type="checkbox" data-translator-preference="o-a" checked>
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Небрежный > Нябрежный, Перемежёвывание > Пярямяжёвывание</div>
+								<div wide_>После <b>Е</b>, либо над ней</div>
 								<div wrapless_></div>
 								<div wrapless_>Е</div>
 								<div wrapless_>Я</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="-1">
+										<input type="checkbox" data-translator-preference="je-ja">
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Снимать > Сымать</div>
+								<div wide_></div>
 								<div wrapless_></div>
 								<div wrapless_>Ним</div>
 								<div wrapless_>Ым</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="0">
+										<input type="checkbox" data-translator-preference="nim-ym">
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Федерация > Хведерация, Фотки > Хвотки</div>
+								<div wide_></div>
 								<div wrapless_></div>
 								<div wrapless_>Ф</div>
 								<div wrapless_>Хв</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="1">
+										<input type="checkbox" data-translator-preference="f-hv">
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Лучше > Лудше, Манчжурия > Манджурия</div>
+								<div wide_></div>
 								<div wrapless_></div>
 								<div wrapless_>Чж / Чш</div>
 								<div wrapless_>Дж / Дш</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="2">
+										<input type="checkbox" data-translator-preference="chzh_chsh-dzh_dsh">
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Што > Шо, Пошто > Пошо</div>
+								<div wide_></div>
 								<div wrapless_></div>
 								<div wrapless_>Што</div>
 								<div wrapless_>Шо</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="3">
+										<input type="checkbox" data-translator-preference="shto-sho">
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Внимательно > Ўнимательно, Волна > Воўна, Кофта > Коўта, Шёл > Шёў</div>
+								<div wide_></div>
 								<div wrapless_>+</div>
 								<div wrapless_>В / Л / Ф</div>
 								<div wrapless_>Ў</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="4" checked>
+										<input type="checkbox" data-translator-preference="v_l_f-short_u" checked>
 										<div></div>
 									</label>
 								</div>
@@ -235,6 +244,7 @@
 							<!--
 							<div>
 								<div wide_>Здрасте > Здрасьте</div>
+								<div wide_></div>
 								<div wrapless_></div>
 								<div wrapless_>З / С</div>
 								<div wrapless_>Зь / Сь</div>
@@ -248,103 +258,111 @@
 							-->
 							<div>
 								<div wide_>Александрович > Алексаныч, Евгениевич > Евгениич</div>
+								<div wide_></div>
 								<div wrapless_></div>
 								<div wrapless_>Еви / Ови</div>
 								<div wrapless_>И / Ы</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="5">
+										<input type="checkbox" data-translator-preference="evi_ovi-i_y">
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Прав и > Прав ы, Так его > Так ыго</div>
+								<div wide_></div>
 								<div wrapless_></div>
 								<div wrapless_>И / Е</div>
 								<div wrapless_>Ы</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="6">
+										<input type="checkbox" data-translator-preference="i_je-y">
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Перепиливая > Перепилюя, Выделывается > Выделуется</div>
+								<div wide_>Вне замены</div>
 								<div wrapless_></div>
 								<div wrapless_>Ива / Ыва</div>
 								<div wrapless_>Ю / У</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="7">
+										<input type="checkbox" data-translator-preference="iva_yva-ju_u">
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Уверенность > Уверенносць, Продолжатель > Продолжацель</div>
+								<div wide_></div>
 								<div wrapless_></div>
 								<div wrapless_>Т</div>
 								<div wrapless_>Ц</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="8">
+										<input type="checkbox" data-translator-preference="t-c">
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Быстрее > Быстрей</div>
+								<div wide_></div>
 								<div wrapless_></div>
 								<div wrapless_>Е'</div>
 								<div wrapless_>Ей</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="9">
+										<input type="checkbox" data-translator-preference="jeje-jey">
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Делаться > Делатса</div>
+								<div wide_></div>
 								<div wrapless_></div>
 								<div wrapless_>Ца / Ся</div>
 								<div wrapless_>Са</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="10">
+										<input type="checkbox" data-translator-preference="ca_sya-sa">
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Лаяние > Лаянье, Печение > Печенье</div>
+								<div wide_></div>
 								<div wrapless_></div>
 								<div wrapless_>Ни</div>
 								<div wrapless_>Нь</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="11">
+										<input type="checkbox" data-translator-preference="ni-n">
 										<div></div>
 									</label>
 								</div>
 							</div>
 							<div>
 								<div wide_>Нестандартные > Нестандартныэ</div>
+								<div wide_></div>
 								<div wrapless_></div>
 								<div wrapless_>Ые</div>
 								<div wrapless_>Ыэ</div>
 								<div>
 									<label _switch>
-										<input type="checkbox" data-translator-preference="12">
+										<input type="checkbox" data-translator-preference="yje-ye">
 										<div></div>
 									</label>
 								</div>
 							</div>
 						</div>
 						<ul _list>
-							<li>Для наглядности примеры приводятся так, как бы замена происходила в русском языке. Ввиду множественных стилистических отличий, не перечисленных здесь, а также возможных комбинаций, итоговые слова, как правило, пишутся по-другому.</li>
+							<li>Для наглядности примеры приводятся так, как если бы замена происходила в русском языке. Ввиду множественных стилистических отличий, не перечисленных здесь, а также возможных комбинаций, итоговые слова, как правило, пишутся по-другому.</li>
 						</ul>
 					</div>
 					<div data-tab="saves" _flex="v">

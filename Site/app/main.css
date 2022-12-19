@@ -895,14 +895,12 @@ ul[_list] li:nth-child(2n) {
 }
 
 [_table] > div > div[wide_] {
-	width: 100%;
-}
-
-[_table] > div > div[narrow_] {
-	width: 1%;
+	width: auto;
 }
 
 [_table] > div > div[wrapless_] {
+	width: 1%;
+
 	white-space: nowrap;
 }
 

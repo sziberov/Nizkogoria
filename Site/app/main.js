@@ -274,7 +274,7 @@ window.Translator = class Translator {
 		//	'(б|т)?рен':				'$1рэн',
 			'г(?!..?г)':				'ґ',
 		//	'(ис)?под(?=[кпстфхцчшщ])':	'$1пот',
-			'(под|с)ним':				['$1ым', 0],
+			'(под|с)ним':				['$1ым', 'nim-ym'],
 			'че?ре[зс](?!л)':			'через'
 		},
 		everywhere: { // Везде
@@ -434,7 +434,7 @@ window.Translator = class Translator {
 
 			'учр':	'учер',
 
-			'ф(?=[аеёиоуыэюя]|ь[еёиоюя])':	['хв', 1],
+			'ф(?=[аеёиоуыэюя]|ь[еёиоюя])':	['хв', 'f-hv'],
 			'фейспалм':						'фэйспалм',
 			'флюоро':						'флюро',
 			'фрикаде':						'фрикадэ',
@@ -451,7 +451,7 @@ window.Translator = class Translator {
 
 			'ча':				'чя',
 		//	'чески':			'чны',
-			'ч(?=ж|ш)':			['д', 2],
+			'ч(?=ж|ш)':			['д', 'chzh_chsh-dzh_dsh'],
 			'что(?![вл])':		'што',
 			'чо':				'чё',
 			'чу':				'чю',
@@ -464,7 +464,7 @@ window.Translator = class Translator {
 			'шоколад':			'шэколад',
 			'шт(?=[клмнш])':	'ш',
 			'ште(?=йн|пс)':		'штэ',
-			'што':				['шо', 3],
+			'што':				['шо', 'shto-sho'],
 			'шч':				'щ',
 			'шш(?=т|э)':		'ш',
 			'шэдевр':			'шэдэвр',
@@ -489,25 +489,24 @@ window.Translator = class Translator {
 			'([бклмрф])\\1':												'$1',
 			'([бвп])ь(?=[еёиюя])':											'$1ъ',
 			'в(?=ь?[ \\t\\p{P}]+[кпстфхцчшщ])':								'ф',
-			'(?<=^|[\\s\\d\\p{P}]+)[вф](?=[ \\t\\p{P}]+[^аеёиоуыэюя])':		['ў', 4],
-			'(?<=^|[\\s\\d\\p{P}]+|[аеёиоуыэюя])[влф](?![аеёиоуъыьэюя])':	['ў', 4],
+			'(?<=^|[\\s\\d\\p{P}]+)[вф](?=[ \\t\\p{P}]+[^аеёиоуыэюя])':		['ў', 'v_l_f-short_u'],
+			'(?<=^|[\\s\\d\\p{P}]+|[аеёиоуыэюя])[влф](?![аеёиоуъыьэюя])':	['ў', 'v_l_f-short_u'],
 			'вот(?=[- \\t]+так)':											'о',
 			'(г|ґ)енез':													'$1енэз',
 			'[дт]ь?(?=(д|т)[еёиьюя])':										'$1',
 		//	'(?<=\\S{4,})евае':												'иё',
-			'(?<=\\S{5,})еви(ч|ш)':											['и$1', 5],
-			'(?<=\\S{5,})(?:[ди]р)?ови(ч|ш)':								['ы$1', 5],
+			'(?<=\\S{5,})еви(ч|ш)':											['и$1', 'evi_ovi-i_y'],
+			'(?<=\\S{5,})(?:[ди]р)?ови(ч|ш)':								['ы$1', 'evi_ovi-i_y'],
 			'(?<!пер)его(?!дя|м|р)':										'ево',
 			'(?<=^|[\\s\\d\\p{P}])(а|у)?ж(?=[ \\t\\p{P}]+[кпстфхцчшщ])':	'$1ш',
 			'([жцчшщ])ь(?=[^еёиюя]|$)':										'$1',
 			'([жцш])ь(?=[еёиюя])':											'$1ъ',
 		//	'(з|с)(?=[днст][еёиьюя])':										['$1ь', *],
-			'(?<=[бвгджз][ \\t]+)и':										['ы', 6],
-			'(?<=[^аеёийоучщыьэюя\\p{P}][ \\t]+)(е(?=во|ё)|и)':				['ы', 6],
-		//	'(?<=[чщь][ \\t]+)е(?=ё)':										['и', 6],
-			'(?<=\\S{3,}[^бвгдкх])ива([еёйюя]\\S*)':						['ю$1', 7],
-			'(?<=\\S{4,})(?<!б|[дзк]р|[пс]л)[иы]ва([еёйюя]\\S*)':			['у$1', 7],
+			'(?<=[бвгджз][ \\t]+)и':										['ы', 'i_je-y'],
+			'(?<=[^аеёийоучщыьэюя\\p{P}][ \\t]+)(е(?=во|ё)|и)':				['ы', 'i_je-y'],
+		//	'(?<=[чщь][ \\t]+)е(?=ё)':										['и', 'i_je-y'],
 			'(?<=\\S([бвзнпртф]))ир(?=ов|у(?!с))':							'',
+			'(?<=\\Sл)иро(?=в(анн|ыва))':									'ё',
 			'(?<=\\Sл)иро':													'я',
 			'(?<=\\Sл)иру':													'ю',
 			'(?<=\\Sсц)ыр(?=[оу])':											'',
@@ -516,7 +515,7 @@ window.Translator = class Translator {
 			'(?<!пе)рейд':													'рэйд',
 			'(ф|хв)анер':													'$1анэр',
 			'(ф|хв)онет':													'$1онэт',
-			'т(?=[еёиюья])':												['ц', 8],
+			'т(?=[еёиюья])':												['ц', 't-c'],
 			'щ(?=[еёищюя])':												'ш',
 			'щь?':															'шь',
 			'((?<=м)|с?т)ьдесят':											'сят',
@@ -525,22 +524,22 @@ window.Translator = class Translator {
 		ending: { // В конце слова
 		//	'в':	'ф',
 		//	'г':	'х',
-			'ее':	['ей', 9],
+			'ее':	['ей', 'jeje-jey'],
 			'име':	'имэ',
 			'стр':	'стор',
 		//	'сь':	'ся',
 			'эго':	'эво',
 
 			'[дт]с((?:ам|ов)?[аиуы]?)':						'ц$1',
-			'цца':											['тса', 10],
-			'ц((?:ам|ов)?[аиуы]?)':							['тс$1', 10],
+			'цца':											['тса', 'ca_sya-sa'],
+			'ц((?:ам|ов)?[аиуы]?)':							['тс$1', 'ca_sya-sa'],
 			'(?<!а)кто':									'хто',
 		//	'(?<=и)нет':									'нэт',
-			'ни([еёюя][вм]?)':								['нь$1', 11],
-			'ни(и[вм]?)':									['ньи', 11],
-			'(л|ў)ся':										['$1са', 10],
+			'ни([еёюя][вм]?)':								['нь$1', 'ni-n'],
+			'ни(и[вм]?)':									['ньи', 'ni-n'],
+			'(л|ў)ся':										['$1са', 'ca_sya-sa'],
 			'(?<!дор|л|(?<![уў])мн|(?<!бы|о)стр)ого(-.*)?':	'ово$1',
-			'ые':											['ыэ', 12],
+			'ые':											['ыэ', 'yje-ye'],
 		//	'(?<!л)ь(ся|те)':								'$1',
 			'([^еёиюя])\\1':								'$1'
 		}
@@ -578,24 +577,12 @@ window.Translator = class Translator {
 				continue;
 			}
 
-			// Разбор гласных
-
-			let vowelIndex = -1;
-
-			v.vowelsCount = 0;
-
 			for(let i = 0; i < v.string.length; i++) {
-				if(!/[аеёиоуыэюя]/i.test(v.string[i])) {
-					continue;
-				}
-
-				vowelIndex++;
-				v.vowelsCount++;
 				if(v.string[i+1] === Characters.grave) {
-					v.graveIndex = vowelIndex;
+					v.graveIndex = i;
 				}
 				if(v.string[i+1] === Characters.acute) {
-					v.acuteIndex = vowelIndex;
+					v.acuteIndex = i;
 				}
 			}
 
@@ -610,19 +597,11 @@ window.Translator = class Translator {
 
 		for(let v of parsed) {
 			if(considerAccents) {
-				// Сбор гласных
-
-				let vowelIndex = -1;
-
-				for(let i = 0; i < v.string.length; i++) {
-					if(!/[аеёиоуыэюя]/i.test(v.string[i])) {
-						continue;
-					}
-
-					vowelIndex++;
-					if([v.graveIndex, v.acuteIndex].includes(vowelIndex)) {
-						v.string = Characters.insertAt(v.string, i+1, v.graveIndex !== vowelIndex ? Characters.acute : Characters.grave);
-					}
+				if(v.graveIndex != null) {
+					v.string = Characters.insertAt(v.string, v.graveIndex+1, Characters.grave);
+				}
+				if(v.acuteIndex != null) {
+					v.string = Characters.insertAt(v.string, v.acuteIndex+1, Characters.acute);
 				}
 			}
 
@@ -633,15 +612,12 @@ window.Translator = class Translator {
 	}
 
 	static go() {
-		let rbe = this.rules.beginning,
-			rev = this.rules.everywhere,
-			ren = this.rules.ending,
-			parsed = this.parse(this.raw),
-			ruleEnabled = (a, returnReplacement) => {
-				let b = !Array.isArray(a),
-					c = this.preferences[a[1]]
+		let parsed = this.parse(this.raw),
+			ruleEnabled = (value, returnReplacement) => {
+				let preferable = Array.isArray(value),
+					enabled = this.preferences[value[1]] ?? false;
 
-				return !returnReplacement ? b ? true : c : b ? a : a[0]
+				return returnReplacement ? (preferable ? value[0] : value) : (preferable ? enabled : true)
 			}
 
 		for(let k in parsed) {
@@ -659,52 +635,109 @@ window.Translator = class Translator {
 				left = parsed[k-1]?.string ?? '',
 				right = parsed[k+1]?.string ?? '',
 				rightmost = parsed[k+2]?.string ?? '',
-				position = leftmost.length+left.length,
-				length = v.string.length,
-				synchronizeLengths = (s, r, p) => {
-					let d = s.length-r.length;
+				start = leftmost.length+left.length,
+				end = start+v.string.length-1,
+				synchronizeLengths = (match, replacement, matchStart) => {
+					let difference = match.length-replacement.length;
 
-					if(p >= position && p < position+length) {
-						length -= d;
+					if(matchStart < start) {
+						start -= difference;
 					}
-					if(p < position) {
-						position -= d;
-					}
+					if(matchStart >= start && matchStart <= end) {
+						end -= difference;
 
-					return r;
+						if(v.graveIndex > matchStart) {
+							v.graveIndex -= difference;
+						}
+						if(v.acuteIndex > matchStart) {
+							v.acuteIndex -= difference;
+						}
+					}
 				}
 
 			v.string = leftmost+left+v.string+right+rightmost;
 
-			for(let k in rbe) v.string = ruleEnabled(rbe[k]) ? v.string.replace(new RegExp('(?<=^|[\\s\\d\\p{P}])'+k+'(?=\\S)',	'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(ruleEnabled(rbe[k], true), ...cg)), cg[cg.length-2])) : v.string;
-			for(let k in rev) v.string = ruleEnabled(rev[k]) ? v.string.replace(new RegExp(k,									'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(ruleEnabled(rev[k], true), ...cg)), cg[cg.length-2])) : v.string;
-			for(let k in ren) v.string = ruleEnabled(ren[k]) ? v.string.replace(new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])',	'giu'), (sr, ...cg) => synchronizeLengths(sr, Characters.replacePreservingCase(sr, Characters.applyCaptureGroups(ruleEnabled(ren[k], true), ...cg)), cg[cg.length-2])) : v.string;
+			for(let type of ['beginning', 'everywhere', 'ending']) {
+				let rules = this.rules[type]
 
-			v.string = v.string.substring(position, position+length);
-
-			// Замена безударного "О" на "А" и предударного "Е" на "Я"
-
-			if((this.preferences[-2] || this.preferences[-1]) && v.vowelsCount > 0) {
-				let vowelIndex = -1;
-
-				for(let i = 0; i < v.string.length; i++) {
-					if(!/[аеёиоуыэюя]/i.test(v.string[i])) {
+				for(let k in rules) {
+					if(!ruleEnabled(rules[k])) {
 						continue;
 					}
 
-					vowelIndex++;
-					if(this.preferences[-2] && /о/i.test(v.string[i]) && vowelIndex !== v.graveIndex && vowelIndex !== v.acuteIndex) {
+					let regex;
+
+					if(type === 'beginning') {
+						regex = new RegExp('(?<=^|[\\s\\d\\p{P}])'+k+'(?=\\S)', 'giu');
+					}
+					if(type === 'everywhere') {
+						regex = new RegExp(k, 'giu');
+					}
+					if(type === 'ending') {
+						regex = new RegExp('(?<=\\S)'+k+'(?=$|[\\s\\d\\p{P}])', 'giu');
+					}
+
+					v.string = v.string.replace(regex, (match, ...captureGroups) => {
+						let replacement = ruleEnabled(rules[k], true),
+							matchStart = captureGroups[captureGroups.length-2]
+
+						replacement = Characters.applyCaptureGroups(replacement, ...captureGroups);
+						replacement = Characters.replacePreservingCase(match, replacement);
+
+						synchronizeLengths(match, replacement, matchStart);
+
+						return replacement;
+					});
+				}
+			}
+
+			v.string = v.string.substring(start, end+1);
+
+			// Замена безударного "О" на "А" и предударного "Е" на "Я"
+
+			if((this.preferences['o-a'] || this.preferences['je-ja'])) {
+				for(let i = 0; i < v.string.length; i++) {
+					if(this.preferences['o-a'] && /о/i.test(v.string[i]) && i !== v.graveIndex && i !== v.acuteIndex) {
 						v.string = Characters.replaceAt(v.string, i, Characters.replacePreservingCase(v.string[i], 'а'));
 					}
-					if(this.preferences[-1] && /е/i.test(v.string[i]) && vowelIndex < (v.graveIndex ?? Infinity) && vowelIndex < (v.acuteIndex ?? Infinity)) {
+					if(this.preferences['je-ja'] && /е/i.test(v.string[i]) && i < (v.graveIndex ?? Infinity) && i < (v.acuteIndex ?? Infinity)) {
 						v.string = Characters.replaceAt(v.string, i, Characters.replacePreservingCase(v.string[i], 'я'));
+					}
+				}
+			}
+
+			// Замена безударных "Ива" и "Ыва" на "Ю" и "У"
+
+			if(this.preferences['iva_yva-ju_u']) {
+				let matches = [...v.string.toLowerCase().matchAll(/[иы](?=ва[еёйюя]\S*)/gi)]
+
+				for(let match of matches) {
+					if(
+						v.graveIndex === match.index ||
+						v.graveIndex === match.index+2 ||
+						v.acuteIndex === match.index ||
+						v.acuteIndex === match.index+2
+					) {
+						continue;
+					}
+
+					let replacement = match[0] === 'и' ? 'ю' : 'у';
+
+					v.string = Characters.replaceAt(v.string, match.index, Characters.replacePreservingCase(v.string[match.index], replacement));
+					v.string = Characters.removeAt(v.string, match.index+1, 2);
+
+					if(v.graveIndex > match.index+2) {
+						v.graveIndex -= 2;
+					}
+					if(v.acuteIndex > match.index+2) {
+						v.acuteIndex -= 2;
 					}
 				}
 			}
 
 			// Замена дублирующихся букв на апострофы
 
-			if(this.preferences[-3]) {
+			if(this.preferences.apostrophe) {
 				for(let i = v.string.length-1; i > -1; i--) {
 					if(v.string[i] === v.string[i-1]) {
 						v.string = Characters.replaceAt(v.string, i, `'`);
@@ -721,14 +754,20 @@ window.Translator = class Translator {
 
 		this.preferences = {}
 
-		if(!preferences.translator) {
+		if(initialisation) {
 			this.savePreferences();
 		}
 		for(let k in preferences.translator) {
+			let element = document.querySelector('[data-translator-preference="'+k+'"]');
+
+			if(element == null) {
+				continue;
+			}
+
 			this.preferences[k] = preferences.translator[k]
 
 			if(initialisation) {
-				document.querySelector('[data-translator-preference="'+k+'"]').checked = preferences.translator[k]
+				element.checked = preferences.translator[k]
 			}
 		}
 
@@ -737,21 +776,24 @@ window.Translator = class Translator {
 
 	static savePreferences(event) {
 		let preferences = JSON.parse(localStorage.getItem('preferences')) ?? {},
-			inDOMPreferences = !event ? document.querySelectorAll('[data-translator-preference]') : [event.srcElement]
+			inDOMPreferences = event == null ? document.querySelectorAll('[data-translator-preference]') : [event.srcElement]
 
-		if(!event || !preferences.translator) {
-			preferences.translator = {}
-		}
+		preferences.translator ??= {}
+
 		for(let v of inDOMPreferences) {
 			let k = v.dataset.translatorPreference;
 
-			if(k) {
-				preferences.translator[k] = v.checked;
+			if(k == null || event == null && preferences.translator[k] != null) {
+				continue;
 			}
+
+			preferences.translator[k] = v.checked;
 		}
 
 		localStorage.setItem('preferences', JSON.stringify(preferences));
-		this.loadPreferences();
+		if(event != null) {
+			this.loadPreferences();
+		}
 	}
 
 	static loadEditor() {
@@ -777,22 +819,22 @@ window.Translator = class Translator {
 				continue;
 			}
 
-			let vowelIndex = -1,
-				active;
+			let active;
 
-			for(let character of string) {
+			for(let i = 0; i < string.length; i++) {
+				let character = string[i]
+
 				if(!/[аеёиоуыэюя]/i.test(character)) {
 					value += character;
 				} else {
-					vowelIndex++;
 					active = '';
 
-					if([v.graveIndex, v.acuteIndex].includes(vowelIndex)) {
+					if([v.graveIndex, v.acuteIndex].includes(i)) {
 						active = 'active';
-						character = character+(v.graveIndex !== vowelIndex ? Characters.acute : Characters.grave);
+						character = character+(v.graveIndex !== i ? Characters.acute : Characters.grave);
 					}
 
-					value += '<a role="button" onclick="Translator.insertAccentBy('+k+', '+vowelIndex+');" accent_="'+active+'">'+character+'</a>';
+					value += '<a role="button" onclick="Translator.insertAccentBy('+k+', '+i+');" accent_="'+active+'">'+character+'</a>';
 				}
 			}
 		}
@@ -889,10 +931,12 @@ window.Translator = class Translator {
 		let accents = Object.entries(JSON.parse(localStorage.getItem('accents')) ?? {}),
 			parsed = this.parse(this.raw);
 
+		accents.sort((a, b) => a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0);
+
 		for(let k in parsed) {
 			let v = parsed[k]
 
-			if(v.type !== 'word' || v.graveIndex != undefined || v.acuteIndex != undefined) {
+			if(v.type !== 'word' || v.graveIndex != null || v.acuteIndex != null) {
 				continue;
 			}
 
@@ -900,13 +944,13 @@ window.Translator = class Translator {
 				closest = accents.filter(v => string.includes(v[0])).sort((a, b) => a[0].length > b[0].length ? -1 : a[0].length < b[0].length ? 1 : 0)[0],
 				exception = string === 'то' && parsed[k-1]?.string === '-' && parsed[k-2]?.type === 'word';	// Изначально безударное '-то'
 
-			if(closest && !exception) {
-				let offset = string.substring(0, string.indexOf(closest[0])).match(/[аеёиоуыэюя]/gi)?.length ?? 0;
+			if(closest != null && !exception) {
+				let offset = string.indexOf(closest[0]) ?? 0;
 
-				if(closest[1].graveIndex != undefined) {
+				if(closest[1].graveIndex != null) {
 					v.graveIndex = closest[1].graveIndex+offset;
 				}
-				if(closest[1].acuteIndex != undefined) {
+				if(closest[1].acuteIndex != null) {
 					v.acuteIndex = closest[1].acuteIndex+offset;
 				}
 			}
@@ -958,27 +1002,27 @@ window.Translator = class Translator {
 
 	static displayAccents() {
 		let accents = JSON.parse(localStorage.getItem('accents')) ?? {},
-			accents_ = []
+			parsed = []
 
 		if(this.raw.trim() !== '' && !confirm(`Отобразить базу ударений вместо текущего текста?`)) {
 			return;
 		}
 
 		for(let k in accents) {
-			accents_.push({
+			parsed.push({
 				string: k,
 				graveIndex: accents[k].graveIndex,
 				acuteIndex: accents[k].acuteIndex
 			});
 		}
 
-		accents_.sort((a, b) => a.string > b.string ? 1 : a.string < b.string ? -1 : 0);
+		parsed.sort((a, b) => a.string > b.string ? 1 : a.string < b.string ? -1 : 0);
 
-		for(let k = accents_.length-1; k > 0; k--) {	// Переносы строк между словами
-			accents_.splice(k, 0, { string: '\n' });
+		for(let k = parsed.length-1; k > 0; k--) {	// Переносы строк между словами
+			parsed.splice(k, 0, { string: '\n' });
 		}
 
-		this.raw = this.unparse(accents_, true);
+		this.raw = this.unparse(parsed, true);
 		this.updateEditor();
 		this.updateSaveButtons();
 		Tab.switch('translate');
@@ -1001,51 +1045,71 @@ window.Translator = class Translator {
 	}
 
 	static insertAccent(grave) {
-		// TODO: Убрать возможность создания фактической повторной диакритики в каждом слове, невидимой при этом в редакторе, используя вывод парсера
-
 		let selection = Editor.getTextSelection(this.in()),
-			selectionStart = selection.end-selection.start === 1 ? selection.end : selection.start;
+			selectionStart = selection.end-selection.start === 1 ? selection.start+1 : selection.start;
 
-		/*
-		let word = this.parsed.find(v => v.start >= selectionStart-1 && v.end <= selectionStart-1);
+		let word = this.parsed.find(v => v.type === 'word' && v.start <= selectionStart-1 && v.end >= selectionStart-1);
 
 		if(word == null) {
 			return;
 		}
-		*/
 
-		if(![Characters.grave, Characters.acute].includes(this.raw[selectionStart-1])) {
-			if(/[аеёиоуыэюя]/i.test(this.raw[selectionStart-1])) {
-				this.raw = Characters.insertAt(this.raw, selectionStart, !grave ? Characters.acute : Characters.grave);
-				this.updateEditor(selectionStart+1);
+		let characterIndex = selectionStart-word.start-1;
+
+		for(let i = selectionStart-1; i > word.start; i--) {
+			if([Characters.grave, Characters.acute].includes(this.raw[i])) {
+				characterIndex--;
+			}
+		}
+
+		if(![word.graveIndex, word.acuteIndex].includes(characterIndex)) {
+			if(!/[аеёиоуыэюя]/i.test(word.string[characterIndex])) {
+				return;
+			}
+
+			if(grave) {
+				if(word.acuteIndex == null || characterIndex >= word.acuteIndex) {
+					return;
+				}
+
+				word.graveIndex = characterIndex;
+			} else {
+				word.acuteIndex = characterIndex;
 			}
 		} else {
-			this.raw = Characters.removeAt(this.raw, selectionStart-1, 1);
-			this.updateEditor(selectionStart-1);
+			if(word.graveIndex === characterIndex) {
+				delete word.graveIndex;
+			} else {
+				delete word.graveIndex;
+				delete word.acuteIndex;
+			}
 		}
+
+		this.raw = this.unparse(this.parsed, true);
+		this.updateEditor(word.start+characterIndex+(word.graveIndex <= characterIndex ? 1 : 0)+(word.acuteIndex <= characterIndex ? 1 : 0)+1);
 	}
 
-	static insertAccentBy(wordIndex, vowelIndex) {
+	static insertAccentBy(wordIndex, characterIndex) {
 		let word = this.parsed[wordIndex]
 
-		if(word == null) {
+		if(word == null || word.type !== 'word') {
 			return;
 		}
 
 		if(word.acuteIndex == null) {
 			word.graveIndex = undefined;
-			word.acuteIndex = vowelIndex;
+			word.acuteIndex = characterIndex;
 		} else
-		if(word.acuteIndex === vowelIndex) {
+		if(word.acuteIndex === characterIndex) {
 			word.acuteIndex = word.graveIndex;
 			word.graveIndex = undefined;
 		} else
-		if(word.acuteIndex < vowelIndex) {
-			word.acuteIndex = vowelIndex;
+		if(word.acuteIndex < characterIndex) {
+			word.acuteIndex = characterIndex;
 		}
 
-		if(word.acuteIndex > vowelIndex) {
-			word.graveIndex = word.graveIndex !== vowelIndex ? vowelIndex : undefined;
+		if(word.acuteIndex > characterIndex) {
+			word.graveIndex = word.graveIndex !== characterIndex ? characterIndex : undefined;
 		}
 
 		this.raw = this.unparse(this.parsed, true);
@@ -1130,8 +1194,8 @@ window.Translator = class Translator {
 		if(accents_.length > 0) {
 			a.prepend(`
 				<div __header>
-					<div wrapless_>Позиция левого ударения</div>
-					<div wrapless_>Позиция правого ударения</div>
+					<div wrapless_>Позиция буквы под побочным ударением</div>
+					<div wrapless_>Позиция буквы под основным ударением</div>
 					<div wide_>${ accents_.length+' '+Characters.numberPostfix(accents_.length) }</div>
 				</div>
 			`);
