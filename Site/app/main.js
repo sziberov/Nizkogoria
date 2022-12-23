@@ -891,6 +891,8 @@ window.Translator = class Translator {
 				data = event.dataTransfer.getData('text');
 			}
 
+			data = data.replaceAll('\r\n', '\n');
+
 			this.raw = Characters.insertAt(this.raw, selection.start, data);
 
 			if(type === 'insertFromPaste') {
