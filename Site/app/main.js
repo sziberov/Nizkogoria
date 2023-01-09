@@ -709,7 +709,7 @@ window.Translator = class Translator {
 			// Замена безударных "Ива" и "Ыва" на "Ю" и "У"
 
 			if(this.preferences['iva_yva-ju_u']) {
-				let matches = [...v.string.toLowerCase().matchAll(/[иы](?=ва[еёйюя]\S*)/gi)]
+				let matches = [...v.string.matchAll(/[иы](?=ва[еёйюя]\S*)/gi)]
 
 				for(let match of matches) {
 					if(
@@ -721,7 +721,7 @@ window.Translator = class Translator {
 						continue;
 					}
 
-					let replacement = match[0] === 'и' ? 'ю' : 'у';
+					let replacement = match[0] === 'и' && /[^бвгґдкх]/i.test(v.string[match.index-1]) ? 'ю' : 'у';
 
 					v.string = Characters.replaceAt(v.string, match.index, Characters.replacePreservingCase(v.string[match.index], replacement));
 					v.string = Characters.removeAt(v.string, match.index+1, 2);
