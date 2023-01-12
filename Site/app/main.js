@@ -623,7 +623,7 @@ window.Translator = class Translator {
 		for(let k in parsed) {
 			let v = parsed[k]
 
-			if(v.type !== 'word') {
+			if(v?.type !== 'word') {
 				continue;
 			}
 
@@ -631,14 +631,14 @@ window.Translator = class Translator {
 
 			k = k*1;
 
-			let leftmost = parsed[k-2]?.string ?? '',
-				left = parsed[k-1]?.string ?? '',
-				right = parsed[k+1]?.string ?? '',
-				rightmost = parsed[k+2]?.string ?? '',
-				start = leftmost.length+left.length,
+			let leftmost = parsed[k-2] ?? { string: '' },
+				left = parsed[k-1] ?? { string: '' },
+				right = parsed[k+1] ?? { string: '' },
+				rightmost = parsed[k+2] ?? { string: '' },
+				start = leftmost.string.length+left.string.length,
 				length = v.string.length;
 
-			v.string = leftmost+left+v.string+right+rightmost;
+			v.string = leftmost.string+left.string+v.string+right.string+rightmost.string;
 
 			for(let type of ['beginning', 'everywhere', 'ending']) {
 				let rules = this.rules[type]
@@ -692,6 +692,20 @@ window.Translator = class Translator {
 			}
 
 			v.string = v.string.substring(start, start+length);
+
+			// Замена безударного постфикса "-то" на "(о)сь"
+
+			if(
+				this.preferences['to-s_os'] &&
+				right.string === '-' && rightmost.string === 'то' &&
+				rightmost.graveIndex !== 1 && rightmost.acuteIndex !== 1
+			) {
+				let connection = /[^аеёийоуўыэюя]/i.test(v.string.at(-1)) ? 'о' : '';
+
+				v.string += connection+'сь';
+
+				parsed.splice(k+1, 2);
+			}
 
 			// Замена безударного "О" на "А" и предударного "Е" на "Я"
 
@@ -942,9 +956,9 @@ window.Translator = class Translator {
 				continue;
 			}
 
-			let string = v.string.toLowerCase()/*.replace(/-то$/g, '')*/,
+			let string = v.string.toLowerCase(),
 				closest = accents.filter(v => string.includes(v[0])).sort((a, b) => a[0].length > b[0].length ? -1 : a[0].length < b[0].length ? 1 : 0)[0],
-				exception = string === 'то' && parsed[k-1]?.string === '-' && parsed[k-2]?.type === 'word';	// Изначально безударное '-то'
+				exception = string === 'то' && parsed[k-1]?.string === '-' && parsed[k-2]?.type === 'word';	// Изначально безударный постфикс "-то"
 
 			if(closest != null && !exception) {
 				let offset = string.indexOf(closest[0]) ?? 0;
@@ -2123,16 +2137,6 @@ window.Dictionary = class Dictionary {
 			origins: ['Альт.']
 		},
 		{
-			strings: ['Чиво́'],
-			meanings: ['Чего (эмоционально)'],
-			origins: ['Разг.']
-		},
-		{
-			strings: ['Чилинепо́х'],
-			meanings: ['Как будто бы на самом деле "не" всё равно (грубо)'],
-			origins: ['Иск.']
-		},
-		{
 			strings: ['Чю́ять'],
 			meanings: ['Чувствовать', 'слышать'],
 			origins: ['Альт.']
@@ -2158,13 +2162,8 @@ window.Dictionary = class Dictionary {
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Што́сь'],
-			meanings: ['Что-то'],
-			origins: ['Альт.']
-		},
-		{
-			strings: ['Хто́сь'],
-			meanings: ['Кто-то'],
+			strings: ['Ґа́рлик'],
+			meanings: ['Чеснок'],
 			origins: ['Альт.']
 		}
 	].sort((a, b) => a.strings[0] > b.strings[0] ? 1 : a.strings[0] < b.strings[0] ? -1 : 0);
