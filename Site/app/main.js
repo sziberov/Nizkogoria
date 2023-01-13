@@ -545,6 +545,26 @@ window.Translator = class Translator {
 		}
 	}
 
+	static pronouns = [
+		'кто',
+		'что',
+		'какой',
+		'такой',
+		'чей',
+		'когда',
+		'тогда',
+		'где',
+		'там',
+		'куда',
+		'туда',
+		'откуда',
+		'оттуда',
+		'как',
+		'так',
+		'сколько',
+		'столько'
+	]
+
 	static preferences = {}
 
 	static ref = (title) => `[data-translator-ref="${ title }"]`;
@@ -617,7 +637,7 @@ window.Translator = class Translator {
 				let preferable = Array.isArray(value),
 					enabled = this.preferences[value[1]] ?? false;
 
-				return returnReplacement ? (preferable ? value[0] : value) : (preferable ? enabled : true)
+				return returnReplacement ? (preferable ? value[0] : value) : (preferable ? enabled : true);
 			}
 
 		for(let k in parsed) {
@@ -631,7 +651,8 @@ window.Translator = class Translator {
 
 			k = k*1;
 
-			let leftmost = parsed[k-2] ?? { string: '' },
+			let originalString = v.string,
+				leftmost = parsed[k-2] ?? { string: '' },
 				left = parsed[k-1] ?? { string: '' },
 				right = parsed[k+1] ?? { string: '' },
 				rightmost = parsed[k+2] ?? { string: '' },
@@ -693,16 +714,18 @@ window.Translator = class Translator {
 
 			v.string = v.string.substring(start, start+length);
 
-			// Замена безударного постфикса "-то" на "(о)сь"
+			// Замена безударного постфикса "-то" на "(о)сь" во фиксированном списке местоимений
 
 			if(
 				this.preferences['to-s_os'] &&
-				right.string === '-' && rightmost.string === 'то' &&
+				this.pronouns.includes(originalString.toLowerCase()) &&
+				right.string === '-' && rightmost.string.toLowerCase() === 'то' &&
 				rightmost.graveIndex !== 1 && rightmost.acuteIndex !== 1
 			) {
-				let connection = /[^аеёийоуўыэюя]/i.test(v.string.at(-1)) ? 'о' : '';
+				let connection = /[^аеёийоуўыэюя]/i.test(v.string.at(-1)) ? 'о' : '',
+					replacement = Characters.replacePreservingCase(rightmost.string, connection+'сь');
 
-				v.string += connection+'сь';
+				v.string += replacement;
 
 				parsed.splice(k+1, 2);
 			}
@@ -711,10 +734,18 @@ window.Translator = class Translator {
 
 			if((this.preferences['o-a'] || this.preferences['je-ja'])) {
 				for(let i = 0; i < v.string.length; i++) {
-					if(this.preferences['o-a'] && /о/i.test(v.string[i]) && i !== v.graveIndex && i !== v.acuteIndex) {
+					if(
+						this.preferences['o-a'] &&
+						v.string[i].toLowerCase() === 'о' &&
+						i !== v.graveIndex && i !== v.acuteIndex
+					) {
 						v.string = Characters.replaceAt(v.string, i, Characters.replacePreservingCase(v.string[i], 'а'));
 					}
-					if(this.preferences['je-ja'] && /е/i.test(v.string[i]) && i < (v.graveIndex ?? Infinity) && i < (v.acuteIndex ?? Infinity)) {
+					if(
+						this.preferences['je-ja'] &&
+						v.string[i].toLowerCase() === 'е' &&
+						i < (v.graveIndex ?? Infinity) && i < (v.acuteIndex ?? Infinity)
+					) {
 						v.string = Characters.replaceAt(v.string, i, Characters.replacePreservingCase(v.string[i], 'я'));
 					}
 				}
