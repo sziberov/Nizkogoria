@@ -497,7 +497,8 @@ window.Translator = class Translator {
 		//	'(?<=\\S{4,})евае':												'иё',
 			'(?<=\\S{5,})еви(ч|ш)':											['и$1', 'evi_ovi-i_y'],
 			'(?<=\\S{5,})(?:[ди]р)?ови(ч|ш)':								['ы$1', 'evi_ovi-i_y'],
-			'(?<!пер)его(?!дя|м|р)':										'ево',
+			'его(?!во|дя|м|р)':												'ево',
+			'шэго(?!ло)':													'шэво',
 			'(?<=^|[\\s\\d\\p{P}])(а|у)?ж(?=[ \\t\\p{P}]+[кпстфхцчшщ])':	'$1ш',
 			'([жцчшщ])ь(?=[^еёиюя]|$)':										'$1',
 			'([жцш])ь(?=[еёиюя])':											'$1ъ',
@@ -528,7 +529,6 @@ window.Translator = class Translator {
 			'име':	'имэ',
 			'стр':	'стор',
 		//	'сь':	'ся',
-			'эго':	'эво',
 
 			'[дт]с((?:ам|ов)?[аиуы]?)':						'ц$1',
 			'цца':											['тса', 'ca_sya-sa'],
@@ -594,12 +594,16 @@ window.Translator = class Translator {
 				continue;
 			}
 
+			let offset = 0;
+
 			for(let i = 0; i < v.string.length; i++) {
 				if(v.string[i+1] === Characters.grave) {
-					v.graveIndex = i;
+					v.graveIndex = i-offset;
+					offset++;
 				}
 				if(v.string[i+1] === Characters.acute) {
-					v.acuteIndex = i;
+					v.acuteIndex = i-offset;
+					offset++;
 				}
 			}
 
@@ -618,7 +622,9 @@ window.Translator = class Translator {
 					v.string = Characters.insertAt(v.string, v.graveIndex+1, Characters.grave);
 				}
 				if(v.acuteIndex != null) {
-					v.string = Characters.insertAt(v.string, v.acuteIndex+1, Characters.acute);
+					let offset = v.graveIndex < v.acuteIndex;
+
+					v.string = Characters.insertAt(v.string, v.acuteIndex+1+offset, Characters.acute);
 				}
 			}
 
@@ -944,7 +950,7 @@ window.Translator = class Translator {
 				selection.start++;
 			}
 		}
-		if(type === 'deleteContentBackward' && selection.start === selection.end) {
+		if(type === 'deleteContentBackward' && selection.start === selection.end) { // TODO: Исправить слияние слов с ударениями
 			if(selection.start === 0) {
 				return;
 			}
