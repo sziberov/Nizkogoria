@@ -548,6 +548,8 @@ window.Translator = class Translator {
 	static pronouns = [
 		'кем', 'кого', 'ком', 'кому', 'кто',
 		'чем', 'чего', 'чём', 'чему', 'что',
+	//	'та', 'тем', 'теми', 'тех', 'то', 'того', 'той', 'том', 'тому', 'тот', 'тою', 'ту',
+	//	'эта', 'этим', 'этими', 'этих', 'это', 'этого', 'этой', 'этом', 'этому', 'этот', 'этою', 'эту',
 		'кое', 'коего', 'коей', 'коем', 'коему', 'коею', 'кои', 'коим', 'коими', 'коих', 'кой', 'кою', 'коя',
 		'какая', 'какие', 'каким', 'какими', 'каких', 'какого', 'какое', 'какой', 'каком', 'какому', 'какую',
 		'такая', 'такие', 'таким', 'такими', 'таких', 'такого', 'такое', 'такой', 'таком', 'такому', 'такую',
@@ -689,24 +691,36 @@ window.Translator = class Translator {
 
 					v.string = v.string.replace(regex, (match, ...captureGroups) => {
 						let replacement = ruleEnabled(rules[k], true),
-							matchStart = captureGroups[captureGroups.length-2]
+							matchStart = captureGroups.at(-2);
 
 						replacement = Characters.applyCaptureGroups(replacement, ...captureGroups);
 						replacement = Characters.replacePreservingCase(match, replacement);
 
-						let difference = match.length-replacement.length;
-
-						if(matchStart < originalStart) {
-							start -= difference;
-						} else
 						if(matchStart < originalStart+originalLength) {
-							length -= difference;
+							let differenceLength = match.length-replacement.length;
 
-							if(v.graveIndex > matchStart-originalStart) {
-								v.graveIndex -= difference;
-							}
-							if(v.acuteIndex > matchStart-originalStart) {
-								v.acuteIndex -= difference;
+							if(matchStart < originalStart) {
+								start -= differenceLength;
+							} else {
+								length -= differenceLength;
+
+								let differenceIndex;
+
+								for(let i = 0; i < Math.max(match.length, replacement.length); i++) {
+									if(replacement[i] !== match[i]) {
+										differenceIndex = i;
+
+										break;
+									}
+								}
+
+								// Абсолютная + относительная > абсолютной + относительной
+								if(originalStart+v.graveIndex > matchStart+differenceIndex) {
+									v.graveIndex -= differenceLength;
+								}
+								if(originalStart+v.acuteIndex > matchStart+differenceIndex) {
+									v.acuteIndex -= differenceLength;
+								}
 							}
 						}
 
@@ -2157,11 +2171,11 @@ window.Dictionary = class Dictionary {
 			origins: ['Разг.']
 		},
 		{
-			strings: ['Чи́ /ли́/'],
+			strings: ['Чи́'],
 			meanings: [
 				'Или\n',
-				'[Усиливает вопросительный (иногда риторический) характер предложения, в начале или возле обращения]\n',
-				'[В паре с отрицательной частицой /не́/ или /ни́/ может означать презительное отношение к кому/чему-либо]'
+				'[Усиливает вопросительный (риторический и не-) характер предложения (может ставиться в начале (в т.ч. перед /ли́/) и возле обращения)]\n',
+				'[Совместно с /не́/ или /ни́/ может означать от сомнительного до презительного отношение к кому/чему-либо]'
 			],
 			origins: ['Альт.']
 		},
@@ -2197,18 +2211,88 @@ window.Dictionary = class Dictionary {
 		},
 		{
 			strings: ['Атку́дава'],
-			meanings: ['Откуда, откудова'],
-			origins: ['Разг., устар.']
+			meanings: ['Откуда', 'откудова'],
+			origins: ['Разг.', 'устар.']
 		},
 		{
 			strings: ['Атту́дава'],
-			meanings: ['Оттуда, оттудова'],
-			origins: ['Разг., устар.']
+			meanings: ['Оттуда', 'оттудова'],
+			origins: ['Разг.', 'устар.']
 		},
 		{
 			strings: ['Атсю́дава'],
-			meanings: ['Отсюда, отсюдова'],
-			origins: ['Разг., устар.']
+			meanings: ['Отсюда', 'отсюдова'],
+			origins: ['Разг.', 'устар.']
+		},
+		{
+			strings: ['Пра́з'],
+			meanings: ['Через'],
+			origins: ['Альт.']
+		},
+		{
+			strings: ['Цу́кар'],
+			meanings: ['Сахар'],
+			origins: ['Альт.']
+		},
+		{
+			strings: ['Де́я'],
+			meanings: ['Действие'],
+			origins: ['Альт.']
+		},
+		{
+			strings: ['Де́ять'],
+			meanings: ['Действовать, делать'],
+			origins: ['Альт.']
+		},
+		{
+			strings: ['Атде́йный'],
+			meanings: ['Отдельный'],
+			origins: ['Альт.']
+		},
+		{
+			strings: ['Аго́ў'],
+			meanings: ['[Оклик]'],
+			origins: ['Альт.']
+		},
+		{
+			strings: ['Маё́ный', 'маё́йный', 'маё́вый'],
+			meanings: ['Мой'],
+			origins: ['Разг.']
+		},
+		{
+			strings: ['Тваё́ный', 'тваё́йный', 'тваё́вый'],
+			meanings: ['Твой'],
+			origins: ['Разг.']
+		},
+		{
+			strings: ['Што́та-ше́мта'],
+			meanings: ['Что-то с чем-то'],
+			origins: ['Иск.']
+		},
+		{
+			strings: ['Спайма́ть'],
+			meanings: ['Поймать'],
+			origins: ['Альт.']
+		},
+		{
+			strings: ['Хава́ть'],
+			meanings: ['Прятать'],
+			origins: ['Альт.']
+		},
+		{
+			strings: ['Стя́г'],
+			meanings: ['Флаг'],
+			origins: ['Альт.']
+		},
+		{
+			strings: ['Тале́рка'],
+			meanings: ['Тарелка'],
+			origins: ['Альт.']
+		},
+		{
+			strings: ['Саўмешя́льнасть'],
+			meanings: ['Совместимость'],
+			origins: ['Альт.']
 		}
 	].sort((a, b) => a.strings[0] > b.strings[0] ? 1 : a.strings[0] < b.strings[0] ? -1 : 0);
 
