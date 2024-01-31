@@ -1,5 +1,5 @@
 window.Tab = class Tab {
-	static globalPostfix = ' ☆ НССР';
+	static globalPostfix = ' ☆ ССЛР';
 
 	static switch(a) {
 		let title = typeof a === 'string' ? a : a.srcElement.dataset.tabRef,
