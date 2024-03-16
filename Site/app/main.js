@@ -176,6 +176,10 @@ window.Characters = class Characters {
 		return string.substring(0, index)+replacement+string.substring(index+replacement.length);
 	}
 
+	static replacePreservingCaseAt(string, index, replacement) {
+		return this.replaceAt(string, index, this.replacePreservingCase(string[index], replacement));
+	}
+
 	static insertAt(string, index, insertement) {
 		return string.slice(0, index)+insertement+string.slice(index);
 	}
@@ -748,23 +752,27 @@ window.Translator = class Translator {
 				parsed.splice(k+1, 2);
 			}
 
-			// Замена безударного "О" на "А" и предударного "Е" на "Я"
+			// Замена безударных "О" и "Ё" на "А" и "Я", и предударного "Е" на "Я"
 
-			if((this.preferences['o-a'] || this.preferences['je-ja'])) {
+			if((this.preferences['o_jo-a_ja'] || this.preferences['je-ja'])) {
 				for(let i = 0; i < v.string.length; i++) {
 					if(
-						this.preferences['o-a'] &&
-						v.string[i].toLowerCase() === 'о' &&
+						this.preferences['o_jo-a_ja'] &&
 						i !== v.graveIndex && i !== v.acuteIndex
 					) {
-						v.string = Characters.replaceAt(v.string, i, Characters.replacePreservingCase(v.string[i], 'а'));
+						if(v.string[i].toLowerCase() === 'о') {
+							v.string = Characters.replacePreservingCaseAt(v.string, i, 'а');
+						}
+						if(v.string[i].toLowerCase() === 'ё') {
+							v.string = Characters.replacePreservingCaseAt(v.string, i, 'я');
+						}
 					}
 					if(
 						this.preferences['je-ja'] &&
 						v.string[i].toLowerCase() === 'е' &&
 						i < (v.graveIndex ?? Infinity) && i < (v.acuteIndex ?? Infinity)
 					) {
-						v.string = Characters.replaceAt(v.string, i, Characters.replacePreservingCase(v.string[i], 'я'));
+						v.string = Characters.replacePreservingCaseAt(v.string, i, 'я');
 					}
 				}
 			}
@@ -786,7 +794,7 @@ window.Translator = class Translator {
 
 					let replacement = match[0] === 'и' && /[^бвгґдкх]/i.test(v.string[match.index-1]) ? 'ю' : 'у';
 
-					v.string = Characters.replaceAt(v.string, match.index, Characters.replacePreservingCase(v.string[match.index], replacement));
+					v.string = Characters.replacePreservingCaseAt(v.string, match.index, replacement);
 					v.string = Characters.removeAt(v.string, match.index+1, 2);
 
 					if(v.graveIndex > match.index+2) {
